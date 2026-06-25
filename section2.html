@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Donor Brick Monument – Section 2</title>
+<title>Southwestern University Donor Brick Monument â Section 2</title>
 <style>
 :root {
   --brick-bg:      #c8714a;
@@ -28,7 +28,7 @@
 body { font-family: Georgia, serif; background: var(--bg); color: var(--text);
        height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-/* ── HEADER ─────────────────────────────────────────── */
+/* ââ HEADER âââââââââââââââââââââââââââââââââââââââââââ */
 header {
   background: linear-gradient(135deg, #8b3a1e, #c8714a);
   padding: 12px 20px; display: flex; align-items: center; gap: 14px;
@@ -45,7 +45,7 @@ header {
 }
 .hadmin-btn:hover { background: rgba(255,152,0,.2); color: #ff9800; border-color: #ff9800; }
 
-/* ── ADMIN BAR ───────────────────────────────────────── */
+/* ââ ADMIN BAR âââââââââââââââââââââââââââââââââââââââââ */
 .adminbar {
   background: #1a0800; border-bottom: 2px solid var(--admin-accent);
   padding: 7px 14px; display: flex; align-items: center; gap: 12px;
@@ -55,7 +55,7 @@ header {
 .adminbar input[type=checkbox] { cursor: pointer; }
 .admin-badge { color: var(--admin-accent); font-weight: bold; font-size: 13px; }
 
-/* ── TOOLBAR ─────────────────────────────────────────── */
+/* ââ TOOLBAR âââââââââââââââââââââââââââââââââââââââââââ */
 .toolbar {
   background: var(--surface); border-bottom: 1px solid var(--surface2);
   padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex-shrink: 0;
@@ -81,13 +81,13 @@ header {
 .tab:hover { color: var(--text); }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* ── LAYOUT ─────────────────────────────────────────── */
+/* ââ LAYOUT âââââââââââââââââââââââââââââââââââââââââââ */
 .main { display: flex; flex: 1; overflow: hidden; }
 
-/* ── SIDEBAR ─────────────────────────────────────────── */
+/* ââ SIDEBAR âââââââââââââââââââââââââââââââââââââââââââ */
 .sidebar {
   width: 230px; min-width: 230px; background: var(--surface);
-  border-right: 1px solid var(--surface2); display: flex; flex-direction: column; overflow: hidden;
+  border-right: 1px solid var(--surface2); display: none; flex-direction: column; overflow: hidden;
 }
 .sidebar h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
               color: var(--muted); padding: 9px 13px 5px; }
@@ -102,7 +102,7 @@ header {
 .li .ls { color: var(--muted); margin-top: 1px; }
 .li .lp { color: #6a4a28; font-size: 9px; margin-top: 1px; }
 
-/* ── VIEWPORT ─────────────────────────────────────────── */
+/* ââ VIEWPORT âââââââââââââââââââââââââââââââââââââââââââ */
 .vp {
   flex: 1; overflow: hidden; position: relative;
   background: var(--soil); cursor: grab;
@@ -117,7 +117,7 @@ header {
   text-transform: uppercase; color: #7a5c38; text-align: center;
 }
 
-/* ── BRICKS ─────────────────────────────────────────── */
+/* ââ BRICKS âââââââââââââââââââââââââââââââââââââââââââ */
 .brick {
   position: absolute;
   background: var(--brick-bg);
@@ -141,7 +141,7 @@ header {
   cursor: default; opacity: 0.5;
 }
 .brick.empty:hover { transform: none; box-shadow: none; }
-/* Filler bricks — narrow edge bricks, never editable */
+/* Filler bricks â narrow edge bricks, never editable */
 .brick.filler {
   background: var(--brick-bg); border-color: var(--brick-border);
   opacity: 0.65; cursor: default; pointer-events: none;
@@ -174,7 +174,7 @@ body.edit-mode .brick:not(.empty):not(.filler):hover {
   box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55);
 }
 body.edit-mode .brick:not(.empty):not(.filler)::after {
-  content: '✏';
+  content: 'â';
   position: absolute; top: 1px; right: 2px;
   font-size: 6px; color: rgba(255,152,0,.8); pointer-events: none;
 }
@@ -192,7 +192,7 @@ body.place-mode .brick.filler {
   pointer-events: none !important;
 }
 
-/* ── DRAG-DROP & PLACE MODE ─────────────────────────── */
+/* ââ DRAG-DROP & PLACE MODE âââââââââââââââââââââââââââ */
 .drag-ghost {
   position: fixed; z-index: 500; pointer-events: none;
   background: var(--brick-bg); border: 2px solid var(--admin-accent);
@@ -216,7 +216,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   box-shadow: 0 0 0 2px #4caf50 !important;
 }
 
-/* ── ZOOM CONTROLS ─────────────────────────────────── */
+/* ââ ZOOM CONTROLS âââââââââââââââââââââââââââââââââââ */
 .zctrl { position: absolute; bottom: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
 .zb {
   width: 32px; height: 32px; background: var(--surface); border: 1px solid var(--surface2);
@@ -225,7 +225,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 }
 .zb:hover { background: var(--surface2); }
 
-/* ── DETAIL PANEL ─────────────────────────────────── */
+/* ââ DETAIL PANEL âââââââââââââââââââââââââââââââââââ */
 .dp {
   position: absolute; bottom: 14px; left: 14px; z-index: 50;
   background: rgba(24,10,2,.94); border: 1px solid var(--surface2);
@@ -238,7 +238,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 .dp .dpos { font-size: 10px; color: var(--muted); margin-top: 5px; }
 .dpx { position: absolute; top: 7px; right: 9px; cursor: pointer; color: var(--muted); font-size: 15px; }
 
-/* ── LEGEND ─────────────────────────────────────────── */
+/* ââ LEGEND âââââââââââââââââââââââââââââââââââââââââââ */
 .legend {
   position: absolute; top: 8px; right: 8px; z-index: 50;
   background: rgba(24,10,2,.88); border: 1px solid var(--surface2);
@@ -247,7 +247,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 .lgi { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
 .lgs { width: 18px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-/* ── TOAST ─────────────────────────────────────────── */
+/* ââ TOAST âââââââââââââââââââââââââââââââââââââââââââ */
 #toast {
   position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
   background: var(--accent); color: var(--bg); padding: 8px 20px; border-radius: 20px;
@@ -256,7 +256,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 }
 #toast.show { opacity: 1; }
 
-/* ── EDIT MODAL ─────────────────────────────────────── */
+/* ââ EDIT MODAL âââââââââââââââââââââââââââââââââââââââ */
 .emodal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.7);
   display: flex; align-items: center; justify-content: center;
@@ -307,32 +307,30 @@ body.place-mode .brick.empty:not(.filler):hover {
 <body>
 
 <header>
-  <div class="logo">🧱</div>
+  <div class="logo"><img src="https://swupiratesathletics.com/images/logos/site/site.png" alt="SWU Pirates" style="height:36px;width:auto;"></div>
   <div class="htext">
-    <h1>Donor Brick Monument — Section 2</h1>
-    <p>Southwestern University · Section 2 · Grid layout</p>
+    <h1>Southwestern University Donor Brick Monument â Section 2</h1>
   </div>
-  <div class="hstats" id="hstats">Loading…</div>
-  <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
+  <div class="hstats" id="hstats" style="display:none">Loadingâ¦</div>
+  <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">â Admin</button>
 </header>
 
 <!-- Admin bar (hidden until logged in) -->
 <div class="adminbar" id="adminBar" style="display:none">
-  <span class="admin-badge">⚙ ADMIN MODE</span>
+  <span class="admin-badge">â ADMIN MODE</span>
   <label>
     <input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks
   </label>
   <span style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
-  <button class="cb" id="placeBtn" onclick="togglePlaceMode()" style="border-color:#4caf50;color:#4caf50" title="Click any empty slot to place a new brick">📍 Place Brick</button>
-  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
-  <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
-  <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
+  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">ð¥ Export Updated HTML</button>
+  <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">ð Reset Edits</button>
+  <button class="cb" onclick="logoutAdmin()">ð Logout</button>
 </div>
 
 <div class="toolbar">
   <div class="sw">
-    <span class="si">🔍</span>
-    <input id="search" type="text" placeholder="Search name, class year, inscription…" autocomplete="off">
+    <span class="si">ð</span>
+    <input id="search" type="text" placeholder="Search name, class year, inscriptionâ¦" autocomplete="off">
   </div>
   <span id="rinfo"></span>
   <div class="tabs">
@@ -340,8 +338,7 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="tab on">Section 2</div>
     <div class="tab" onclick="location.href='section3.html'">Section 3</div>
   </div>
-  <button class="cb" onclick="resetView()">⊙ Reset</button>
-  <button class="cb" onclick="exportCSV()">⬇ Export</button>
+  <button class="cb" onclick="resetView()">â Reset view</button>
 </div>
 
 <div class="main">
@@ -357,18 +354,13 @@ body.place-mode .brick.empty:not(.filler):hover {
 
     <div class="zctrl">
       <button class="zb" onclick="zoom(1.25)" title="Zoom in">+</button>
-      <button class="zb" onclick="zoom(0.8)"  title="Zoom out">−</button>
-      <button class="zb" onclick="resetView()" title="Fit view" style="font-size:11px">⊙</button>
+      <button class="zb" onclick="zoom(0.8)"  title="Zoom out">â</button>
+      <button class="zb" onclick="resetView()" title="Fit view" style="font-size:11px">â</button>
     </div>
 
-    <div class="legend">
-      <div class="lgi"><div class="lgs" style="background:#c8714a;border:1px solid #a0502e"></div>Recorded brick</div>
-      <div class="lgi"><div class="lgs" style="background:#b8724f;opacity:.5;border:1px solid #9a5030"></div>Unrecorded</div>
-      <div class="lgi"><div class="lgs" style="background:#fff176;border:1px solid #f9a825"></div>Search match</div>
-    </div>
 
     <div class="dp" id="dp">
-      <span class="dpx" onclick="closeDetail()">✕</span>
+      <span class="dpx" onclick="closeDetail()">â</span>
       <h4 id="dpname"></h4>
       <div class="dt" id="dptext"></div>
       <div class="dpos" id="dppos"></div>
@@ -379,7 +371,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 <!-- Edit modal -->
 <div class="emodal-overlay" id="editOverlay">
   <div class="emodal">
-    <h3>✏ Edit Brick</h3>
+    <h3>â Edit Brick</h3>
     <div class="epos" id="epos"></div>
     <label>Line 1 (primary name / title)</label>
     <input type="text" id="el1" placeholder="Primary inscription line">
@@ -409,16 +401,16 @@ body.place-mode .brick.empty:not(.filler):hover {
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-// LAYOUT CONSTANTS — Section 2: flat 16×20 grid
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// LAYOUT CONSTANTS â Section 2: flat 16Ã20 grid
 // Each spreadsheet column/row = UNIT pixels
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const UNIT = 44;       // pixel stride per grid unit (both x and y)
 const GAP  = 4;        // mortar gap
 const PAD  = 18;       // canvas padding
 
-const NUM_COLS = 16;   // spreadsheet column count (B–Q)
-const NUM_ROWS = 20;   // spreadsheet row count (rows 2–21)
+const NUM_COLS = 16;   // spreadsheet column count (BâQ)
+const NUM_ROWS = 20;   // spreadsheet row count (rows 2â21)
 
 const CW = 2 * PAD + NUM_COLS * UNIT;   // 740px
 const CH = 2 * PAD + NUM_ROWS * UNIT;   // 916px
@@ -428,13 +420,13 @@ function by(r)  { return PAD + r * UNIT; }
 function bW(cs) { return cs * UNIT - GAP; }   // brick width from colspan
 function bH(rs) { return rs * UNIT - GAP; }   // brick height from rowspan
 
-// ═══════════════════════════════════════════════════════════
-// LAYOUT — from Google Sheets Section 2
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// LAYOUT â from Google Sheets Section 2
 // Each entry: [row_off, col_off, rowspan, colspan]
-//   rowspan=2, colspan=1  → filler brick (narrow, no text, not editable)
-//   rowspan=2, colspan=2  → large text brick  (84×84 px)
-//   rowspan=1, colspan=2  → standard text brick (84×40 px)
-// ═══════════════════════════════════════════════════════════
+//   rowspan=2, colspan=1  â filler brick (narrow, no text, not editable)
+//   rowspan=2, colspan=2  â large text brick  (84Ã84 px)
+//   rowspan=1, colspan=2  â standard text brick (84Ã40 px)
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const LAYOUT = [
   // Row group 0
   [ 0, 0,2,1],[ 0, 1,2,2],[ 0, 3,2,2],[ 0, 5,2,1],[ 0, 6,2,2],
@@ -463,28 +455,28 @@ const LAYOUT = [
   // Row group 8
   [16, 0,2,1],[16, 1,2,2],[16, 3,2,1],[16, 4,2,2],[16, 6,2,1],
   [16, 7,2,2],[16, 9,2,1],[16,10,2,2],[16,12,2,1],[16,13,2,2],[16,15,2,1],
-  // Row group 9 — mixed: full-height + stacked half-height pairs
+  // Row group 9 â mixed: full-height + stacked half-height pairs
   [18, 0,2,2],[18, 2,1,2],[18, 4,2,2],[18, 6,1,2],[18, 8,2,2],
   [18,10,1,2],[18,12,2,2],[18,14,2,2],
   [19, 2,1,2],[19, 6,1,2],[19,10,1,2],
 ];
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — edits baked in at export time (empty by default)
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ADMIN â edits baked in at export time (empty by default)
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const INITIAL_EDITS = {};
 
-// ── Google Apps Script sync ─────────────────────────────────
+// ââ Google Apps Script sync âââââââââââââââââââââââââââââââââ
 const SECTION_ID = 2;
 const GAS_URL    = 'https://script.google.com/macros/s/AKfycbxbKbla6zp7MPRsRo-3HxNA2baLJu6UI9VCaEyUxLITzzG0wOXexYY1_GObi_ahezBs/exec';
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // BUILD DATA STRUCTURES
-// Text bricks (colspan ≥ 2) get brick objects in brickMap/brickById/bricks.
-// Filler bricks (colspan = 1) are render-only — no data, no interaction.
-// ═══════════════════════════════════════════════════════════
-const brickMap  = {};   // "r,c" → brick_id   (text slot anchors only)
-const brickById = {};   // brick_id → brick object
+// Text bricks (colspan â¥ 2) get brick objects in brickMap/brickById/bricks.
+// Filler bricks (colspan = 1) are render-only â no data, no interaction.
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const brickMap  = {};   // "r,c" â brick_id   (text slot anchors only)
+const brickById = {};   // brick_id â brick object
 const bricks    = [];   // all text brick objects
 
 LAYOUT.forEach(([r, c, rs, cs], i) => {
@@ -497,9 +489,9 @@ LAYOUT.forEach(([r, c, rs, cs], i) => {
   }
 });
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // ADMIN PERSISTENCE
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const EDITS_KEY = 'brickEdits_s2';
 let localEdits  = JSON.parse(localStorage.getItem(EDITS_KEY) || '{}');
 let remoteEdits = {};
@@ -509,7 +501,7 @@ function saveLocalEdits() {
   localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits));
 }
 
-// ─────────────────────────────────────────────────────────────
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function applyEdits() {
   Object.keys(allEdits).forEach(key => {
     const id = brickMap[key];
@@ -521,9 +513,9 @@ function applyEdits() {
   });
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // RENDER MONUMENT
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderMonument() {
   const mon = document.getElementById('mon');
   mon.innerHTML = '';
@@ -537,7 +529,7 @@ function renderMonument() {
   mon.appendChild(bg);
 
   // Orientation labels
-  [['▲ Garden / North Border', -16], ['▼ Walkway / South', CH + 2]].forEach(([txt, top]) => {
+  [['â² Garden / North Border', -16], ['â¼ Walkway / South', CH + 2]].forEach(([txt, top]) => {
     const lbl = document.createElement('div');
     lbl.className = 'orient';
     lbl.style.cssText = `left:0;top:${top}px;width:${CW}px;`;
@@ -596,10 +588,10 @@ function renderMonument() {
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 2`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded Â· Section 2`;
 }
 
-// ── Auto-fit text inside each brick — each line independently ──
+// ââ Auto-fit text inside each brick â each line independently ââ
 function fitBrick(el) {
   const spans = el.querySelectorAll('.bl');
   if (!spans.length) return;
@@ -622,9 +614,9 @@ function fitBrick(el) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // SIDEBAR LIST
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function buildList(list) {
   const container = document.getElementById('blist');
   container.innerHTML = '';
@@ -635,8 +627,8 @@ function buildList(list) {
   list.forEach(b => {
     const el = document.createElement('div');
     el.className = 'li';
-    el.innerHTML = `<div class="ln">${b.lines[0] || '—'}</div>` +
-      (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' · ')}</div>` : '') +
+    el.innerHTML = `<div class="ln">${b.lines[0] || 'â'}</div>` +
+      (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' Â· ')}</div>` : '') +
       `<div class="lp">Grid ${b.row},${b.col}</div>`;
     el.addEventListener('click', () => scrollToBrick(b));
     container.appendChild(el);
@@ -660,9 +652,9 @@ function highlightBricks(matches) {
   });
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // DETAIL PANEL
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let activeBrick = null;
 function onBrickClick(b, el) {
   closeDetail();
@@ -670,7 +662,7 @@ function onBrickClick(b, el) {
   activeBrick = b;
   document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
   el.classList.add('act');
-  document.getElementById('dpname').textContent = b.lines[0] || '—';
+  document.getElementById('dpname').textContent = b.lines[0] || 'â';
   document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
   document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
   document.getElementById('dp').classList.add('open');
@@ -707,16 +699,16 @@ function scrollToBrick(b) {
   applyTransform();
   setTimeout(() => {
     el.classList.add('act');
-    document.getElementById('dpname').textContent = b.lines[0] || '—';
+    document.getElementById('dpname').textContent = b.lines[0] || 'â';
     document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
     document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
     document.getElementById('dp').classList.add('open');
   }, 60);
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // PAN & ZOOM
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let scale = 1, panX = 0, panY = 0;
 let dragging = false, dragSx, dragSy, dragPx, dragPy;
 
@@ -807,27 +799,9 @@ vp.addEventListener('touchmove', e => {
 }, { passive: false });
 vp.addEventListener('touchend', () => { dragging = false; lastDist = 0; });
 
-// ═══════════════════════════════════════════════════════════
-// SEARCH
-// ═══════════════════════════════════════════════════════════
-let searchTimer;
-document.getElementById('search').addEventListener('input', e => {
-  clearTimeout(searchTimer);
-  const q = e.target.value.trim();
-  searchTimer = setTimeout(() => {
-    if (!q) {
-      document.getElementById('rinfo').textContent = '';
-      highlightBricks([]);
-      buildList(bricks.filter(b => b.lines.length));
-    } else {
-      updateList(q);
-    }
-  }, 200);
-});
-
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // EXPORT CSV
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function exportCSV() {
   const rows = [['Row','Col','Rowspan','Colspan','Line1','Line2','Line3','Line4','Line5','Line6','Line7','Line8']];
   bricks.forEach(b => rows.push([
@@ -841,9 +815,9 @@ function exportCSV() {
   a.click();
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // TOAST
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -852,9 +826,9 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — LOGIN / LOGOUT
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ADMIN â LOGIN / LOGOUT
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const ADMIN_PASS = 'SWU_Monument';
 let adminMode = false;
 
@@ -896,7 +870,7 @@ function togglePlaceMode() {
   if (on) {
     document.getElementById('editToggle').checked = true;
     setEditMode(true);
-    toast('📍 Click any glowing empty slot to add a brick');
+    toast('ð Click any glowing empty slot to add a brick');
   } else {
     toast('Place mode off');
   }
@@ -906,9 +880,9 @@ document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); openAdminLogin(); }
 });
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — EDIT MODAL
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ADMIN â EDIT MODAL
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let editTarget = null;
 
 function openEditModal(b, el) {
@@ -923,10 +897,10 @@ function openEditModal(b, el) {
   document.getElementById('el8').value = b ? (b.lines[7] || '') : '';
   const cs = b ? b.colspan : 2;
   const rs = b ? b.rowspan : 1;
-  const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col × 2 row)'
-                  : cs === 2 && rs === 1 ? 'Standard (2 col × 1 row)'
-                  : cs + ' col × ' + rs + ' row';
-  document.getElementById('ebricktype').textContent = '🧱 Brick type: ' + typeLabel;
+  const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col Ã 2 row)'
+                  : cs === 2 && rs === 1 ? 'Standard (2 col Ã 1 row)'
+                  : cs + ' col Ã ' + rs + ' row';
+  document.getElementById('ebricktype').textContent = 'ð§± Brick type: ' + typeLabel;
   document.getElementById('epos').textContent = b ? `Grid position: ${b.row}, ${b.col}` : '';
   document.getElementById('editOverlay').classList.add('open');
   document.getElementById('el1').focus();
@@ -968,7 +942,7 @@ function saveBrickEdit() {
   buildList(bricks.filter(b => b.lines.length));
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 2`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded Â· Section 2`;
 
   closeEditModal();
   toast('Brick saved!');
@@ -982,7 +956,7 @@ function clearBrickEdit() {
 function resetAllEdits() {
   if (!confirm('Reset ALL admin edits for Section 2? This cannot be undone.')) return;
   localStorage.removeItem(EDITS_KEY);
-  toast('Edits reset — reloading...');
+  toast('Edits reset â reloading...');
   setTimeout(() => location.reload(), 900);
 }
 
@@ -996,9 +970,9 @@ document.getElementById('editOverlay').addEventListener('keydown', e => {
   if (e.key === 'Escape') closeEditModal();
 });
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // GAS HELPERS
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
   if (!GAS_URL) return;
   const cb = '_gsCb' + Date.now();
@@ -1013,9 +987,9 @@ function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
   document.head.appendChild(s);
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // DRAG-DROP BRICKS
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const vpEl = document.getElementById('vp');
 let _db = null, _del = null, _dGhost = null;
 let _dsx = 0, _dsy = 0, _dragging = false;
@@ -1114,7 +1088,25 @@ function finalizeBrickMove(toRow, toCol) {
 
   // Persist swapped state
   if (fromB.lines.length) { localEdits[fromKey] = { lines: fromB.lines }; allEdits[fromKey] = { lines: fromB.lines }; }
-  else                    { delete localEdits[fromKey]; delete allEdits[fromKey]; }
+  else                    { delete localEdits[fromKey]; delete allEdits[fromKââââââââââââââââââââââââââââââââââââââââââââ
+// SEARCH
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+let searchTimer;
+document.getElementById('search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  const q = e.target.value.trim();
+  searchTimer = setTimeout(() => {
+    if (!q) {
+      document.getElementById('rinfo').textContent = '';
+      highlightBricks([]);
+      buildList(bricks.filter(b => b.lines.length));
+    } else {
+      updateList(q);
+    }
+  }, 200);
+});
+
+// âââââââââââââââey]; }
   if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines };   allEdits[toKey]   = { lines: toB.lines };   }
   else                    { delete localEdits[toKey];   delete allEdits[toKey];   }
   saveLocalEdits();
@@ -1134,9 +1126,9 @@ function finalizeBrickMove(toRow, toCol) {
   toast('Brick moved!');
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // INIT WITH GAS
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function initWithGAS() {
   const go = () => {
     allEdits = Object.assign({}, INITIAL_EDITS, remoteEdits, localEdits);
@@ -1158,9 +1150,9 @@ function initWithGAS() {
   document.head.appendChild(s);
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // EXPORT UPDATED HTML
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function exportHTML() {
   const merged = Object.assign({}, INITIAL_EDITS, localEdits);
   let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
@@ -1178,9 +1170,9 @@ function exportHTML() {
   toast('section2_updated.html downloaded!');
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // INIT
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 initWithGAS();
 window.addEventListener('resize', resetView);
 </script>
