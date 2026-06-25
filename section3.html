@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donor Brick Monument – Section 3</title>
+<style>
+:root {
+  --brick-bg:      #c8714a;
+  --brick-border:  #a0502e;
+  --brick-mortar:  #c9aa80;
+  --brick-text:    #3a1a08;
+  --brick-empty:   #b8724f;
+  --soil:          #1a0e06;
+  --accent:        #e8a050;
+  --bg:            #1e1208;
+  --surface:       #2e1c0e;
+  --surface2:      #3e2a18;
+  --text:          #f0e4d0;
+  --muted:         #9a7050;
+  --hi-bg:         #fff176;
+  --hi-border:     #f9a825;
+  --act-bg:        #ffeb3b;
+  --act-border:    #ff6f00;
+  --admin-accent:  #ff9800;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: var(--bg); color: var(--text);
+       height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+header {
+  background: linear-gradient(135deg, #8b3a1e, #c8714a);
+  padding: 12px 20px; display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.5); flex-shrink: 0;
+}
+.logo { font-size: 26px; }
+.htext h1 { font-size: 19px; font-weight: normal; }
+.htext p  { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; }
+.hstats   { margin-left: auto; text-align: right; font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.6; }
+.hadmin-btn {
+  background: rgba(0,0,0,.3); border: 1px solid rgba(255,152,0,.5);
+  color: rgba(255,255,255,.6); padding: 5px 9px; border-radius: 6px;
+  cursor: pointer; font-size: 11px; font-family: inherit; transition: all .2s;
+}
+.hadmin-btn:hover { background: rgba(255,152,0,.2); color: #ff9800; border-color: #ff9800; }
+
+.adminbar {
+  background: #1a0800; border-bottom: 2px solid var(--admin-accent);
+  padding: 7px 14px; display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0; font-size: 12px;
+}
+.adminbar label { color: var(--text); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.adminbar input[type=checkbox] { cursor: pointer; }
+.admin-badge { color: var(--admin-accent); font-weight: bold; font-size: 13px; }
+
+.toolbar {
+  background: var(--surface); border-bottom: 1px solid var(--surface2);
+  padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex-shrink: 0;
+}
+.sw { position: relative; flex: 1; min-width: 180px; }
+.sw input {
+  width: 100%; padding: 7px 12px 7px 34px;
+  background: var(--bg); border: 1px solid var(--surface2); border-radius: 18px;
+  color: var(--text); font-size: 13px; outline: none; transition: border-color .2s;
+}
+.sw input:focus { border-color: var(--accent); }
+.si { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
+#rinfo { font-size: 12px; color: var(--accent); min-width: 100px; }
+.cb {
+  background: var(--surface2); border: 1px solid #5a3a20; color: var(--text);
+  padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit;
+  transition: background .15s; white-space: nowrap;
+}
+.cb:hover { background: #5a3a20; }
+.tabs { display: flex; margin-left: 6px; }
+.tab { padding: 6px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
+       border-bottom: 2px solid transparent; transition: all .2s; }
+.tab:hover { color: var(--text); }
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+.main { display: flex; flex: 1; overflow: hidden; }
+
+.sidebar {
+  width: 230px; min-width: 230px; background: var(--surface);
+  border-right: 1px solid var(--surface2); display: flex; flex-direction: column; overflow: hidden;
+}
+.sidebar h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+              color: var(--muted); padding: 9px 13px 5px; }
+#blist { flex: 1; overflow-y: auto; }
+.li {
+  padding: 7px 13px; cursor: pointer; border-bottom: 1px solid var(--surface2);
+  font-size: 11px; line-height: 1.4; transition: background .15s;
+}
+.li:hover { background: var(--surface2); }
+.li.hi { background: rgba(248,161,48,.15); }
+.li .ln { font-weight: bold; color: var(--text); }
+.li .ls { color: var(--muted); margin-top: 1px; }
+.li .lp { color: #6a4a28; font-size: 9px; margin-top: 1px; }
+
+.vp { flex: 1; overflow: hidden; position: relative; background: var(--soil); cursor: grab; }
+.vp.drag { cursor: grabbing; }
+.canvas { position: absolute; transform-origin: 0 0; }
+.mon { position: relative; }
+.mbg { position: absolute; background: var(--brick-mortar); border-radius: 3px; }
+.orient {
+  position: absolute; pointer-events: none;
+  font-size: 9px; font-family: sans-serif; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #7a5c38; text-align: center;
+}
+
+.brick {
+  position: absolute; background: var(--brick-bg); border: 1px solid var(--brick-border);
+  border-radius: 2px; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 2px 3px; text-align: center;
+  cursor: pointer; overflow: hidden; transition: transform .1s, box-shadow .1s; user-select: none;
+}
+.brick:hover { transform: scale(1.07); box-shadow: 0 3px 14px rgba(0,0,0,.55); z-index: 10; }
+.brick .bl {
+  font-weight: bold; letter-spacing: 0.3px; color: var(--brick-text); line-height: 1.25;
+  font-family: 'Times New Roman', serif; text-transform: uppercase; display: block;
+  width: 100%; text-align: center; white-space: nowrap; overflow: hidden;
+}
+.brick.empty { background: var(--brick-empty); border-color: #9a5030; cursor: default; opacity: 0.5; }
+.brick.empty:hover { transform: none; box-shadow: none; }
+.brick.filler { background: var(--brick-bg); border-color: var(--brick-border); opacity: 0.65; cursor: default; pointer-events: none; }
+.brick.filler:hover { transform: none !important; box-shadow: none !important; }
+.brick.hi {
+  background: var(--hi-bg) !important; border-color: var(--hi-border) !important;
+  box-shadow: 0 0 0 2px var(--hi-border), 0 0 14px rgba(249,168,37,.6) !important; z-index: 20;
+}
+.brick.hi .bl { color: #3a2000 !important; }
+.brick.act {
+  background: var(--act-bg) !important; border-color: var(--act-border) !important;
+  box-shadow: 0 0 0 3px var(--act-border), 0 0 22px rgba(255,111,0,.7) !important;
+  z-index: 30; animation: bp 1.2s ease-in-out infinite;
+}
+@keyframes bp {
+  0%,100% { box-shadow: 0 0 0 3px var(--act-border), 0 0 16px rgba(255,111,0,.55); }
+  50%      { box-shadow: 0 0 0 6px var(--act-border), 0 0 30px rgba(255,111,0,.9); }
+}
+.brick.act .bl { color: #1a0800 !important; }
+
+body.edit-mode .brick:not(.empty):not(.filler) { cursor: grab; box-shadow: 0 0 0 1px rgba(255,152,0,.4) inset; }
+body.edit-mode .brick:not(.empty):not(.filler):active { cursor: grabbing; }
+body.edit-mode .brick:not(.empty):not(.filler):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); }
+body.edit-mode .brick:not(.empty):not(.filler)::after {
+  content: '✏'; position: absolute; top: 1px; right: 2px;
+  font-size: 6px; color: rgba(255,152,0,.8); pointer-events: none;
+}
+body.edit-mode .brick.empty:not(.filler) { cursor: cell; opacity: 0.7; box-shadow: 0 0 0 1px rgba(255,152,0,.3) inset; }
+body.edit-mode .brick.empty:not(.filler):hover { opacity: 1; box-shadow: 0 0 0 2px var(--admin-accent); transform: scale(1.05); }
+body.edit-mode .brick.filler, body.place-mode .brick.filler { pointer-events: none !important; }
+
+.drag-ghost {
+  position: fixed; z-index: 500; pointer-events: none; background: var(--brick-bg);
+  border: 2px solid var(--admin-accent); border-radius: 3px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 2px 3px; text-align: center;
+  opacity: 0.9; box-shadow: 0 8px 28px rgba(0,0,0,.8); transform: scale(1.12) rotate(-2deg);
+}
+.brick.drop-target {
+  box-shadow: 0 0 0 3px var(--admin-accent), 0 0 18px rgba(255,152,0,.7) !important;
+  background: rgba(255,152,0,.3) !important; z-index: 25; transition: none !important;
+}
+body.drag-active * { cursor: grabbing !important; user-select: none; }
+.pbtn-on { background: rgba(76,175,80,.2) !important; color: #4caf50 !important; border-color: #4caf50 !important; }
+body.place-mode .brick.empty:not(.filler) {
+  background: rgba(76,175,80,.2) !important; border-color: rgba(76,175,80,.6) !important;
+  opacity: 1 !important; cursor: crosshair !important;
+}
+body.place-mode .brick.empty:not(.filler):hover {
+  background: rgba(76,175,80,.45) !important; transform: scale(1.06); box-shadow: 0 0 0 2px #4caf50 !important;
+}
+
+.zctrl { position: absolute; bottom: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
+.zb {
+  width: 32px; height: 32px; background: var(--surface); border: 1px solid var(--surface2);
+  color: var(--text); border-radius: 50%; font-size: 17px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .15s;
+}
+.zb:hover { background: var(--surface2); }
+
+.dp {
+  position: absolute; bottom: 14px; left: 14px; z-index: 50;
+  background: rgba(24,10,2,.94); border: 1px solid var(--surface2);
+  border-radius: 10px; padding: 13px 17px; max-width: 270px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.7); display: none;
+}
+.dp.open { display: block; }
+.dp h4 { font-size: 14px; color: var(--accent); margin-bottom: 5px; }
+.dp .dt { font-size: 12px; line-height: 1.6; color: var(--text); }
+.dp .dpos { font-size: 10px; color: var(--muted); margin-top: 5px; }
+.dpx { position: absolute; top: 7px; right: 9px; cursor: pointer; color: var(--muted); font-size: 15px; }
+
+.legend {
+  position: absolute; top: 8px; right: 8px; z-index: 50;
+  background: rgba(24,10,2,.88); border: 1px solid var(--surface2);
+  border-radius: 8px; padding: 9px 11px; font-size: 10px;
+}
+.lgi { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.lgs { width: 18px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+#toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: var(--bg); padding: 8px 20px; border-radius: 20px;
+  font-size: 12px; font-weight: bold; opacity: 0; pointer-events: none; z-index: 200;
+  transition: opacity .25s;
+}
+#toast.show { opacity: 1; }
+
+.emodal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center; z-index: 300; display: none;
+}
+.emodal-overlay.open { display: flex; }
+.emodal {
+  background: var(--surface); border: 1px solid var(--admin-accent);
+  border-radius: 12px; padding: 22px 26px; min-width: 320px; max-width: 460px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.8);
+}
+.emodal h3 { font-size: 15px; color: var(--admin-accent); margin-bottom: 4px; }
+.emodal .epos { font-size: 10px; color: var(--muted); margin-bottom: 14px; }
+.emodal label { display: block; font-size: 10px; color: var(--muted); margin: 8px 0 3px; text-transform: uppercase; letter-spacing: .8px; }
+.emodal input[type=text] {
+  width: 100%; background: var(--bg); border: 1px solid var(--surface2);
+  border-radius: 6px; padding: 7px 10px; color: var(--text); font-size: 12px;
+  font-family: Georgia, serif; outline: none; transition: border-color .2s;
+}
+.emodal input[type=text]:focus { border-color: var(--admin-accent); }
+.emodal .ebtns { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.ebtn-save { background: var(--admin-accent); color: #1a0800; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; font-weight: bold; transition: opacity .15s; }
+.ebtn-save:hover { opacity: .85; }
+.ebtn-cancel { background: var(--surface2); color: var(--text); border: 1px solid #5a3a20; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; transition: background .15s; }
+.ebtn-cancel:hover { background: #5a3a20; }
+.ebtn-clear { background: none; color: #ff6060; border: 1px solid #ff6060; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; transition: all .15s; margin-right: auto; }
+.ebtn-clear:hover { background: rgba(255,96,96,.1); }
+.emodal .ebricktype { font-size: 10px; color: var(--muted); margin-top: 10px; background: var(--bg); border-radius: 5px; padding: 5px 9px; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧱</div>
+  <div class="htext">
+    <h1>Donor Brick Monument — Section 3</h1>
+    <p>Southwestern University · Section 3 · Grid layout</p>
+  </div>
+  <div class="hstats" id="hstats">Loading…</div>
+  <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
+</header>
+
+<div class="adminbar" id="adminBar" style="display:none">
+  <span class="admin-badge">⚙ ADMIN MODE</span>
+  <label><input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks</label>
+  <span style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
+  <button class="cb" id="placeBtn" onclick="togglePlaceMode()" style="border-color:#4caf50;color:#4caf50">📍 Place Brick</button>
+  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
+  <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
+  <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
+</div>
+
+<div class="toolbar">
+  <div class="sw">
+    <span class="si">🔍</span>
+    <input id="search" type="text" placeholder="Search name, class year, inscription…" autocomplete="off">
+  </div>
+  <span id="rinfo"></span>
+  <div class="tabs">
+    <div class="tab" onclick="location.href='monument.html'">Section 1</div>
+    <div class="tab" onclick="location.href='section2.html'">Section 2</div>
+    <div class="tab on">Section 3</div>
+  </div>
+  <button class="cb" onclick="resetView()">⊙ Reset</button>
+  <button class="cb" onclick="exportCSV()">⬇ Export</button>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <h3>Recorded Bricks (<span id="rcnt">0</span>)</h3>
+    <div id="blist"></div>
+  </aside>
+  <div class="vp" id="vp">
+    <div class="canvas" id="canvas"><div class="mon" id="mon"></div></div>
+    <div class="zctrl">
+      <button class="zb" onclick="zoom(1.25)">+</button>
+      <button class="zb" onclick="zoom(0.8)">−</button>
+      <button class="zb" onclick="resetView()" style="font-size:11px">⊙</button>
+    </div>
+    <div class="legend">
+      <div class="lgi"><div class="lgs" style="background:#c8714a;border:1px solid #a0502e"></div>Recorded brick</div>
+      <div class="lgi"><div class="lgs" style="background:#b8724f;opacity:.5;border:1px solid #9a5030"></div>Unrecorded</div>
+      <div class="lgi"><div class="lgs" style="background:#fff176;border:1px solid #f9a825"></div>Search match</div>
+    </div>
+    <div class="dp" id="dp">
+      <span class="dpx" onclick="closeDetail()">✕</span>
+      <h4 id="dpname"></h4>
+      <div class="dt" id="dptext"></div>
+      <div class="dpos" id="dppos"></div>
+    </div>
+  </div>
+</div>
+
+<div class="emodal-overlay" id="editOverlay">
+  <div class="emodal">
+    <h3>✏ Edit Brick</h3>
+    <div class="epos" id="epos"></div>
+    <label>Line 1 (primary name / title)</label>
+    <input type="text" id="el1" placeholder="Primary inscription line">
+    <label>Line 2</label><input type="text" id="el2" placeholder="Second line (optional)">
+    <label>Line 3</label><input type="text" id="el3" placeholder="Third line (optional)">
+    <label>Line 4</label><input type="text" id="el4" placeholder="Fourth line (optional)">
+    <label>Line 5</label><input type="text" id="el5" placeholder="Fifth line (optional)">
+    <label>Line 6</label><input type="text" id="el6" placeholder="Sixth line (optional)">
+    <label>Line 7</label><input type="text" id="el7" placeholder="Seventh line (optional)">
+    <label>Line 8</label><input type="text" id="el8" placeholder="Eighth line (optional)">
+    <div class="ebricktype" id="ebricktype"></div>
+    <div class="ebtns">
+      <button class="ebtn-clear" onclick="clearBrickEdit()">Clear brick</button>
+      <button class="ebtn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="ebtn-save" onclick="saveBrickEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// LAYOUT CONSTANTS — Section 3: flat 15×20 grid
+// ═══════════════════════════════════════════════════════════
+const UNIT = 44;
+const GAP  = 4;
+const PAD  = 18;
+
+const NUM_COLS = 15;
+const NUM_ROWS = 20;
+
+const CW = 2 * PAD + NUM_COLS * UNIT;   // 696px
+const CH = 2 * PAD + NUM_ROWS * UNIT;   // 916px
+
+function bx(c)  { return PAD + c * UNIT; }
+function by(r)  { return PAD + r * UNIT; }
+function bW(cs) { return cs * UNIT - GAP; }
+function bH(rs) { return rs * UNIT - GAP; }
+
+// ═══════════════════════════════════════════════════════════
+// LAYOUT — from Google Sheets Section 3
+// [row_off, col_off, rowspan, colspan]
+// ═══════════════════════════════════════════════════════════
+const LAYOUT = [
+  // Row group 0
+  [ 0, 0,2,2],[ 0, 2,2,1],[ 0, 3,2,2],[ 0, 5,2,2],[ 0, 7,2,1],
+  [ 0, 8,2,2],[ 0,10,2,2],[ 0,12,2,1],[ 0,13,2,2],
+  // Row group 1
+  [ 2, 0,2,2],[ 2, 2,2,2],[ 2, 4,2,1],[ 2, 5,2,2],[ 2, 7,2,2],
+  [ 2, 9,2,1],[ 2,10,2,2],[ 2,12,2,2],[ 2,14,2,1],
+  // Row group 2
+  [ 4, 0,2,1],[ 4, 1,2,1],[ 4, 2,2,2],[ 4, 4,2,1],[ 4, 5,2,1],
+  [ 4, 6,2,2],[ 4, 8,2,1],[ 4, 9,2,1],[ 4,10,2,2],[ 4,12,2,1],[ 4,13,2,2],
+  // Row group 3
+  [ 6, 0,2,2],[ 6, 2,2,1],[ 6, 3,2,1],[ 6, 4,2,2],[ 6, 6,2,1],
+  [ 6, 7,2,1],[ 6, 8,2,2],[ 6,10,2,1],[ 6,11,2,1],[ 6,12,2,2],[ 6,14,2,1],
+  // Row group 4
+  [ 8, 0,2,1],[ 8, 1,2,2],[ 8, 3,2,1],[ 8, 4,2,1],[ 8, 5,2,2],
+  [ 8, 7,2,1],[ 8, 8,2,1],[ 8, 9,2,2],[ 8,11,2,1],[ 8,12,2,1],[ 8,13,2,2],
+  // Row group 5
+  [10, 0,2,2],[10, 2,2,1],[10, 3,2,2],[10, 5,2,1],[10, 6,2,1],
+  [10, 7,2,2],[10, 9,2,1],[10,10,2,1],[10,11,2,2],[10,13,2,1],[10,14,2,1],
+  // Row group 6
+  [12, 0,2,1],[12, 1,2,2],[12, 3,2,1],[12, 4,2,1],[12, 5,2,2],
+  [12, 7,2,1],[12, 8,2,1],[12, 9,2,2],[12,11,2,1],[12,12,2,1],[12,13,2,2],
+  // Row group 7
+  [14, 0,2,2],[14, 2,2,1],[14, 3,2,2],[14, 5,2,1],[14, 6,2,1],
+  [14, 7,2,2],[14, 9,2,1],[14,10,2,1],[14,11,2,2],[14,13,2,1],[14,14,2,1],
+  // Row group 8 — mixed: tall bricks + stacked std pairs
+  [16, 0,2,1],[16, 1,2,2],[16, 3,1,2],[16, 5,2,2],[16, 7,1,2],
+  [16, 9,2,2],[16,11,1,2],[16,13,2,2],
+  [17, 3,1,2],[17, 7,1,2],[17,11,1,2],
+  // Row group 9 — full tall + stacked std + trailing filler
+  [18, 0,2,2],[18, 2,2,2],[18, 4,1,2],[18, 6,2,2],[18, 8,1,2],
+  [18,10,2,2],[18,12,1,2],[18,14,2,1],
+  [19, 4,1,2],[19, 8,1,2],[19,12,1,2],
+];
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — edits baked in at export time (empty by default)
+// ═══════════════════════════════════════════════════════════
+const INITIAL_EDITS = {};
+const SECTION_ID = 3;
+const GAS_URL    = 'https://script.google.com/macros/s/AKfycbxbKbla6zp7MPRsRo-3HxNA2baLJu6UI9VCaEyUxLITzzG0wOXexYY1_GObi_ahezBs/exec';
+
+// ═══════════════════════════════════════════════════════════
+// BUILD DATA STRUCTURES
+// ═══════════════════════════════════════════════════════════
+const brickMap  = {};
+const brickById = {};
+const bricks    = [];
+
+LAYOUT.forEach(([r, c, rs, cs], i) => {
+  if (cs >= 2) {
+    const id  = 'b' + i;
+    const obj = { id, row: r, col: c, rowspan: rs, colspan: cs, lines: [], name: '' };
+    bricks.push(obj);
+    brickById[id] = obj;
+    brickMap[r + ',' + c] = id;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN PERSISTENCE
+// ═══════════════════════════════════════════════════════════
+const EDITS_KEY = 'brickEdits_s3';
+let localEdits  = JSON.parse(localStorage.getItem(EDITS_KEY) || '{}');
+let remoteEdits = {};
+let allEdits    = {};
+
+function saveLocalEdits() { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }
+
+function applyEdits() {
+  Object.keys(allEdits).forEach(key => {
+    const id = brickMap[key];
+    if (!id) return;
+    const b = brickById[id], e = allEdits[key];
+    b.lines = (e.lines || []).filter(Boolean);
+    b.name  = b.lines[0] || '';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER MONUMENT
+// ═══════════════════════════════════════════════════════════
+function renderMonument() {
+  const mon = document.getElementById('mon');
+  mon.innerHTML = '';
+  mon.style.width  = CW + 'px';
+  mon.style.height = CH + 'px';
+
+  const bg = document.createElement('div');
+  bg.className = 'mbg';
+  bg.style.cssText = `left:0;top:0;width:${CW}px;height:${CH}px;`;
+  mon.appendChild(bg);
+
+  [['▲ Garden / North Border', -16], ['▼ Walkway / South', CH + 2]].forEach(([txt, top]) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'orient';
+    lbl.style.cssText = `left:0;top:${top}px;width:${CW}px;`;
+    lbl.textContent = txt;
+    mon.appendChild(lbl);
+  });
+
+  LAYOUT.forEach(([r, c, rs, cs]) => {
+    const isFiller = cs === 1;
+    const b = isFiller ? null : brickById[brickMap[r + ',' + c]];
+
+    const el = document.createElement('div');
+    el.className = isFiller ? 'brick filler' : ('brick' + (b && b.lines.length ? '' : ' empty'));
+    el.style.left   = bx(c) + 'px';
+    el.style.top    = by(r) + 'px';
+    el.style.width  = bW(cs) + 'px';
+    el.style.height = bH(rs) + 'px';
+    el.dataset.row  = r;
+    el.dataset.col  = c;
+
+    if (!isFiller && b) {
+      el.id = b.id; el.dataset.id = b.id;
+      b.lines.forEach(ln => {
+        const s = document.createElement('span');
+        s.className = 'bl'; s.textContent = ln; el.appendChild(s);
+      });
+      el.addEventListener('mousedown', e => {
+        if (e.button !== 0 || !document.body.classList.contains('edit-mode')) return;
+        e.stopPropagation(); startBrickDrag(e, b, el);
+      });
+      el.addEventListener('click', () => {
+        if (document.body.classList.contains('edit-mode') || document.body.classList.contains('place-mode')) openEditModal(b, el);
+        else if (b.lines.length) onBrickClick(b, el);
+      });
+      if (b.lines.length) fitBrick(el);
+    }
+    mon.appendChild(el);
+  });
+
+  const recorded = bricks.filter(b => b.lines.length > 0).length;
+  document.getElementById('rcnt').textContent = recorded;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 3`;
+}
+
+function fitBrick(el) {
+  const spans = el.querySelectorAll('.bl');
+  if (!spans.length) return;
+  const MAX = 14, MIN = 5, bw = el.clientWidth - 6;
+  spans.forEach(sp => {
+    let fs = MAX; sp.style.fontSize = fs + 'px';
+    while (fs > MIN && sp.scrollWidth > bw) { fs = Math.max(MIN, fs - 0.25); sp.style.fontSize = fs + 'px'; }
+  });
+  if (el.scrollHeight > el.clientHeight + 1) {
+    const ratio = (el.clientHeight - 4) / el.scrollHeight;
+    spans.forEach(sp => { const cur = parseFloat(sp.style.fontSize); sp.style.fontSize = Math.max(MIN, cur * ratio * 0.95) + 'px'; });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function buildList(list) {
+  const container = document.getElementById('blist');
+  container.innerHTML = '';
+  if (!list.length) { container.innerHTML = '<div style="padding:14px;font-size:11px;color:var(--muted)">No results</div>'; return; }
+  list.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'li';
+    el.innerHTML = `<div class="ln">${b.lines[0]||'—'}</div>` +
+      (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' · ')}</div>` : '') +
+      `<div class="lp">Grid ${b.row},${b.col}</div>`;
+    el.addEventListener('click', () => scrollToBrick(b));
+    container.appendChild(el);
+  });
+}
+
+function updateList(query) {
+  if (!query) { buildList(bricks.filter(b => b.lines.length)); return; }
+  const q = query.toLowerCase();
+  const results = bricks.filter(b => b.lines.some(l => l.toLowerCase().includes(q)));
+  document.getElementById('rinfo').textContent = results.length + ' found';
+  highlightBricks(results); buildList(results);
+}
+
+function highlightBricks(matches) {
+  document.querySelectorAll('.brick.hi').forEach(el => el.classList.remove('hi'));
+  const ids = new Set(matches.map(b => b.id));
+  document.querySelectorAll('.brick[data-id]').forEach(el => { if (ids.has(el.dataset.id)) el.classList.add('hi'); });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════════════════
+let activeBrick = null;
+function onBrickClick(b, el) {
+  closeDetail();
+  if (activeBrick === b) { activeBrick = null; return; }
+  activeBrick = b;
+  document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
+  el.classList.add('act');
+  document.getElementById('dpname').textContent = b.lines[0] || '—';
+  document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
+  document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
+  document.getElementById('dp').classList.add('open');
+  highlightSidebarItem(b.id);
+}
+function closeDetail() {
+  document.getElementById('dp').classList.remove('open');
+  document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
+  activeBrick = null;
+}
+function highlightSidebarItem(id) {
+  document.querySelectorAll('.li.hi').forEach(el => el.classList.remove('hi'));
+  bricks.forEach((b, i) => {
+    const all = document.querySelectorAll('.li');
+    if (b.id === id && all[i]) { all[i].classList.add('hi'); all[i].scrollIntoView({ block: 'nearest' }); }
+  });
+}
+function scrollToBrick(b) {
+  closeDetail();
+  const el = document.querySelector(`.brick[data-id="${b.id}"]`);
+  if (!el) return;
+  const vp = document.getElementById('vp'), vpR = vp.getBoundingClientRect();
+  panX = vpR.width  / 2 - (bx(b.col) + bW(b.colspan) / 2) * scale;
+  panY = vpR.height / 2 - (by(b.row) + bH(b.rowspan) / 2) * scale;
+  applyTransform();
+  setTimeout(() => {
+    el.classList.add('act');
+    document.getElementById('dpname').textContent = b.lines[0] || '—';
+    document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
+    document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
+    document.getElementById('dp').classList.add('open');
+  }, 60);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAN & ZOOM
+// ═══════════════════════════════════════════════════════════
+let scale = 1, panX = 0, panY = 0, dragging = false, dragSx, dragSy, dragPx, dragPy;
+
+function applyTransform() {
+  document.getElementById('canvas').style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+}
+function resetView() {
+  const vp = document.getElementById('vp'), vpW = vp.clientWidth, vpH = vp.clientHeight;
+  scale = Math.min(vpW / CW, vpH / CH) * 0.9;
+  panX = (vpW - CW * scale) / 2; panY = (vpH - CH * scale) / 2;
+  applyTransform();
+}
+function zoom(f) {
+  const vp = document.getElementById('vp'), cx = vp.clientWidth / 2, cy = vp.clientHeight / 2;
+  panX = cx - (cx - panX) * f; panY = cy - (cy - panY) * f;
+  scale = Math.max(0.15, Math.min(4, scale * f)); applyTransform();
+}
+
+const vp = document.getElementById('vp');
+vp.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = vp.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const f = e.deltaY < 0 ? 1.12 : 0.89;
+  panX = mx - (mx - panX) * f; panY = my - (my - panY) * f;
+  scale = Math.max(0.15, Math.min(4, scale * f)); applyTransform();
+}, { passive: false });
+vp.addEventListener('mousedown', e => {
+  if (e.target.classList.contains('brick') || e.target.classList.contains('bl')) return;
+  dragging = true; dragSx = e.clientX; dragSy = e.clientY; dragPx = panX; dragPy = panY;
+  vp.classList.add('drag');
+});
+window.addEventListener('mousemove', e => {
+  if (!dragging) return; panX = dragPx + e.clientX - dragSx; panY = dragPy + e.clientY - dragSy; applyTransform();
+});
+window.addEventListener('mouseup', () => { dragging = false; vp.classList.remove('drag'); });
+
+let lastDist = 0;
+vp.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) { dragging = true; dragSx = e.touches[0].clientX; dragSy = e.touches[0].clientY; dragPx = panX; dragPy = panY; }
+  else if (e.touches.length === 2) { dragging = false; lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); }
+}, { passive: true });
+vp.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && dragging) { panX = dragPx + e.touches[0].clientX - dragSx; panY = dragPy + e.touches[0].clientY - dragSy; applyTransform(); }
+  else if (e.touches.length === 2) {
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    if (lastDist > 0) {
+      const f = dist / lastDist, rect = vp.getBoundingClientRect();
+      const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+      const my = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+      panX = mx - (mx - panX) * f; panY = my - (my - panY) * f;
+      scale = Math.max(0.15, Math.min(4, scale * f)); applyTransform();
+    }
+    lastDist = dist;
+  }
+}, { passive: false });
+vp.addEventListener('touchend', () => { dragging = false; lastDist = 0; });
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════
+let searchTimer;
+document.getElementById('search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  const q = e.target.value.trim();
+  searchTimer = setTimeout(() => {
+    if (!q) { document.getElementById('rinfo').textContent = ''; highlightBricks([]); buildList(bricks.filter(b => b.lines.length)); }
+    else updateList(q);
+  }, 200);
+});
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════════════════
+function exportCSV() {
+  const rows = [['Row','Col','Rowspan','Colspan','Line1','Line2','Line3','Line4','Line5','Line6','Line7','Line8']];
+  bricks.forEach(b => rows.push([b.row, b.col, b.rowspan, b.colspan, ...Array.from({length:8}, (_,i) => b.lines[i]||'')]));
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'section3_bricks.csv'; a.click();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — LOGIN / LOGOUT / MODES
+// ═══════════════════════════════════════════════════════════
+const ADMIN_PASS = 'SWU_Monument';
+let adminMode = false;
+
+function openAdminLogin() {
+  if (adminMode) { toast('Already in admin mode'); return; }
+  const p = prompt('Enter admin password:');
+  if (p === null) return;
+  if (p === ADMIN_PASS) { adminMode = true; document.getElementById('adminBar').style.display = 'flex'; toast('Admin mode active'); }
+  else toast('Incorrect password');
+}
+function logoutAdmin() {
+  adminMode = false; document.getElementById('adminBar').style.display = 'none';
+  setEditMode(false); document.getElementById('editToggle').checked = false; toast('Logged out');
+}
+function setEditMode(on) {
+  if (on) { document.body.classList.add('edit-mode'); }
+  else { document.body.classList.remove('edit-mode', 'place-mode'); const pb = document.getElementById('placeBtn'); if (pb) pb.classList.remove('pbtn-on'); closeDetail(); }
+}
+function togglePlaceMode() {
+  const on = document.body.classList.toggle('place-mode');
+  document.getElementById('placeBtn').classList.toggle('pbtn-on', on);
+  if (on) { document.getElementById('editToggle').checked = true; setEditMode(true); toast('📍 Click any glowing empty slot to add a brick'); }
+  else toast('Place mode off');
+}
+document.addEventListener('keydown', e => { if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); openAdminLogin(); } });
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — EDIT MODAL
+// ═══════════════════════════════════════════════════════════
+let editTarget = null;
+
+function openEditModal(b, el) {
+  editTarget = { brick: b, el };
+  ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach((id, i) =>
+    document.getElementById(id).value = b ? (b.lines[i] || '') : '');
+  const cs = b ? b.colspan : 2, rs = b ? b.rowspan : 1;
+  const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col × 2 row)' : cs === 2 && rs === 1 ? 'Standard (2 col × 1 row)' : cs + ' col × ' + rs + ' row';
+  document.getElementById('ebricktype').textContent = '🧱 Brick type: ' + typeLabel;
+  document.getElementById('epos').textContent = b ? `Grid position: ${b.row}, ${b.col}` : '';
+  document.getElementById('editOverlay').classList.add('open');
+  document.getElementById('el1').focus();
+}
+function closeEditModal() { document.getElementById('editOverlay').classList.remove('open'); editTarget = null; }
+
+function saveBrickEdit() {
+  if (!editTarget || !editTarget.brick) return;
+  const b = editTarget.brick;
+  const lines = ['el1','el2','el3','el4','el5','el6','el7','el8']
+    .map(id => document.getElementById(id).value.trim().toUpperCase())
+    .filter(Boolean);
+  const key = b.row + ',' + b.col;
+  b.lines = lines; b.name = lines[0] || '';
+  localEdits[key] = { lines }; allEdits[key] = { lines }; saveLocalEdits();
+  if (GAS_URL) gasSet(SECTION_ID, key, lines[0]||'', lines[1]||'', lines[2]||'', b.colspan, lines[3]||'', lines[4]||'', lines[5]||'', lines[6]||'', lines[7]||'');
+  document.getElementById('mon').innerHTML = '';
+  renderMonument();
+  buildList(bricks.filter(b => b.lines.length));
+  const recorded = bricks.filter(b => b.lines.length > 0).length;
+  document.getElementById('rcnt').textContent = recorded;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 3`;
+  closeEditModal(); toast('Brick saved!');
+}
+function clearBrickEdit() { ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach(id => document.getElementById(id).value = ''); }
+function resetAllEdits() {
+  if (!confirm('Reset ALL admin edits for Section 3? This cannot be undone.')) return;
+  localStorage.removeItem(EDITS_KEY); toast('Edits reset — reloading...');
+  setTimeout(() => location.reload(), 900);
+}
+
+document.getElementById('editOverlay').addEventListener('click', e => { if (e.target === document.getElementById('editOverlay')) closeEditModal(); });
+document.getElementById('editOverlay').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) saveBrickEdit();
+  if (e.key === 'Escape') closeEditModal();
+});
+
+// ═══════════════════════════════════════════════════════════
+// GAS HELPERS
+// ═══════════════════════════════════════════════════════════
+function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
+  if (!GAS_URL) return;
+  const cb = '_gsCb' + Date.now(), s = document.createElement('script');
+  window[cb] = function() { delete window[cb]; s.parentNode && s.parentNode.removeChild(s); };
+  const p = new URLSearchParams({ action:'set', section, key, l1:l1||'', l2:l2||'', l3:l3||'', l4:l4||'', l5:l5||'', l6:l6||'', l7:l7||'', l8:l8||'', size:size||2, callback:cb });
+  s.src = GAS_URL + '?' + p; document.head.appendChild(s);
+}
+
+// ═══════════════════════════════════════════════════════════
+// DRAG-DROP
+// ═══════════════════════════════════════════════════════════
+const vpEl = document.getElementById('vp');
+let _db = null, _del = null, _dGhost = null, _dsx = 0, _dsy = 0, _dragging = false;
+let _dtRow = -1, _dtCol = -1, _dtEl = null;
+
+function startBrickDrag(e, b, el) {
+  _db = b; _del = el; _dsx = e.clientX; _dsy = e.clientY; _dragging = false;
+  function onMove(ev) {
+    if (!_dragging && Math.hypot(ev.clientX - _dsx, ev.clientY - _dsy) > 6) {
+      _dragging = true; document.body.classList.add('drag-active');
+      _dGhost = document.createElement('div'); _dGhost.className = 'drag-ghost';
+      _dGhost.style.width = bW(b.colspan) + 'px'; _dGhost.style.height = bH(b.rowspan) + 'px';
+      b.lines.forEach(line => { const sp = document.createElement('span'); sp.className = 'bl'; sp.textContent = line; _dGhost.appendChild(sp); });
+      document.body.appendChild(_dGhost); fitBrick(_dGhost); _del.style.opacity = '0.25';
+    }
+    if (_dragging && _dGhost) {
+      _dGhost.style.left = (ev.clientX - bW(b.colspan) / 2) + 'px';
+      _dGhost.style.top  = (ev.clientY - bH(b.rowspan) / 2) + 'px';
+      updateDragHighlight(ev.clientX, ev.clientY);
+    }
+  }
+  function onUp() {
+    window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp);
+    document.body.classList.remove('drag-active');
+    if (_dragging) {
+      if (_dtRow >= 0 && validTextSlot(_dtRow, _dtCol)) finalizeBrickMove(_dtRow, _dtCol);
+      else if (_del) _del.style.opacity = '';
+      if (_dGhost) { _dGhost.remove(); _dGhost = null; }
+      clearDragHighlight();
+    } else { openEditModal(b, el); }
+    _dragging = false; _db = null; _del = null;
+  }
+  window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+}
+
+function validTextSlot(row, col) { return brickMap.hasOwnProperty(row + ',' + col); }
+function screenToSlot(cx, cy) {
+  const r = vpEl.getBoundingClientRect();
+  return { row: Math.round(((cy - r.top - panY) / scale - PAD) / UNIT), col: Math.round(((cx - r.left - panX) / scale - PAD) / UNIT) };
+}
+function updateDragHighlight(cx, cy) {
+  const { row, col } = screenToSlot(cx, cy);
+  if (row === _dtRow && col === _dtCol) return;
+  clearDragHighlight();
+  if (!validTextSlot(row, col) || (_db && row === _db.row && col === _db.col)) return;
+  _dtRow = row; _dtCol = col;
+  _dtEl = document.querySelector(`.brick[data-row="${row}"][data-col="${col}"]`);
+  if (_dtEl) _dtEl.classList.add('drop-target');
+}
+function clearDragHighlight() { if (_dtEl) { _dtEl.classList.remove('drop-target'); _dtEl = null; } _dtRow = -1; _dtCol = -1; }
+
+function finalizeBrickMove(toRow, toCol) {
+  const fromKey = `${_db.row},${_db.col}`, toKey = `${toRow},${toCol}`;
+  if (fromKey === toKey) { if (_del) _del.style.opacity = ''; return; }
+  const fromB = _db, toB = brickById[brickMap[toKey]];
+  if (!toB) { if (_del) _del.style.opacity = ''; return; }
+  const fl = fromB.lines.slice(), fn = fromB.name;
+  fromB.lines = toB.lines; fromB.name = toB.name; toB.lines = fl; toB.name = fn;
+  if (fromB.lines.length) { localEdits[fromKey] = { lines: fromB.lines }; allEdits[fromKey] = { lines: fromB.lines }; } else { delete localEdits[fromKey]; delete allEdits[fromKey]; }
+  if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines };   allEdits[toKey]   = { lines: toB.lines };   } else { delete localEdits[toKey];   delete allEdits[toKey];   }
+  saveLocalEdits();
+  if (GAS_URL) {
+    gasSet(SECTION_ID, fromKey, fromB.lines[0]||'', fromB.lines[1]||'', fromB.lines[2]||'', fromB.colspan, fromB.lines[3]||'', fromB.lines[4]||'', fromB.lines[5]||'', fromB.lines[6]||'', fromB.lines[7]||'');
+    gasSet(SECTION_ID, toKey,   toB.lines[0]||'',   toB.lines[1]||'',   toB.lines[2]||'',   toB.colspan,  toB.lines[3]||'',   toB.lines[4]||'',   toB.lines[5]||'',   toB.lines[6]||'',   toB.lines[7]||'');
+  }
+  document.getElementById('mon').innerHTML = ''; renderMonument(); buildList(bricks.filter(b => b.lines.length)); toast('Brick moved!');
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT WITH GAS
+// ═══════════════════════════════════════════════════════════
+function initWithGAS() {
+  const go = () => {
+    allEdits = Object.assign({}, INITIAL_EDITS, remoteEdits, localEdits);
+    applyEdits(); renderMonument(); buildList(bricks.filter(b => b.lines.length)); setTimeout(resetView, 50);
+  };
+  if (!GAS_URL) { go(); return; }
+  const cb = '_gsInit' + Date.now(), s = document.createElement('script');
+  const t = setTimeout(() => { if (window[cb]) { delete window[cb]; go(); } }, 5000);
+  window[cb] = function(data) { clearTimeout(t); remoteEdits = data || {}; delete window[cb]; s.parentNode && s.parentNode.removeChild(s); go(); };
+  s.onerror = function() { clearTimeout(t); delete window[cb]; go(); };
+  s.src = GAS_URL + '?action=get&section=' + SECTION_ID + '&callback=' + cb;
+  document.head.appendChild(s);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT UPDATED HTML
+// ═══════════════════════════════════════════════════════════
+function exportHTML() {
+  const merged = Object.assign({}, INITIAL_EDITS, localEdits);
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  html = html.replace('const INITIAL_EDITS = {};', 'const INITIAL_EDITS = ' + JSON.stringify(merged, null, 2) + ';');
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = 'section3_updated.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  toast('section3_updated.html downloaded!');
+}
+
+initWithGAS();
+window.addEventListener('resize', resetView);
+</script>
+</body>
+</html>

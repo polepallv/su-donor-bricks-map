@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alumni Donor Brick Finder – Section 1</title>
+<style>
+  :root {
+    --brick: #b5522b;
+    --brick-dark: #8b3a1e;
+    --bg: #1a1208;
+    --surface: #2a1e10;
+    --surface2: #362811;
+    --text: #f0e8d8;
+    --muted: #a08060;
+    --accent: #e8a050;
+    --highlight: #ffdd44;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--brick-dark), var(--brick));
+    padding: 20px 24px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  .logo { font-size: 32px; }
+  .header-text h1 { font-size: 22px; font-weight: normal; letter-spacing: 0.5px; }
+  .header-text p { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+  /* SEARCH BAR */
+  .search-bar {
+    background: var(--surface);
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--surface2);
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .search-wrap {
+    flex: 1; min-width: 220px; position: relative;
+  }
+  .search-wrap input {
+    width: 100%; padding: 10px 16px 10px 42px;
+    background: var(--bg); border: 1px solid var(--surface2);
+    border-radius: 24px; color: var(--text); font-size: 15px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap .icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 16px; pointer-events: none;
+  }
+  #search-results {
+    background: var(--bg); border: 1px solid var(--surface2);
+    border-radius: var(--radius); position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    z-index: 100; max-height: 280px; overflow-y: auto; display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  #search-results.open { display: block; }
+  .result-item {
+    padding: 10px 16px; cursor: pointer; border-bottom: 1px solid var(--surface2);
+    transition: background 0.15s;
+  }
+  .result-item:hover { background: var(--surface2); }
+  .result-item .name { font-size: 14px; font-weight: bold; }
+  .result-item .meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .no-results { padding: 12px 16px; color: var(--muted); font-size: 14px; font-style: italic; }
+
+  .btn-add {
+    background: var(--accent); color: var(--bg); border: none;
+    padding: 10px 20px; border-radius: 24px; font-size: 14px;
+    cursor: pointer; white-space: nowrap; font-family: inherit;
+    transition: opacity 0.2s;
+  }
+  .btn-add:hover { opacity: 0.85; }
+
+  /* SECTION TABS */
+  .tabs {
+    display: flex; gap: 0; background: var(--surface); border-bottom: 1px solid var(--surface2);
+    padding: 0 24px;
+  }
+  .tab {
+    padding: 12px 20px; cursor: pointer; font-size: 14px; color: var(--muted);
+    border-bottom: 3px solid transparent; transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* MAIN LAYOUT */
+  main { display: flex; height: calc(100vh - 160px); }
+
+  /* LEFT: photo grid */
+  .photo-grid {
+    width: 220px; min-width: 220px; background: var(--surface);
+    border-right: 1px solid var(--surface2); overflow-y: auto; padding: 12px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .photo-grid h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+  .thumb-card {
+    position: relative; border-radius: var(--radius); overflow: hidden;
+    cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .thumb-card:hover { border-color: var(--muted); }
+  .thumb-card.active { border-color: var(--accent); }
+  .thumb-card img { width: 100%; display: block; }
+  .thumb-card .thumb-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.6); color: white; font-size: 11px;
+    padding: 4px 8px;
+  }
+  .thumb-card .thumb-count {
+    position: absolute; top: 6px; right: 6px;
+    background: var(--accent); color: var(--bg);
+    border-radius: 12px; font-size: 10px; font-weight: bold;
+    padding: 2px 7px;
+  }
+
+  /* RIGHT: zoom viewer */
+  .viewer {
+    flex: 1; overflow: hidden; position: relative;
+    background: var(--bg); cursor: grab;
+  }
+  .viewer.dragging { cursor: grabbing; }
+  .viewer-inner {
+    position: absolute; transform-origin: 0 0;
+  }
+  .viewer-inner img {
+    display: block; max-width: none; user-select: none; -webkit-user-drag: none;
+  }
+
+  /* Brick highlight overlays */
+  .brick-overlay {
+    position: absolute; border: 3px solid var(--highlight);
+    border-radius: 3px; pointer-events: none;
+    box-shadow: 0 0 0 3px rgba(255,221,68,0.3), 0 0 16px rgba(255,221,68,0.5);
+    animation: pulse 1.5s ease-in-out infinite;
+    display: none;
+  }
+  .brick-overlay.visible { display: block; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(255,221,68,0.3), 0 0 16px rgba(255,221,68,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(255,221,68,0.5), 0 0 32px rgba(255,221,68,0.7); }
+  }
+
+  /* Viewer controls */
+  .viewer-controls {
+    position: absolute; bottom: 16px; right: 16px; display: flex; gap: 8px; z-index: 10;
+  }
+  .ctrl-btn {
+    width: 36px; height: 36px; background: var(--surface);
+    border: 1px solid var(--surface2); color: var(--text); border-radius: 50%;
+    font-size: 18px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: background 0.15s;
+  }
+  .ctrl-btn:hover { background: var(--surface2); }
+
+  /* Photo label in viewer */
+  .viewer-label {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(0,0,0,0.6); color: white; font-size: 12px;
+    padding: 5px 10px; border-radius: 4px; z-index: 10;
+    pointer-events: none;
+  }
+
+  /* MODAL: Add Brick */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--surface2);
+    border-radius: 12px; padding: 28px; width: 480px; max-width: 95vw;
+  }
+  .modal h2 { font-size: 18px; margin-bottom: 6px; }
+  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--surface2);
+    color: var(--text); padding: 9px 12px; border-radius: var(--radius);
+    font-size: 14px; font-family: inherit; outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel {
+    background: none; border: 1px solid var(--surface2); color: var(--text);
+    padding: 8px 18px; border-radius: var(--radius); cursor: pointer;
+    font-family: inherit; font-size: 14px;
+  }
+  .btn-save {
+    background: var(--accent); color: var(--bg); border: none;
+    padding: 8px 20px; border-radius: var(--radius); cursor: pointer;
+    font-family: inherit; font-size: 14px; font-weight: bold;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: var(--bg); padding: 10px 24px;
+    border-radius: 24px; font-size: 14px; font-weight: bold;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 300;
+  }
+  #toast.show { opacity: 1; }
+
+  /* Export/import strip */
+  .data-strip {
+    background: var(--surface); border-top: 1px solid var(--surface2);
+    padding: 8px 24px; display: flex; gap: 12px; align-items: center;
+    font-size: 12px; color: var(--muted);
+  }
+  .data-strip a, .data-strip button {
+    color: var(--accent); text-decoration: none; cursor: pointer;
+    background: none; border: none; font-size: 12px; padding: 0;
+    font-family: inherit;
+  }
+  .data-strip a:hover, .data-strip button:hover { text-decoration: underline; }
+
+  /* Tooltip on hover over overlay */
+  .brick-tooltip {
+    position: absolute; background: rgba(0,0,0,0.85);
+    color: white; font-size: 12px; padding: 6px 10px;
+    border-radius: 6px; pointer-events: none; z-index: 50;
+    white-space: nowrap; display: none;
+  }
+
+  /* Instruction */
+  .viewer-hint {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center; color: var(--muted); pointer-events: none;
+    font-size: 15px; line-height: 1.7;
+  }
+  .viewer-hint .big { font-size: 40px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧱</div>
+  <div class="header-text">
+    <h1>Alumni Donor Brick Finder</h1>
+    <p>Search for a name to locate a brick, or zoom into any photo below.</p>
+  </div>
+</header>
+
+<div class="search-bar">
+  <div class="search-wrap">
+    <span class="icon">🔍</span>
+    <input type="text" id="search-input" placeholder="Search by name, class year, or inscription…" autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <button class="btn-add" onclick="openAddModal()">+ Add a Brick</button>
+  <label class="btn-add" style="background:var(--surface2);color:var(--text);border:1px solid var(--surface2);">
+    📂 Import CSV
+    <input type="file" id="csv-import" accept=".csv,.json" style="display:none" onchange="importCSV(this)">
+  </label>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchSection(0)">Section 1 (Current)</div>
+  <div class="tab" onclick="showToast('Section 2 photos not yet added.')">Section 2</div>
+  <div class="tab" onclick="showToast('Section 3 photos not yet added.')">Section 3</div>
+</div>
+
+<main>
+  <aside class="photo-grid" id="photo-grid">
+    <h3>Photos</h3>
+    <!-- Filled by JS -->
+  </aside>
+  <div class="viewer" id="viewer">
+    <div class="viewer-hint" id="viewer-hint">
+      <div class="big">📷</div>
+      Select a photo from the left<br>or search for a name above
+    </div>
+    <div class="viewer-inner" id="viewer-inner">
+      <img id="viewer-img" src="" alt="" style="display:none">
+    </div>
+    <div class="viewer-label" id="viewer-label" style="display:none"></div>
+    <div class="viewer-controls">
+      <button class="ctrl-btn" onclick="zoom(1.3)" title="Zoom in">+</button>
+      <button class="ctrl-btn" onclick="zoom(1/1.3)" title="Zoom out">−</button>
+      <button class="ctrl-btn" onclick="resetView()" title="Reset">⊙</button>
+    </div>
+    <div id="brick-tooltip" class="brick-tooltip"></div>
+  </div>
+</main>
+
+<div class="data-strip">
+  <span id="brick-count">0 bricks catalogued</span>
+  <span>·</span>
+  <button onclick="exportJSON()">Export brick data</button>
+  <span>·</span>
+  <button onclick="exportCSV()">Download as CSV</button>
+  <span>·</span>
+  <span style="font-style:italic">Click "Add a Brick" to tag a brick's location on any photo</span>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h2 id="modal-title">Tag a Brick</h2>
+    <p id="modal-desc">Fill in the details for this brick. Row/Col help alumni find the brick visually.</p>
+    <div class="form-group">
+      <label>Name on Brick *</label>
+      <input type="text" id="f-name" placeholder="e.g. John & Jane Smith">
+    </div>
+    <div class="form-group">
+      <label>Inscription / Class Year</label>
+      <input type="text" id="f-inscription" placeholder="e.g. Class of 2001">
+    </div>
+    <div class="form-group">
+      <label>Photo</label>
+      <select id="f-photo"></select>
+    </div>
+    <div style="display:flex; gap:10px">
+      <div class="form-group" style="flex:1">
+        <label>Row (from top, 1-based)</label>
+        <input type="number" id="f-row" min="1" placeholder="e.g. 5">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>Column (from left, 1-based)</label>
+        <input type="number" id="f-col" min="1" placeholder="e.g. 8">
+      </div>
+    </div>
+    <div style="display:flex; gap:10px">
+      <div class="form-group" style="flex:1">
+        <label>Pixel X (optional, precise)</label>
+        <input type="number" id="f-px" placeholder="auto from row/col">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>Pixel Y (optional, precise)</label>
+        <input type="number" id="f-py" placeholder="auto from row/col">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveBrick()">Save Brick</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const PHOTOS = [
+  { file: 'photos/20260609_115155_display.jpg', thumb: 'photos/20260609_115155_thumb.jpg', label: 'Photo 1', w: 1800, h: 2400 },
+  { file: 'photos/20260609_115209_display.jpg', thumb: 'photos/20260609_115209_thumb.jpg', label: 'Photo 2', w: 1800, h: 2400 },
+  { file: 'photos/20260609_115214_display.jpg', thumb: 'photos/20260609_115214_thumb.jpg', label: 'Photo 3', w: 1800, h: 2400 },
+  { file: 'photos/20260609_115220_display.jpg', thumb: 'photos/20260609_115220_thumb.jpg', label: 'Photo 4', w: 1800, h: 2400 },
+  { file: 'photos/20260609_115225_display.jpg', thumb: 'photos/20260609_115225_thumb.jpg', label: 'Photo 5', w: 1800, h: 2400 },
+  { file: 'photos/20260609_115232_display.jpg', thumb: 'photos/20260609_115232_thumb.jpg', label: 'Photo 6', w: 1800, h: 2400 },
+];
+
+// Approximate brick dimensions for row/col → pixel conversion
+// A standard brick is ~120x80px at display resolution
+const BRICK_W = 120, BRICK_H = 80;
+const BRICK_ORIGIN_X = 150, BRICK_ORIGIN_Y = 100;
+
+let bricks = JSON.parse(localStorage.getItem('donor_bricks') || '[]');
+// Try to load bundled bricks.json too
+fetch('bricks.json').then(r => r.ok ? r.json() : []).then(data => {
+  if (data.length) {
+    // Merge: bundled data is source of truth for existing IDs
+    const ids = new Set(bricks.map(b => b.id));
+    data.forEach(b => { if (!ids.has(b.id)) bricks.push(b); });
+    saveBricks();
+    renderCount();
+    renderGrid();
+  }
+}).catch(() => {});
+
+// ============================================================
+// STATE
+// ============================================================
+let currentPhoto = null;
+let scale = 1, panX = 0, panY = 0;
+let dragging = false, startX, startY, startPanX, startPanY;
+let editingId = null;
+let activeHighlights = [];
+
+// ============================================================
+// RENDER GRID
+// ============================================================
+function renderGrid() {
+  const grid = document.getElementById('photo-grid');
+  const h3 = grid.querySelector('h3');
+  grid.innerHTML = '';
+  grid.appendChild(h3);
+
+  PHOTOS.forEach((p, i) => {
+    const count = bricks.filter(b => b.photoIndex === i).length;
+    const card = document.createElement('div');
+    card.className = 'thumb-card' + (currentPhoto === i ? ' active' : '');
+    card.innerHTML = `
+      <img src="${p.thumb}" alt="${p.label}" loading="lazy">
+      <div class="thumb-label">${p.label}</div>
+      ${count ? `<div class="thumb-count">${count}</div>` : ''}
+    `;
+    card.onclick = () => loadPhoto(i);
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// VIEWER
+// ============================================================
+function loadPhoto(index, flyToX, flyToY) {
+  currentPhoto = index;
+  const p = PHOTOS[index];
+  const img = document.getElementById('viewer-img');
+  const inner = document.getElementById('viewer-inner');
+  const hint = document.getElementById('viewer-hint');
+  const label = document.getElementById('viewer-label');
+
+  // Clear existing overlays
+  inner.querySelectorAll('.brick-overlay').forEach(el => el.remove());
+  activeHighlights = [];
+
+  img.onload = () => {
+    img.style.display = 'block';
+    hint.style.display = 'none';
+    label.style.display = 'block';
+    label.textContent = p.label;
+    resetView();
+
+    // If fly-to coords given, center on them after reset
+    if (flyToX !== undefined) {
+      setTimeout(() => {
+        flyTo(flyToX, flyToY);
+      }, 100);
+    }
+
+    // Re-render all overlays for this photo
+    renderOverlays(index);
+  };
+  img.src = p.file;
+
+  renderGrid();
+}
+
+function renderOverlays(photoIndex) {
+  const inner = document.getElementById('viewer-inner');
+  inner.querySelectorAll('.brick-overlay').forEach(el => el.remove());
+
+  bricks.filter(b => b.photoIndex === photoIndex).forEach(b => {
+    const div = createOverlay(b);
+    inner.appendChild(div);
+  });
+}
+
+function createOverlay(brick) {
+  const div = document.createElement('div');
+  div.className = 'brick-overlay';
+  div.dataset.id = brick.id;
+  const coords = brickCoords(brick);
+  div.style.left = coords.x + 'px';
+  div.style.top = coords.y + 'px';
+  div.style.width = BRICK_W + 'px';
+  div.style.height = BRICK_H + 'px';
+
+  div.addEventListener('mouseenter', (e) => {
+    const tt = document.getElementById('brick-tooltip');
+    tt.innerHTML = `<strong>${brick.name}</strong>${brick.inscription ? '<br>' + brick.inscription : ''}`;
+    tt.style.display = 'block';
+    positionTooltip(e);
+  });
+  div.addEventListener('mousemove', positionTooltip);
+  div.addEventListener('mouseleave', () => {
+    document.getElementById('brick-tooltip').style.display = 'none';
+  });
+  return div;
+}
+
+function brickCoords(brick) {
+  if (brick.px !== undefined && brick.py !== undefined) {
+    return { x: brick.px, y: brick.py };
+  }
+  // Estimate from row/col
+  const row = (brick.row || 1) - 1;
+  const col = (brick.col || 1) - 1;
+  return {
+    x: BRICK_ORIGIN_X + col * (BRICK_W + 4),
+    y: BRICK_ORIGIN_Y + row * (BRICK_H + 4)
+  };
+}
+
+function positionTooltip(e) {
+  const viewer = document.getElementById('viewer');
+  const rect = viewer.getBoundingClientRect();
+  const tt = document.getElementById('brick-tooltip');
+  let tx = e.clientX - rect.left + 12;
+  let ty = e.clientY - rect.top - 36;
+  if (tx + 200 > rect.width) tx = e.clientX - rect.left - 180;
+  tt.style.left = tx + 'px';
+  tt.style.top = ty + 'px';
+}
+
+// ============================================================
+// PAN & ZOOM
+// ============================================================
+const viewer = document.getElementById('viewer');
+const inner = document.getElementById('viewer-inner');
+
+function applyTransform() {
+  inner.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  inner.style.transformOrigin = '0 0';
+}
+
+function resetView() {
+  const vw = viewer.clientWidth, vh = viewer.clientHeight;
+  const img = document.getElementById('viewer-img');
+  const iw = img.naturalWidth || 1800, ih = img.naturalHeight || 2400;
+  scale = Math.min(vw / iw, vh / ih) * 0.95;
+  panX = (vw - iw * scale) / 2;
+  panY = (vh - ih * scale) / 2;
+  applyTransform();
+}
+
+function zoom(factor, cx, cy) {
+  const vw = viewer.clientWidth, vh = viewer.clientHeight;
+  cx = cx ?? vw / 2; cy = cy ?? vh / 2;
+  const imgX = (cx - panX) / scale;
+  const imgY = (cy - panY) / scale;
+  scale = Math.max(0.1, Math.min(20, scale * factor));
+  panX = cx - imgX * scale;
+  panY = cy - imgY * scale;
+  applyTransform();
+}
+
+function flyTo(imgX, imgY) {
+  const vw = viewer.clientWidth, vh = viewer.clientHeight;
+  scale = 3;
+  panX = vw / 2 - imgX * scale;
+  panY = vh / 2 - imgY * scale;
+  applyTransform();
+}
+
+viewer.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = viewer.getBoundingClientRect();
+  zoom(e.deltaY < 0 ? 1.12 : 1/1.12, e.clientX - rect.left, e.clientY - rect.top);
+}, { passive: false });
+
+viewer.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  dragging = true; viewer.classList.add('dragging');
+  startX = e.clientX; startY = e.clientY;
+  startPanX = panX; startPanY = panY;
+});
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  panX = startPanX + (e.clientX - startX);
+  panY = startPanY + (e.clientY - startY);
+  applyTransform();
+});
+window.addEventListener('mouseup', () => {
+  dragging = false; viewer.classList.remove('dragging');
+});
+
+// Touch support
+viewer.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    dragging = true;
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+    startPanX = panX; startPanY = panY;
+  }
+}, { passive: true });
+viewer.addEventListener('touchmove', e => {
+  if (dragging && e.touches.length === 1) {
+    panX = startPanX + (e.touches[0].clientX - startX);
+    panY = startPanY + (e.touches[0].clientY - startY);
+    applyTransform();
+  }
+}, { passive: true });
+viewer.addEventListener('touchend', () => { dragging = false; });
+
+// ============================================================
+// SEARCH
+// ============================================================
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) { searchResults.classList.remove('open'); return; }
+
+  const matches = bricks.filter(b =>
+    b.name.toLowerCase().includes(q) ||
+    (b.inscription || '').toLowerCase().includes(q)
+  ).slice(0, 20);
+
+  if (!matches.length) {
+    searchResults.innerHTML = `<div class="no-results">No bricks found for "${searchInput.value}"</div>`;
+  } else {
+    searchResults.innerHTML = matches.map(b => `
+      <div class="result-item" onclick="selectBrick('${b.id}')">
+        <div class="name">${highlight(b.name, q)}</div>
+        <div class="meta">${b.inscription || ''} · ${PHOTOS[b.photoIndex]?.label || ''}</div>
+      </div>
+    `).join('');
+  }
+  searchResults.classList.add('open');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) searchResults.classList.remove('open');
+});
+
+function highlight(text, q) {
+  const idx = text.toLowerCase().indexOf(q);
+  if (idx < 0) return text;
+  return text.slice(0, idx) + `<mark style="background:var(--highlight);color:#000">${text.slice(idx, idx + q.length)}</mark>` + text.slice(idx + q.length);
+}
+
+function selectBrick(id) {
+  const brick = bricks.find(b => b.id === id);
+  if (!brick) return;
+  searchResults.classList.remove('open');
+
+  const coords = brickCoords(brick);
+
+  if (currentPhoto !== brick.photoIndex) {
+    loadPhoto(brick.photoIndex, coords.x + BRICK_W/2, coords.y + BRICK_H/2);
+  } else {
+    flyTo(coords.x + BRICK_W/2, coords.y + BRICK_H/2);
+    highlightBrick(id);
+  }
+  // Highlight after load
+  setTimeout(() => highlightBrick(id), 300);
+  showToast(`Found: ${brick.name}`);
+}
+
+function highlightBrick(id) {
+  const inner = document.getElementById('viewer-inner');
+  inner.querySelectorAll('.brick-overlay').forEach(el => el.classList.remove('visible'));
+  const el = inner.querySelector(`[data-id="${id}"]`);
+  if (el) el.classList.add('visible');
+}
+
+// ============================================================
+// ADD / EDIT BRICK MODAL
+// ============================================================
+function openAddModal(editId) {
+  editingId = editId || null;
+  const modal = document.getElementById('modal-bg');
+  const photoSel = document.getElementById('f-photo');
+  photoSel.innerHTML = PHOTOS.map((p, i) => `<option value="${i}">${p.label}</option>`).join('');
+
+  if (editId) {
+    const b = bricks.find(x => x.id === editId);
+    document.getElementById('modal-title').textContent = 'Edit Brick';
+    document.getElementById('modal-desc').textContent = 'Update this brick\'s details.';
+    document.getElementById('f-name').value = b.name || '';
+    document.getElementById('f-inscription').value = b.inscription || '';
+    document.getElementById('f-photo').value = b.photoIndex;
+    document.getElementById('f-row').value = b.row || '';
+    document.getElementById('f-col').value = b.col || '';
+    document.getElementById('f-px').value = b.px !== undefined ? b.px : '';
+    document.getElementById('f-py').value = b.py !== undefined ? b.py : '';
+  } else {
+    document.getElementById('modal-title').textContent = 'Tag a Brick';
+    document.getElementById('modal-desc').textContent = 'Enter the brick details. Use Row/Col to mark its position (count from top-left).';
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-inscription').value = '';
+    document.getElementById('f-photo').value = currentPhoto ?? 0;
+    document.getElementById('f-row').value = '';
+    document.getElementById('f-col').value = '';
+    document.getElementById('f-px').value = '';
+    document.getElementById('f-py').value = '';
+  }
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+function saveBrick() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+
+  const photoIndex = parseInt(document.getElementById('f-photo').value);
+  const row = parseInt(document.getElementById('f-row').value) || undefined;
+  const col = parseInt(document.getElementById('f-col').value) || undefined;
+  const pxVal = document.getElementById('f-px').value;
+  const pyVal = document.getElementById('f-py').value;
+
+  const brick = {
+    id: editingId || Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    name,
+    inscription: document.getElementById('f-inscription').value.trim(),
+    photoIndex,
+    row, col,
+    px: pxVal !== '' ? parseFloat(pxVal) : undefined,
+    py: pyVal !== '' ? parseFloat(pyVal) : undefined,
+  };
+
+  if (editingId) {
+    const idx = bricks.findIndex(b => b.id === editingId);
+    if (idx >= 0) bricks[idx] = brick;
+  } else {
+    bricks.push(brick);
+  }
+
+  saveBricks();
+  closeModal();
+  renderCount();
+  renderGrid();
+  if (currentPhoto === photoIndex) {
+    renderOverlays(photoIndex);
+    const coords = brickCoords(brick);
+    flyTo(coords.x + BRICK_W/2, coords.y + BRICK_H/2);
+    setTimeout(() => highlightBrick(brick.id), 200);
+  }
+  showToast('Brick saved!');
+}
+
+// ============================================================
+// PERSIST & EXPORT
+// ============================================================
+function saveBricks() {
+  localStorage.setItem('donor_bricks', JSON.stringify(bricks));
+}
+
+function renderCount() {
+  document.getElementById('brick-count').textContent = `${bricks.length} brick${bricks.length !== 1 ? 's' : ''} catalogued`;
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(bricks, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'bricks.json'; a.click();
+}
+
+function exportCSV() {
+  const header = 'id,name,inscription,photo,row,col,px,py\n';
+  const rows = bricks.map(b =>
+    [b.id, `"${b.name}"`, `"${b.inscription||''}"`, PHOTOS[b.photoIndex]?.label || '', b.row||'', b.col||'', b.px||'', b.py||''].join(',')
+  ).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'bricks.csv'; a.click();
+}
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      if (file.name.endsWith('.json')) {
+        const data = JSON.parse(e.target.result);
+        let added = 0;
+        const ids = new Set(bricks.map(b => b.id));
+        data.forEach(b => { if (!ids.has(b.id)) { bricks.push(b); added++; } });
+        saveBricks(); renderCount(); renderGrid();
+        showToast(`Imported ${added} bricks`);
+      } else {
+        // CSV
+        const lines = e.target.result.split('\n').slice(1).filter(l => l.trim());
+        let added = 0;
+        const ids = new Set(bricks.map(b => b.id));
+        lines.forEach(line => {
+          const [id, name, inscription, photo, row, col, px, py] = line.split(',');
+          const pIdx = PHOTOS.findIndex(p => p.label === photo);
+          const brick = {
+            id: id.trim(), name: (name||'').replace(/"/g,'').trim(),
+            inscription: (inscription||'').replace(/"/g,'').trim(),
+            photoIndex: pIdx >= 0 ? pIdx : 0,
+            row: row ? parseInt(row) : undefined, col: col ? parseInt(col) : undefined,
+            px: px ? parseFloat(px) : undefined, py: py ? parseFloat(py) : undefined,
+          };
+          if (!ids.has(brick.id) && brick.name) { bricks.push(brick); added++; }
+        });
+        saveBricks(); renderCount(); renderGrid();
+        showToast(`Imported ${added} bricks`);
+      }
+    } catch(err) { showToast('Import failed – check file format'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// SECTION SWITCH (placeholder)
+// ============================================================
+function switchSection(i) {
+  document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderGrid();
+renderCount();
+// Load first photo automatically
+loadPhoto(0);
+</script>
+</body>
+</html>

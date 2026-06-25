@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donor Brick Monument – Section 1</title>
+<style>
+:root {
+  --brick-bg:      #c8714a;
+  --brick-border:  #a0502e;
+  --brick-mortar:  #c9aa80;
+  --brick-text:    #3a1a08;
+  --brick-empty:   #b8724f;
+  --soil:          #1a0e06;
+  --accent:        #e8a050;
+  --bg:            #1e1208;
+  --surface:       #2e1c0e;
+  --surface2:      #3e2a18;
+  --text:          #f0e4d0;
+  --muted:         #9a7050;
+  --hi-bg:         #fff176;
+  --hi-border:     #f9a825;
+  --act-bg:        #ffeb3b;
+  --act-border:    #ff6f00;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: var(--bg); color: var(--text);
+       height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── HEADER ─────────────────────────────────────────── */
+header {
+  background: linear-gradient(135deg, #8b3a1e, #c8714a);
+  padding: 12px 20px; display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.5); flex-shrink: 0;
+}
+.logo { font-size: 26px; }
+.htext h1 { font-size: 19px; font-weight: normal; }
+.htext p  { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; }
+.hstats   { margin-left: auto; text-align: right; font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.6; }
+
+/* ── TOOLBAR ─────────────────────────────────────────── */
+.toolbar {
+  background: var(--surface); border-bottom: 1px solid var(--surface2);
+  padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex-shrink: 0;
+}
+.sw { position: relative; flex: 1; min-width: 180px; }
+.sw input {
+  width: 100%; padding: 7px 12px 7px 34px;
+  background: var(--bg); border: 1px solid var(--surface2); border-radius: 18px;
+  color: var(--text); font-size: 13px; outline: none; transition: border-color .2s;
+}
+.sw input:focus { border-color: var(--accent); }
+.si { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
+#rinfo { font-size: 12px; color: var(--accent); min-width: 100px; }
+.cb {
+  background: var(--surface2); border: 1px solid #5a3a20; color: var(--text);
+  padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit;
+  transition: background .15s; white-space: nowrap;
+}
+.cb:hover { background: #5a3a20; }
+.tabs { display: flex; margin-left: 6px; }
+.tab { padding: 6px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
+       border-bottom: 2px solid transparent; transition: all .2s; }
+.tab:hover { color: var(--text); }
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar {
+  width: 230px; min-width: 230px; background: var(--surface);
+  border-right: 1px solid var(--surface2); display: flex; flex-direction: column; overflow: hidden;
+}
+.sidebar h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+              color: var(--muted); padding: 9px 13px 5px; }
+#blist { flex: 1; overflow-y: auto; }
+.li {
+  padding: 7px 13px; cursor: pointer; border-bottom: 1px solid var(--surface2);
+  font-size: 11px; line-height: 1.4; transition: background .15s;
+}
+.li:hover { background: var(--surface2); }
+.li.hi { background: rgba(248,161,48,.15); }
+.li .ln { font-weight: bold; color: var(--text); }
+.li .ls { color: var(--muted); margin-top: 1px; }
+.li .lp { color: #6a4a28; font-size: 9px; margin-top: 1px; }
+
+/* ── VIEWPORT ─────────────────────────────────────────── */
+.vp {
+  flex: 1; overflow: hidden; position: relative;
+  background: var(--soil); cursor: grab;
+}
+.vp.drag { cursor: grabbing; }
+.canvas { position: absolute; transform-origin: 0 0; }
+
+/* ── MONUMENT ─────────────────────────────────────────── */
+.mon { position: relative; }
+
+/* Mortar background panels (T-shape) */
+.mbg {
+  position: absolute;
+  background: var(--brick-mortar);
+  border-radius: 3px;
+}
+
+/* Orientation labels */
+.orient {
+  position: absolute; pointer-events: none;
+  font-size: 9px; font-family: sans-serif; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #7a5c38; text-align: center;
+}
+
+/* Row ruler ticks */
+.rtick {
+  position: absolute; pointer-events: none;
+  font-size: 8px; font-family: sans-serif; color: #8a6434;
+  line-height: 1;
+}
+
+/* ── BRICKS ─────────────────────────────────────────── */
+.brick {
+  position: absolute;
+  background: var(--brick-bg);
+  border: 1px solid var(--brick-border);
+  border-radius: 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2px 3px; text-align: center;
+  cursor: pointer; overflow: hidden;
+  transition: transform .1s, box-shadow .1s;
+  user-select: none;
+}
+.brick:hover { transform: scale(1.07); box-shadow: 0 3px 14px rgba(0,0,0,.55); z-index: 10; }
+
+.brick .bl {
+  font-weight: bold; letter-spacing: 0.3px;
+  color: var(--brick-text); line-height: 1.25; font-family: 'Times New Roman', serif;
+  text-transform: uppercase; display: block; width: 100%; text-align: center;
+  white-space: nowrap; overflow: hidden;
+}
+
+.brick.empty {
+  background: var(--brick-empty); border-color: #9a5030;
+  cursor: default; opacity: 0.5;
+}
+.brick.empty:hover { transform: none; box-shadow: none; }
+
+.brick.hi {
+  background: var(--hi-bg) !important; border-color: var(--hi-border) !important;
+  box-shadow: 0 0 0 2px var(--hi-border), 0 0 14px rgba(249,168,37,.6) !important;
+  z-index: 20;
+}
+.brick.hi .bl { color: #3a2000 !important; }
+
+.brick.act {
+  background: var(--act-bg) !important; border-color: var(--act-border) !important;
+  box-shadow: 0 0 0 3px var(--act-border), 0 0 22px rgba(255,111,0,.7) !important;
+  z-index: 30; animation: bp 1.2s ease-in-out infinite;
+}
+@keyframes bp {
+  0%,100% { box-shadow: 0 0 0 3px var(--act-border), 0 0 16px rgba(255,111,0,.55); }
+  50%      { box-shadow: 0 0 0 6px var(--act-border), 0 0 30px rgba(255,111,0,.9); }
+}
+.brick.act .bl { color: #1a0800 !important; }
+
+/* ── ZOOM CONTROLS ─────────────────────────────────── */
+.zctrl { position: absolute; bottom: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
+.zb {
+  width: 32px; height: 32px; background: var(--surface); border: 1px solid var(--surface2);
+  color: var(--text); border-radius: 50%; font-size: 17px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .15s;
+}
+.zb:hover { background: var(--surface2); }
+
+/* ── DETAIL PANEL ─────────────────────────────────── */
+.dp {
+  position: absolute; bottom: 14px; left: 14px; z-index: 50;
+  background: rgba(24,10,2,.94); border: 1px solid var(--surface2);
+  border-radius: 10px; padding: 13px 17px; max-width: 270px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.7); display: none;
+}
+.dp.open { display: block; }
+.dp h4 { font-size: 14px; color: var(--accent); margin-bottom: 5px; }
+.dp .dt { font-size: 12px; line-height: 1.6; color: var(--text); }
+.dp .dpos { font-size: 10px; color: var(--muted); margin-top: 5px; }
+.dpx { position: absolute; top: 7px; right: 9px; cursor: pointer; color: var(--muted); font-size: 15px; }
+
+/* ── LEGEND ─────────────────────────────────────────── */
+.legend {
+  position: absolute; top: 8px; right: 8px; z-index: 50;
+  background: rgba(24,10,2,.88); border: 1px solid var(--surface2);
+  border-radius: 8px; padding: 9px 11px; font-size: 10px;
+}
+.lgi { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.lgs { width: 18px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── TOAST ─────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: var(--bg); padding: 8px 20px; border-radius: 20px;
+  font-size: 12px; font-weight: bold; opacity: 0; pointer-events: none; z-index: 200;
+  transition: opacity .25s;
+}
+#toast.show { opacity: 1; }
+
+/* ── ADMIN ───────────────────────────────────────────── */
+:root { --admin-accent: #ff9800; }
+.hadmin-btn {
+  background: rgba(0,0,0,.3); border: 1px solid rgba(255,152,0,.5);
+  color: rgba(255,255,255,.6); padding: 5px 9px; border-radius: 6px;
+  cursor: pointer; font-size: 11px; font-family: inherit; transition: all .2s;
+}
+.hadmin-btn:hover { background: rgba(255,152,0,.2); color: #ff9800; border-color: #ff9800; }
+.adminbar {
+  background: #1a0800; border-bottom: 2px solid var(--admin-accent);
+  padding: 7px 14px; display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0; font-size: 12px;
+}
+.adminbar label { color: var(--text); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.admin-badge { color: var(--admin-accent); font-weight: bold; font-size: 13px; }
+body.edit-mode .brick:not(.empty) { cursor: cell; box-shadow: 0 0 0 1px rgba(255,152,0,.4) inset; }
+body.edit-mode .brick:not(.empty):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); transform: scale(1.07); }
+body.edit-mode .brick:not(.empty)::after { content: '✏'; position: absolute; top: 1px; right: 2px; font-size: 6px; color: rgba(255,152,0,.8); pointer-events: none; }
+body.edit-mode .brick.empty { cursor: cell; opacity: .7; }
+body.edit-mode .brick.empty:hover { opacity:1; transform:scale(1.05); box-shadow:0 0 0 2px var(--admin-accent); }
+.emodal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.75);
+  display: none; align-items: center; justify-content: center; z-index: 400;
+}
+.emodal-overlay.open { display: flex; }
+.emodal {
+  background: var(--surface); border: 1px solid var(--admin-accent);
+  border-radius: 12px; padding: 22px 26px; min-width: 320px; max-width: 460px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.8);
+}
+.emodal h3 { font-size: 15px; color: var(--admin-accent); margin-bottom: 4px; }
+.emodal .epos { font-size: 10px; color: var(--muted); margin-bottom: 14px; }
+.emodal label { display: block; font-size: 10px; color: var(--muted); margin: 8px 0 3px; text-transform: uppercase; letter-spacing: .8px; }
+.emodal input[type=text], .emodal select {
+  width: 100%; background: var(--bg); border: 1px solid var(--surface2);
+  border-radius: 6px; padding: 7px 10px; color: var(--text); font-size: 12px;
+  font-family: Georgia, serif; outline: none; transition: border-color .2s;
+}
+.emodal input[type=text]:focus, .emodal select:focus { border-color: var(--admin-accent); }
+.emodal .ebtns { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.ebtn-save { background: var(--admin-accent); color: #1a0800; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; font-weight: bold; }
+.ebtn-cancel { background: var(--surface2); color: var(--text); border: 1px solid #5a3a20; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; }
+.ebtn-clear { background: none; color: #ff6060; border: 1px solid #ff6060; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; margin-right: auto; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+
+/* ── DRAG-DROP & PLACE MODE ─────────────────────────── */
+.drag-ghost {
+  position: fixed; z-index: 500; pointer-events: none;
+  background: var(--brick-bg); border: 2px solid var(--admin-accent);
+  border-radius: 3px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 2px 3px;
+  text-align: center; opacity: 0.9;
+  box-shadow: 0 8px 28px rgba(0,0,0,.8); transform: scale(1.12) rotate(-2deg);
+}
+.brick.drop-target {
+  box-shadow: 0 0 0 3px var(--admin-accent), 0 0 18px rgba(255,152,0,.7) !important;
+  background: rgba(255,152,0,.3) !important; z-index: 25; transition: none !important;
+}
+body.drag-active * { cursor: grabbing !important; user-select: none; }
+.pbtn-on { background: rgba(76,175,80,.2) !important; color: #4caf50 !important; border-color: #4caf50 !important; }
+body.place-mode .brick.empty {
+  background: rgba(76,175,80,.2) !important; border-color: rgba(76,175,80,.6) !important;
+  opacity: 1 !important; cursor: crosshair !important;
+}
+body.place-mode .brick.empty:hover {
+  background: rgba(76,175,80,.45) !important; transform: scale(1.06);
+  box-shadow: 0 0 0 2px #4caf50 !important;
+}
+body.edit-mode .brick:not(.empty) { cursor: grab; }
+body.edit-mode .brick:not(.empty):active { cursor: grabbing; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧱</div>
+  <div class="htext">
+    <h1>Donor Brick Monument — Section 1</h1>
+    <p>Southwestern University · Section 1 · T-shaped monument · Running bond layout · ~185 bricks recorded</p>
+  </div>
+  <div class="hstats" id="hstats">Loading…</div>
+  <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
+</header>
+
+<!-- Admin bar (hidden until logged in) -->
+<div class="adminbar" id="adminBar" style="display:none">
+  <span class="admin-badge">⚙ ADMIN MODE</span>
+  <label><input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks</label>
+  <span style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
+  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
+  <button class="cb" id="placeBtn" onclick="togglePlaceMode()" style="border-color:#4caf50;color:#4caf50" title="Click any empty slot to place a new brick">📍 Place Brick</button>
+  <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
+  <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
+</div>
+
+<div class="toolbar">
+  <div class="sw">
+    <span class="si">🔍</span>
+    <input id="search" type="text" placeholder="Search name, class year, inscription…" autocomplete="off">
+  </div>
+  <span id="rinfo"></span>
+  <div class="tabs">
+    <div class="tab on">Section 1</div>
+    <div class="tab" onclick="location.href='section2.html'">Section 2</div>
+    <div class="tab" onclick="location.href='section3.html'">Section 3</div>
+  </div>
+  <button class="cb" onclick="resetView()">⊙ Reset</button>
+  <button class="cb" onclick="exportCSV()">⬇ Export</button>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <h3>Recorded Bricks (<span id="rcnt">0</span>)</h3>
+    <div id="blist"></div>
+  </aside>
+
+  <div class="vp" id="vp">
+    <div class="canvas" id="canvas">
+      <div class="mon" id="mon"></div>
+    </div>
+
+    <div class="zctrl">
+      <button class="zb" onclick="zoom(1.25)" title="Zoom in">+</button>
+      <button class="zb" onclick="zoom(0.8)"  title="Zoom out">−</button>
+      <button class="zb" onclick="resetView()" title="Fit view" style="font-size:11px">⊙</button>
+    </div>
+
+    <div class="legend">
+      <div class="lgi"><div class="lgs" style="background:#c8714a;border:1px solid #a0502e"></div>Recorded brick</div>
+      <div class="lgi"><div class="lgs" style="background:#b8724f;opacity:.5;border:1px solid #9a5030"></div>Unrecorded</div>
+      <div class="lgi"><div class="lgs" style="background:#fff176;border:1px solid #f9a825"></div>Search match</div>
+    </div>
+
+    <div class="dp" id="dp">
+      <span class="dpx" onclick="closeDetail()">✕</span>
+      <h4 id="dpname"></h4>
+      <div class="dt" id="dptext"></div>
+      <div class="dpos" id="dppos"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="emodal-overlay" id="editOverlay">
+  <div class="emodal">
+    <h3>✏ Edit Brick</h3>
+    <div class="epos" id="epos"></div>
+    <label>Line 1 (primary name / title)</label>
+    <input type="text" id="el1" placeholder="Primary inscription line">
+    <label>Line 2</label>
+    <input type="text" id="el2" placeholder="Second line (optional)">
+    <label>Line 3</label>
+    <input type="text" id="el3" placeholder="Third line (optional)">
+    <label>Line 4</label>
+    <input type="text" id="el4" placeholder="Fourth line (optional)">
+    <label>Line 5</label>
+    <input type="text" id="el5" placeholder="Fifth line (optional)">
+    <label>Line 6</label>
+    <input type="text" id="el6" placeholder="Sixth line (optional)">
+    <label>Line 7</label>
+    <input type="text" id="el7" placeholder="Seventh line (optional)">
+    <label>Line 8</label>
+    <input type="text" id="el8" placeholder="Eighth line (optional)">
+    <label>Brick size</label>
+    <select id="esize">
+      <option value="1,1">Standard (1 col × 1 row)</option>
+      <option value="2,1">Wide (2 cols × 1 row)</option>
+      <option value="1,2">Tall (1 col × 2 rows)</option>
+      <option value="2,2">Large (2 cols × 2 rows)</option>
+    </select>
+    <div class="ebtns">
+      <button class="ebtn-clear" onclick="clearBrickEdit()">Clear brick</button>
+      <button class="ebtn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="ebtn-save" onclick="saveBrickEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// LAYOUT CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const BW = 80, BH = 40, GAP = 4;
+const SX = BW + GAP;          // stride x = 84
+const SY = BH + GAP;          // stride y = 44
+const STAG = SX / 2;          // stagger offset = 42
+const PAD = 18;
+
+const MCOLS = 25, MROWS = 33; // main section
+const SCOLS = 6,  SROWS = 8;  // stem section
+const SCOL0 = 9;              // stem starts at col 9 (cols 9-14)
+const SROW0 = MROWS;          // stem starts at row 33
+
+// Computed canvas size
+const CW = 2 * PAD + MCOLS * SX;               // 2166
+const CH = 2 * PAD + (MROWS + SROWS) * SY;     // 1840
+
+// ═══════════════════════════════════════════════════════════
+// COORDINATE HELPERS
+// ═══════════════════════════════════════════════════════════
+function bx(col, row) {
+  return PAD + col * SX + (row % 2 === 1 && !straightRows.has(row) ? STAG : 0);
+}
+function by(row) {
+  return PAD + row * SY;
+}
+
+// Is (row, col) inside the T-shape?
+function valid(row, col) {
+  const staggered = row % 2 === 1 && !straightRows.has(row);
+  if (row >= 0 && row < MROWS)
+    return col >= 0 && col <= MCOLS - 1 - (staggered ? 1 : 0);
+  if (row >= SROW0 && row < SROW0 + SROWS)
+    return col >= SCOL0 && col <= SCOL0 + SCOLS - 1 - (staggered ? 1 : 0);
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════
+// COORDINATE REMAPPING — old 15-col × 26-row → new 25-col × 33-row
+// ═══════════════════════════════════════════════════════════
+function rRow(r) { return Math.min(MROWS - 1, Math.round(5 + r * 27 / 25)); }
+function rCol(c) { return Math.round(c * 24 / 14); }
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — edits baked in at export time (empty by default)
+// ═══════════════════════════════════════════════════════════
+const INITIAL_EDITS = {};
+
+// ── Google Apps Script sync ─────────────────────────────────
+// Paste your deployed web-app URL below. Leave blank for local-only mode.
+const SECTION_ID = 1;
+const GAS_URL    = 'https://script.google.com/macros/s/AKfycbxbKbla6zp7MPRsRo-3HxNA2baLJu6UI9VCaEyUxLITzzG0wOXexYY1_GObi_ahezBs/exec';
+
+const EDITS_KEY = 'brickEdits_s1';
+let localEdits  = JSON.parse(localStorage.getItem(EDITS_KEY) || '{}');
+let remoteEdits = {};
+let allEdits    = {};   // populated by initWithGAS() before first render
+function saveLocalEdits() { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }
+
+// ═══════════════════════════════════════════════════════════
+// BRICK DATA  (original coords, remapped at load time)
+// [old_row, old_col, line1, line2?, line3?, size?]
+// ═══════════════════════════════════════════════════════════
+const RAW = [
+// ── section 4 / rows 22-25 (near walkway) ───────────────
+[25, 0,"STEN DAVIS KLINE","CLASS OF 1994"],
+[25, 1,"SARA MCCUTCHEN","CLASS OF 1996","AΔΠ Z '93"],
+[25, 2,"MICHAEL NGUYEN","SAYS KEEP IT JUICY!","CLASS OF 2003"],
+[25, 4,"PHILLIP SILVERMAN","CLASS OF 2019"],
+[25, 5,"NEVA L. MEBANE","CLASS 2017"],
+[25, 6,"ZACHARY ANGLIN '13","TIKA"],
+[25, 8,"ROBERT LANCASTER","PROFESSOR & CHAIR","ART DEPT 1959-1974",2],
+[25,10,"WENDY STREZA GASPA","CLASS OF 1992","AΘΩ ΔZ"],
+[25,11,"KYLIE LEBLANC '13"],
+[25,12,"MORGAN MEROVITCH","ALWAYS","BE SOUTHWESTERN",2],
+[25,14,"ANNA G. CONTRERAS '07","CLASS OF 2007"],
+[24,12,"JEAN-CLAUDE","ON T'AIME","TU NOUS MANQUES"],
+[24,13,"PETE KENNEDY","CLASS OF 1985"],
+[24,14,"JOHN W. CHAPMAN","CLASS OF 1960","PHYSICS"],
+[23,13,"THANK YOU S.U.","JULIA SYKORA"],
+[24,12,'"INDEED."'],
+[23,12,"CLASS OF 2004","MATTHEW MILLER"],
+[23,11,"DR. DOUG THOMPSON","CLASS OF 1984","DK KIM THOMPSON '85"],
+[22,11,"BERTHA FAUDOA","CLASS OF 2015","THE FIRST BUT NOT THE LAST",2],
+[22,13,"HATTIE ROSE KOTZUR","MUSIC MAJOR","CLASS OF 2016"],
+[22,14,"BRYONY MCLAUGHLIN","CLASS OF 2016"],
+[21,13,"REV. FRANCISCO P. ESTRADA","CLASS OF 1974"],
+[21,14,"DEE CHAPMAN BOWEN","CLASS OF 1987"],
+// ── section 3 / rows 15-21 ──────────────────────────────
+[21, 0,"JUNE E. FISHER","CLASS OF 1950","MARY CAY WILLIS '85",2],
+[21, 2,"-WANDER-EXPLORE-DISCOVER-","CLASS OF 2014"],
+[20, 0,"TY NIXON","CLASS OF 2018"],
+[20, 1,"CALEB BRIMMAGE"],
+[20, 2,"SARAH ALLY","D/O ANIS & SHAHLA","CLASS OF 2015"],
+[19, 0,"MORGAN & THERESA CAWTHON","CLASSES OF 1987 & 1988",null,2],
+[19, 2,"MELANIE BONEVAC","AΔΠ 2013"],
+[19, 3,"DANIEL R. COBOS","ΦΔΘ / ANGELA R. COBOS","ΔΔΔ"],
+[18, 0,"NICHOLAS THOR HURTER","KAPPA SIGMA","SPRING '14"],
+[18, 1,"AMANDA KRCHA LESIKAR","2001 / ΑΞΔ"],
+[18, 2,"JEREMY D. SNYDER"],
+[18, 3,"DR. JULIA PA."],
+[17, 0,"DAVID & DANNETTE JOHNSON","CLASS OF 1995"],
+[17, 1,"WORTH PAYTON","CLASS OF 2017","ΚΣ / ΑΦΩ"],
+[17, 2,"CARA P. HOLMES","CLASS OF 1997","ΛΔΠ Z'94"],
+[21, 4,"DIANE MCMEANS KREGER","DELTA ZETA","CLASS OF 1976"],
+[21, 5,"BROOKE B. CAUDELL","CLASS OF 1987"],
+[21, 6,"BELLE V. JO","POLITICAL SCIENCE 2015"],
+[20, 4,"E.M. RAY CLASS OF 1951","H.S. RAY CLASS OF 1952"],
+[20, 5,"DR. & MRS. ROBERT CATES"],
+[20, 6,"ABBY EARLE","UPC, ΣΦΛ, SPC, ΚΔΠ","EDUCATION MAJOR"],
+[20, 7,"THANKS MOM & DAD","FOR THE LOVE & SUPPORT","GAVIN MORGAN"],
+[19, 4,"THE RENEGAR WEST FAMILY",null,null,2],
+[19, 6,"DAVID & PAMELA EIMANN","1981-1992"],
+[19, 7,"ABE MARTINEZ","ΚΣ MR. SOUTHWESTERN","CLASS OF 2016"],
+[18, 4,"JACKSON R. TIMIAN","LACROSSE / TIKA MAY 2015"],
+[18, 5,"EMILY PATTERSON","ΣΦΛ CLASS OF 2015"],
+[18, 6,"HAYLEE","CLASS OF 2016","AΦΩ"],
+[17, 4,"CATIE WILLIS","BZ COMM STUDIES","NAIDEIA, ADΠI, LAX"],
+[17, 5,"CHRISTINA GRANADO GONZALES","WOMEN'S SOCCER #2","CLASS OF 2005"],
+[17, 6,"EMMA KATHRYN GROVES","ΛΕΔ CLASS OF 2017"],
+[21, 8,"IN MEMORY OF JENNIFER MURPHY","BELOVED MURPH","AΔΠ Z '92"],
+[21, 9,"DEBBIE NEDBALEK 1983 (BASKETBALL)","KATHERINE FREEMAN","2015 (ZTA)"],
+[21,10,"SARA CZARNECKI","SHE BELIEVED SHE COULD","SO SHE DID 2015"],
+[21,11,"COTY MAY / KEENA","2005"],
+[20, 8,"FOR OUR DAUGHTER","JOAN MILBURN","CLASS OF 2019"],
+[20, 9,"CHARLES MCTYEIRE BISHOP","1911-1922"],
+[20,10,"ASHLEE MARTIN","CLASS OF 2000 / GOLF CHAMPS","DELTA DELTA DELTA"],
+[19, 8,"ALLIE BEITO","CLASS 2015 / ΔΔΔ"],
+[19, 9,"CAITLIN SCHNEIDER","CLASS OF 2017"],
+[19,10,"XUEYU DEREK SU","2017 / ΚΣ"],
+[18, 8,"CHRISTOPHER R. LUCA","PI KAPPA ALPHA","PIRATE #29"],
+[18, 9,"VIRGINIA P. STOFER","ALBUQUERQUE, NM","2015 TENNIS / ADΠI"],
+[18,10,"KENDAL BUERKLE","CLASS OF 2018","ZETA TAU ALPHA"],
+[17, 8,"POWER QUAD","AK CP RD CS"],
+[17, 9,"MICHAEL PERRI","2015 / KA"],
+[21,12,"ALWAYS CLASS OF 2012","JON & NISA","THANKS DR. CROW"],
+[21,13,"MASTERSON '75"],
+[20,12,"DYLAN WOOD / JENNIFER HARRIS","CLASSES OF '93 & '94"],
+[20,13,"ELLEN P. STEWART","ZTA CLASS OF 1997"],
+[19,12,"ELIZABETH KNOX / ERIC ARIAS","CLASS OF 2008"],
+[19,13,"AMBERLA ASHTON PREVOST","CLASS OF 2017","MATTHEW 19:26"],
+[18,11,"ROBERT KENNETH PETERS","1963-1967"],
+[18,12,"MARISSA PRIEST","CLASS OF 1983"],
+[17,11,"LAURA C. THORNTON","2009"],
+[17,12,"IN HONOR OF MY DAD","CHARLES CONTRERAS","WHO GOT ME THROUGH"],
+[17,13,"IN HONOR OF CHRISTOPHER JOHN ROARTY","2010"],
+[20,14,"IN MEMORIAM","HENRY MCCONNELL COX","1959-1963"],
+[19,14,"WOOD CLASS OF 2016","LIFE'S EVERY WORD"],
+// ── section 2 / rows 9-16 ───────────────────────────────
+[16, 0,"THOMAS B. WILKES JR.","CLASS OF 1939","NOCONA, TX / ΦΔΘ"],
+[16, 1,"WHITNEY MCCOLLY","CLASS OF 2013","LOVE YOU MOM AND DAD"],
+[16, 2,"SARAH BARNETT / VANESSA VASQUEZ","CLASS OF 2004"],
+[15, 0,"R.L. MCGUINGAN"],
+[15, 1,"FORREST ALEXANDER STANLEY-STEVENS","PERSEVERE AND SEE"],
+[15, 2,"DEBORAH WIENERS HEMPHILL","CLASS OF 1980 / ΦΜ"],
+[15, 3,"MEGAN HEALY SCH.","CLASS OF 2007"],
+[14, 0,"H. DAVID MEDLEY '48","ROSEMARY MEDLEY '49","NANCY ROWLEY '51 / MARY MEDLEY '74",2],
+[14, 2,"CHRISTIE BRUNNER ROBBINS","1997"],
+[14, 3,"GREGORY K. CAUDELL","CLASS OF 1986","KAPPA ALPHA ORDER"],
+[13, 0,"MOLLIE & STEVE BUTLER","CLASS OF 1995 & 1996",null,2],
+[13, 2,"JAMESON OTTO & STEVIE GARZA OTTO","CLASS OF 2007"],
+[13, 3,"CARLETON S. WILKES","CLASS OF 1976","SALADO, TX / ΠΚΑ"],
+[13, 4,"A. DANIELS #12"],
+[12, 0,"KAREN HOLLOMAN '90","IN HONOR OF","BEVERLY & HERB STONE"],
+[12, 1,"CHRISTIAN F. LOPEZ","VERY PROUD OF YOU","LOVE, MOM & DAD"],
+[12, 2,"JOAN BRAY","CLASS OF 1967"],
+[12, 3,"SANDI KRCHA / LALENA"],
+[11, 0,"EY STRAWN","CLASS OF 1992"],
+[11, 1,"CLASS OF 2014 MATTHEW MILLER"],
+[11, 2,"JOANN WALDROP"],
+[11, 3,"CHRISTINE SONNEN FERNANDEZ","CLASS OF 1997"],
+[10, 0,"ALAINA HAUB NEALE","BA CUM LAUDE 1996"],
+[10, 1,"HENRY FISHER","ATTENDED 1924-1925"],
+[16, 4,"BRYCE '94 FAMILY"],
+[16, 5,"JOSEPH — HOW BAD DO YOU WANT TO SUCCEED?","LOVE MOM & DAD"],
+[16, 6,"DR. MARO HERRICK","TIKA"],
+[16, 7,"NORA HORSCK","CLASS OF 1999"],
+[15, 4,"CHASE EASTLAND","2016"],
+[15, 5,"AUSTIN PATRICK ROBINSON","KA CLASS OF 2017"],
+[15, 6,"JIMMY ALLEYN","2015"],
+[15, 7,"BILL & JACKIE CALDWELL","DAVID 2004"],
+[14, 4,"NY MARTIN CLASS OF 2015","PHI LAMBDA"],
+[14, 5,"CAROL BENDER MAAK","1976-1980","DELTA DELTA DELTA"],
+[14, 6,"WILLIAM H. GLAZE","ALMA SMITH GLAZE","ΩΜΣ 1956"],
+[14, 7,"ANNANELLE HAROT","CLASS OF 1948","DISTINGUISHED ALUM 1998"],
+[13, 5,"VALDA MAECKEL JENSEN '53","CORPUS CHRISTI, TX"],
+[13, 6,"THE RICHARDS FAMILY","KENDALL, KELLY, BRYAN & DAVID",null,2],
+[13, 8,"BARB AND JOHN LIND"],
+[13, 9,"JORDAN L.","WOMEN'S LACROSSE","2013-2014"],
+[12, 5,"IN HONOR OF MAYA E. CUNA","THINK BIG, WORK HARD!",null,2],
+[12, 7,"WILL REED","CLASS OF '75"],
+[12, 8,"IN HONOR OF DR. EDWARD KAIN'S","WORK WITH STUDENTS","AND COLLEAGUES",2],
+[11, 5,"BEN S. GALINDO","CLASS OF 2016","EARTH FIRST"],
+[11, 6,"IN MEMORY OF ROBERT PAYSSEE","CLASS OF 1962"],
+[11, 7,"WENDY H. SNYDER & KATIE FROELICH","FROM ROOMMATES TO LIFELONG FRIENDS",null,2],
+[10, 5,"LESLIE DAVID ROMO","SUE LYNN COLE ROMO 1976","TIKA / ADΠI"],
+[10, 6,"SABRINA CAMACHO RANGEL","KEMPER SCHOLAR","CLASS OF 2015"],
+[10, 7,"PETER H. HAMEL","CLASS OF 1962","PHI DELTA THETA"],
+[16, 8,"HONORS GRADUATE 2015"],
+[16, 9,"OUR BELOVED MURPH","ADΠI Z '92"],
+[15, 8,"TIFFANY GRIESENBECK REX","2003"],
+[15, 9,"JAMES SAMUEL BARCUS","1924-1928"],
+[15,10,"IDA WILSON HARDT","1909-1911"],
+[14, 8,"LLEEN WILLIS","CLASS OF '84 / ALPHA DELTA PI"],
+[14, 9,"SHELBY LOVE","APΩ CLASS OF 2015"],
+[14,10,"IN MEMORY OF PEGGY OVERLY","FROM MOLLY & LIZ"],
+[14,11,"MCLAREN MEREDITH","CLASS OF 1944","BIOLOGY/GERMAN CUM LAUDE"],
+[13, 9,"MONIQUE CHAVEZ","CLASS OF 1994"],
+[13,10,"LINDA SOUTHWICK","BIOLOGY DEPARTMENT"],
+[12, 8,"JOHN WESLEY HARDT","DOCTOR OF DIVINITY","BISHOP OF THE UMC"],
+[12, 9,'"MEMORY IS SEATED PREDOMINANTLY IN THE HEART." — MATT & KELSEY',null,null,2],
+[12,11,"HANNAH STEEN","CLASS OF 2018"],
+[11, 8,"JUNE STRANG CHASE HANKINS","1962-1968 FREETHINKER"],
+[11, 9,"WOMEN'S LACROSSE EST. 2014","INAUGURAL COACH MATTHEW GROSSO",null,2],
+[11,11,"K.W. SCHOLL TRUST"],
+[10, 8,"IN HONOR OF ALL MY ZETA SISTERS","HELEN HICKS GROOS","CLASS OF 1974"],
+[10, 9,"ROBERT STEWART HYER","1898-1911"],
+[10,10,"THIRD GENERATION JANN WICKERSHAM BUTTERY","1956"],
+[16,12,"FLOYD & GRACONNA DYER","2006-2010"],
+[16,13,"HAPPY ANNIVERSARY","ME & HONEY LUCAS","CLASS OF 2016"],
+[16,14,"TIM & DANIELLE STAPLETON","2000-1999"],
+[15,12,"JIM SMITH '65","KAPPA ALPHA ORDER","IN MEMORY OF JIM A. & TOM H. '62"],
+[15,13,"IN MEMORY OF DOUGLAS G. SMITH AND FAMILY"],
+[14,12,"MICHAEL WEBB '97","LORI WILES WEBB '98","KA & AΔΠ"],
+[14,13,"MICHELLE CHUANG AND ROB MACK"],
+[14,14,"STEPHEN P. CRAGG","CLASS OF 1918"],
+[13,12,"DAVID STRONG CLASS OF 2015","IN MEMORY OF LES & FRAN STRONG"],
+[13,13,"PAUL D. PRICE","CLASS OF 1993","FOR MICAN AND KIERSTEN"],
+[12,12,"AMANDA LEE AMBROSE","CLASS OF 2017","WOMEN'S SOFTBALL INAUGURAL"],
+[12,13,"ELIZABETH DINN & MICHAEL HARSH","CLASSES OF '91 & '93"],
+[12,14,"BRETNA & MARVIN HACKERT"],
+[11,12,"WHITFIELD HORN","1922-1924"],
+[11,13,"IN MEMORY OF LYNDA A. MALONE"],
+[10,12,"CONNIE G. DANIEL","CLASS OF 2012"],
+[10,13,"IN MEMORY OF LYNDA A. MALONE"],
+[10,14,"LAURA N."],
+// ── section 1 / rows 3-9 ───────────────────────────────
+[ 9, 0,"ANDREA GUARDADOS","CLASS OF 2011 G.A."],
+[ 9, 1,"BOB THOMAS","TIKA / AΔΠ '75"],
+[ 9, 2,"MOLLY A. PRICE","ZETA TAU ALPHA","CLASS OF 2013"],
+[ 9, 3,"LITTLE FRIENDS FOREVER","EST. 2003 C/O 2005",null,2],
+[ 8, 0,"IN HONOR OF PROFESSOR MACY MELE LIEBER"],
+[ 8, 1,"LINDA BOYCE","SU STAFF RETIRED 2004"],
+[ 8, 2,"IN MEMORY OF MATTHEW C. BOGEN","CLASS OF 2010"],
+[ 8, 3,"ANNE PRICE ROMERO CLASS OF 2010","ARMANDO ROMERO CLASS OF 2011"],
+[ 7, 0,"RAYMOND L. FORD","PI KAPPA ALPHA","1968-1972"],
+[ 7, 1,"GEE THE GOOD / CAITLYN B. BOGAN","CLASS OF 2005"],
+[ 7, 2,"FIRST GENERATION SAMUEL LATHAM"],
+[ 6, 0,"HONOR... GRACE MARIE ALERS","CLASS OF 2017"],
+[ 6, 1,"CELESTINE NAN SUTTON","CLASS OF 2003"],
+[ 6, 2,"GLENN & PATRICIA LESMEISTER","KEVIN 2015"],
+[ 6, 3,"DANIEL R. COBOS '99 / ΦΔΘ","ANGELA R. COBOS '02 / ΔΔΔ"],
+[ 5, 0,"MIRANDA H. WOLK","CLASS OF 2010"],
+[ 5, 1,"SEAN D. O'NEIL 2006","ASHLEY E. STILL 2006"],
+[ 5, 2,"I LOVE THIS PLACE, IT LOVED ME BACK","RAVITA SINGH"],
+[ 5, 3,"MARCELA & CHRISTOF STRAUB","CLASS OF 2005"],
+[ 4, 0,"ALLIE LINDGREN 2015","U MUST FOLLOW YOUR HEART"],
+[ 4, 1,"LIANA N. HAMEL","CLASS OF 1998"],
+[ 4, 2,"JULIUS B. YOUNG","A WELL-WORN STONE","AESAR"],
+[ 3, 0,"SARA KATHLEEN GRIFFIN","CLASS OF 2016"],
+[ 3, 1,"ELIZABETH DRAKE WHEELER 1976","ZETA TAU ALPHA"],
+[ 3, 2,"SHANNON GILL","AΔΠ CLASS OF 1990"],
+[ 3, 3,"HARRIET ANN CHAPMAN KNOWLES","CLASS OF 1977"],
+[ 2, 0,"ROY B. LLING. JR","1917-2000"],
+[ 2, 1,"PJ OWNTERS / SU FOOTBALL #73","TSAAM / AΩ '31"],
+[ 2, 2,"LANEY W. VALIAN '03","PETER / LUNA BELLE / JACK WYLIE VALIAN"],
+[ 2, 3,"JOSEPH CROMER","KEEP MOVING FORWARD. LOVE MOM"],
+[ 1, 0,"AIVY HOANG / TAEYUN KIM","CLASS OF 2018"],
+[ 1, 1,"SARAH MARIE FAULK","CLASS OF 2014"],
+[ 1, 2,"KRISTI WRIGHT","CLASS OF 1983"],
+[ 1, 3,"TIMOTHY J. TREVIN","CLASS OF 1993"],
+[ 9, 4,"PRICE & GILMORE FAMILY","2004 / 1974 / 2003"],
+[ 9, 5,"CHESTER CLASS OF 1970","PI KAPPA ALPHA"],
+[ 9, 6,"CORINNE COMBS","WINNER — TOO BUSY TO BE ALIVE AWARD"],
+[ 8, 4,"LODREO H. HARRIS CLASS OF 1990","DONALDSON BUCKMAN CLASS OF 1984"],
+[ 8, 5,"IN LOVING MEMORY OF","HARLEY G. BASS","1933-2012"],
+[ 8, 6,"DRS. KYLE & SHANNON LANCASTER","CLASS OF 1995"],
+[ 8, 7,"RUTH SCHMIDT DYAR '59"],
+[ 7, 4,"SANDA S. LAZARES 2007","DELTA DELTA DELTA"],
+[ 7, 5,"IN LOVING MEMORY OF W.J. LALLEM.","CLASS OF 1976"],
+[ 7, 6,"ANGIE AND SCOTT TALBERT","CLASS OF 2001"],
+[ 6, 4,"ANGELYN MARIE CONA","PHYSICS 2015"],
+[ 6, 5,"LORENDA ELISE LESBIEN","CLASS 2008"],
+[ 6, 6,"ALIBRA CLASS OF 2017","ALPHA CHI PHI CHI"],
+[ 6, 7,"IN MEMORY OF ELEANOR","BELOVED FRIEND"],
+[ 5, 4,"CARRIE & KATHRYN","CLASS OF 2000"],
+[ 5, 5,"FOURTH GENERATION MARALEE BUTTERY VERA","1880"],
+[ 5, 6,"MADDIE STROUP","CLASS OF 2018 / ΛΕΔ","XTYL"],
+[ 5, 7,"WANDA LANCASTER","COORDINATOR OF SPECIAL EVENTS","1975-1994"],
+[ 4, 4,"TOM OWNBY ATY","CLASS OF 1973"],
+[ 4, 5,"JASON A. CHAPMAN","CLASS OF 2003"],
+[ 4, 6,"DAVID J. ELLIS","CLASS OF 1973 / ΔΔΑ"],
+[ 4, 7,"ROBERT WALLIS","CLASS OF 1984"],
+[ 3, 4,"JAKE B. SCHRUN","2000-2013"],
+[ 3, 5,"DR. SHERRY ADRIAN","ADRIANE DORSEY '04","EDUCATION DEPT"],
+[ 3, 6,"CHRISTINA CRANDALL","CLASS OF 2018","2 TIMOTHY 4:7"],
+[ 3, 7,"FLORE FAMILY 2001 ELIZABETH"],
+[ 2, 4,"NA UHLES CLASS OF 2012","ACCOUNTING"],
+[ 2, 5,"DO NOT MESS WITH ACADEMICS","EBB TO PCS CC 1981"],
+[ 2, 6,"DAVID & ALEXANDRAA DENNISON","1992 & 1993"],
+[ 2, 7,"RICARDO SEBASTIAN GONZALEZ","CLASS OF 2015"],
+[ 1, 4,"SYDNEY LAWSON + DAWKINS","SU TRACK AND FIELD","FAITH, HOPE, LOVE"],
+[ 1, 5,"COLLEEN BURKE-HILL AND ROBERT HILL"],
+[ 1, 6,"HEIDI CEPHUS","CLASS OF 2003"],
+[ 1, 7,"OLIVIA LASATER CLASS OF 2019","IN LOVING MEMORY PATRICIA K. DINGE."],
+[ 9, 8,"IN MEMORIAM JOHN R. TRAMPLEY","1941-1964"],
+[ 9, 9,"BRANDON G. BAKER","MUSIC EDUCATION PERCUSSION","GRADUATE 2016"],
+[ 8, 8,"IN MEMORY OF WILLIAM 'BILL' R. SHELDON JR."],
+[ 8, 9,"WILLIAM H. GLAZE / ALMA SMITH GLAZE","ΩΜΣ / ΔΔΔ 1956"],
+[ 8,10,"GREET HUNT","CLASS OF 2013 / CLASS OF 2012","ENVIRO. STUDIES"],
+[ 7, 8,"CHELSEA N. LEEDER","CLASS OF 2014","SU BASKETBALL"],
+[ 7, 9,"IN MEMORY OF LEE 'EXCELLENT' FERGUSON","THANK YOU DRK"],
+[ 7,10,"MARK MAYFIELD '76","KAY MAYFIELD '16"],
+[ 6, 8,"IN HONOR OF HENRY HOLLOWAY","BELOVED CHOIR DIRECTOR"],
+[ 6, 9,"ANNETTE AUSTIN FIGUEROA","CLASS OF 1993"],
+[ 5, 8,"BRENT PIETCHAN CLASS OF '95","I CELEBRATE W/ '93","KAPPA ALPHA ORDER"],
+[ 5, 9,"MICHAEL S. LADD","CLASS OF 1996"],
+[ 5,10,"IN MEMORY OF SHEREE REYNOLDS HEY"],
+[ 4, 8,"DAVID AND LAUREN BLACKETTER",null,null,2],
+[ 4,10,"IN PURSUIT OF LIFELONG LEARNING","TRAVIS WEDON '05"],
+[ 3, 8,"GAIL TODD HANEY '71",null,null,2],
+[ 3,10,"JOSHUA VAN HOUTEN","CHEMISTRY & MATH","SU SWIM TEAM, N.A. 1983"],
+[ 3,11,"STEVE BARKER '83 / MARY C. ELLIS '85","MARRIED 12/11/93"],
+[ 2, 8,"JULIE ANNE MEASLET BENAVIERS","CLASS OF 2005"],
+[ 2, 9,"SECOND GENERATION HAZEL VIOLET OATMAN BOWMAN","1922"],
+[ 2,10,"ASHLEY COLE","CLASS OF 2009","THANKS DAD LOVE YOU"],
+[ 1, 8,"BRIANA FELIX"],
+[ 1, 9,"IN MEMORY OF JENNIFER MURPHY"],
+[ 1,10,"DR. H. EUGENE"],
+[ 9,12,"ALEC HELLINGER / GAY","CLASS OF 1970"],
+[ 9,13,"ALEC BERGASIDON","CLASS OF 2014"],
+[ 8,12,"AMBER HOLLENBECK JR.","CLASS OF 1987"],
+[ 8,13,"WILLIAM T. JORDAN CLASS OF 1938","DONNA RAY JORDAN CLASS OF 1967"],
+[ 7,12,"KENNETH W. DRAKE","CLASS OF 1973"],
+[ 6,12,"CASTLE CLASS OF... / ROJO CLASS OF 2000"],
+[ 6,13,"HANNAH NICHOLSON","CLASS OF 2016 GAI"],
+[ 5,12,"AMANDA LEE AMBROSE","CLASS OF 2017","WOMEN'S SOFTBALL INAUGURAL"],
+[ 5,13,"ELIZABETH DINN & MICHAEL HARSH","CLASSES OF '91 & '93"],
+[ 4,12,"IN LOVING MEMORY FARO 1964"],
+[ 4,13,"MARC HANEY '69"],
+[ 3,12,"IN CARMEN MILAN","2001"],
+[ 2,12,"CATHERINE CLAU","CLASS OF"],
+[ 1,12,"DONNA ROSS FARO '84"],
+
+// ── NEW — extracted from June 2026 photos ────────────────
+// Photo 2 (right-center close-up): bricks near WANDA LANCASTER / MICHAEL S. LADD area
+[ 6, 9,"FERNANDA BORBA","BILINGUAL EDUCATION","CLASS OF 2009"],
+[ 6,10,"ANDIE DIAZ","ALPHA PHI OMEGA","CLASS OF 2017"],
+// Photo 3 (left-center close-up): bottom rows near walkway side
+[22, 4,"MARTIN ALEMAN JR"],
+// Photo 3 (middle section): distinctive 3-line inscription
+[13,11,"A PLACE TO SIT AND","THINK ABOUT NOTHING"],
+// Photo 3 (middle-right): name visible adjacent to inscription above
+[11,14,"JESSICA BRANT","CLASS OF 2016"],
+];
+
+// ═══════════════════════════════════════════════════════════
+// BUILD DATA STRUCTURES
+// ═══════════════════════════════════════════════════════════
+const brickMap = {};   // "r,c" → brick obj
+const brickById = {};
+const bricks = [];
+
+RAW.forEach((raw, i) => {
+  const [or, oc, ...fields] = raw;
+  const nr = rRow(or);
+  const nc = rCol(oc);
+  // Parse fields: strings/null = lines, first number = size, second number = rowspan
+  const rawLines = []; let size = 1, rowspan = 1, foundNum = false;
+  for (const f of fields) {
+    if (!foundNum && typeof f === 'number') { size = f; foundNum = true; }
+    else if (foundNum && typeof f === 'number') { rowspan = f; }
+    else if (!foundNum && f) rawLines.push(f);
+  }
+  const lines = rawLines.filter(Boolean);
+  const obj = { id: 'b' + i, row: nr, col: nc, lines, size, rowspan, name: lines[0] || '' };
+
+  // Validate all spanned slots are inside the T-shape
+  let ok = true;
+  outer: for (let dr = 0; dr < rowspan; dr++) {
+    for (let dc = 0; dc < size; dc++) {
+      if (!valid(nr + dr, nc + dc)) { ok = false; break outer; }
+    }
+  }
+  if (!ok) { obj.size = 1; obj.rowspan = 1; }
+
+  // Collision check — first entry wins
+  if (brickMap[nr + ',' + nc]) return;
+
+  bricks.push(obj);
+  brickById[obj.id] = obj;
+  // Register all spanned slots — only (nr, nc) is the "anchor"; rest go in occupied
+  brickMap[nr + ',' + nc] = obj.id;
+});
+
+// occupied set — rebuilt by applyEditsAndRender() after GAS fetch
+// Tracks all slots that are "covered" by a multi-cell brick (not the anchor)
+let occupied    = new Set();
+let straightRows = new Set(); // rows that don't stagger due to spanning tall bricks
+
+function rebuildOccupied() {
+  occupied = new Set();
+  bricks.forEach(b => {
+    for (let dr = 0; dr < (b.rowspan || 1); dr++) {
+      for (let dc = 0; dc < (b.size || 1); dc++) {
+        if (dr === 0 && dc === 0) continue; // anchor slot — not "occupied"
+        occupied.add((b.row + dr) + ',' + (b.col + dc));
+      }
+    }
+  });
+}
+
+function rebuildStraightRows() {
+  straightRows = new Set();
+  bricks.forEach(b => {
+    if ((b.rowspan || 1) > 1) {
+      for (let r = b.row; r < b.row + (b.rowspan || 1); r++) straightRows.add(r);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER MONUMENT
+// ═══════════════════════════════════════════════════════════
+function renderMonument() {
+  const mon = document.getElementById('mon');
+  mon.style.width  = CW + 'px';
+  mon.style.height = CH + 'px';
+
+  // ── Mortar background (T-shape) ──────────────────────────
+  const mainH = PAD + MROWS * SY;          // top of stem junction
+  const stemL = PAD + SCOL0 * SX - GAP/2;
+  const stemW = SCOLS * SX + GAP;
+  const stemH = SROWS * SY + PAD;
+
+  const mbMain = div('mbg');
+  mbMain.style.cssText = `left:0;top:0;width:${CW}px;height:${mainH}px;`;
+  mon.appendChild(mbMain);
+
+  const mbStem = div('mbg');
+  mbStem.style.cssText = `left:${stemL}px;top:${mainH}px;width:${stemW}px;height:${stemH}px;border-radius:0 0 3px 3px;`;
+  mon.appendChild(mbStem);
+
+  // ── Orientation labels ────────────────────────────────────
+  addLabel(mon, '↑ NORTH — FAR END', CW / 2 - 60, 4);
+  addLabel(mon, '↓ SOUTH — WALKWAY', CW / 2 - 62, mainH - 14);
+  addLabel(mon, '↓ STEM (walkway side)', stemL + stemW / 2 - 64, mainH + 2);
+
+  // ── Row numbers (every 5) ─────────────────────────────────
+  for (let r = 0; r < MROWS + SROWS; r += 5) {
+    if (!valid(r, 0) && !valid(r, SCOL0)) continue;
+    const col0 = r < MROWS ? 0 : SCOL0;
+    const tick = div('rtick');
+    const x = bx(col0, r) - 18;
+    const y = by(r) + BH / 2 - 4;
+    tick.style.cssText = `left:${x}px;top:${y}px;`;
+    tick.textContent = 'R' + (r + 1);
+    mon.appendChild(tick);
+  }
+
+  // ── Bricks ────────────────────────────────────────────────
+  const total = (MROWS + SROWS);
+  for (let row = 0; row < total; row++) {
+    const staggered = row % 2 === 1 && !straightRows.has(row);
+    let c0, c1;
+    if (row < MROWS) {
+      c0 = 0; c1 = MCOLS - 1 - (staggered ? 1 : 0);
+    } else {
+      c0 = SCOL0; c1 = SCOL0 + SCOLS - 1 - (staggered ? 1 : 0);
+    }
+
+    for (let col = c0; col <= c1; col++) {
+      if (occupied.has(row + ',' + col)) continue;
+      const bid = brickMap[row + ',' + col];
+      const b   = bid ? brickById[bid] : null;
+      makeBrick(mon, row, col, b);
+    }
+  }
+}
+
+function makeBrick(parent, row, col, b) {
+  const el = div(b ? 'brick' : 'brick empty');
+  const colspan = b ? (b.size    || 1) : 1;
+  const rowspan = b ? (b.rowspan || 1) : 1;
+  const w = colspan > 1 ? colspan * SX - GAP : BW;
+  const h = rowspan > 1 ? rowspan * SY - GAP : BH;
+  const x = bx(col, row);
+  const y = by(row);
+
+  el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+
+  if (b) {
+    if (colspan > 1) el.classList.add('w' + colspan);
+    if (rowspan > 1) el.classList.add('h' + rowspan);
+    el.id = b.id;
+    el.dataset.row = row;
+    el.dataset.col = col;
+    b.lines.forEach(line => {
+      const sp = div('bl');
+      sp.textContent = line;
+      el.appendChild(sp);
+    });
+    el.addEventListener('mousedown', e => {
+      if (e.button !== 0 || !document.body.classList.contains('edit-mode')) return;
+      if (b.size > 1) { openEditModal(b, el); return; } // wide bricks: edit only, no drag
+      e.stopPropagation(); // prevent canvas pan
+      startBrickDrag(e, b, el);
+    });
+    el.addEventListener('click', () => {
+      if (!document.body.classList.contains('edit-mode')) selectBrick(b.id);
+    });
+  } else {
+    el.dataset.row = row;
+    el.dataset.col = col;
+    el.addEventListener('click', () => {
+      if (document.body.classList.contains('edit-mode') ||
+          document.body.classList.contains('place-mode')) {
+        openEditModal(null, el, row, col);
+      }
+    });
+  }
+
+  parent.appendChild(el);
+  fitBrick(el);
+}
+
+// ── Auto-fit text inside each brick — each line independently ──
+function fitBrick(el) {
+  const spans = el.querySelectorAll('.bl');
+  if (!spans.length) return;
+  const MAX = 7.5, MIN = 2.8;
+  const bw = el.clientWidth - 6; // usable width (subtract horizontal padding)
+
+  // Step 1: fit each line to brick width independently (no wrapping)
+  spans.forEach(sp => {
+    let fs = MAX;
+    sp.style.fontSize = fs + 'px';
+    while (fs > MIN && sp.scrollWidth > bw) {
+      fs = Math.max(MIN, fs - 0.25);
+      sp.style.fontSize = fs + 'px';
+    }
+  });
+
+  // Step 2: if total height still overflows, scale all lines down proportionally
+  if (el.scrollHeight > el.clientHeight + 1) {
+    const ratio = (el.clientHeight - 4) / el.scrollHeight;
+    spans.forEach(sp => {
+      const cur = parseFloat(sp.style.fontSize);
+      sp.style.fontSize = Math.max(MIN, cur * ratio * 0.95) + 'px';
+    });
+  }
+}
+
+function div(cls) {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  return d;
+}
+function addLabel(parent, text, x, y) {
+  const d = div('orient');
+  d.textContent = text;
+  d.style.cssText = `left:${x}px;top:${y}px;width:200px;`;
+  parent.appendChild(d);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function renderList(filtered) {
+  const list = document.getElementById('blist');
+  const items = (filtered || bricks).filter(b => b.lines.length > 0);
+  items.sort((a, b) => a.lines[0].localeCompare(b.lines[0]));
+  list.innerHTML = items.map(b => `
+    <div class="li" data-id="${b.id}" onclick="selectBrick('${b.id}')">
+      <div class="ln">${esc(b.lines[0])}</div>
+      ${b.lines.slice(1).length ? `<div class="ls">${b.lines.slice(1).map(esc).join(' · ')}</div>` : ''}
+      <div class="lp">Row ${b.row+1}, Col ${b.col+1}</div>
+    </div>`).join('');
+  document.getElementById('rcnt').textContent = bricks.length;
+  document.getElementById('hstats').innerHTML =
+    `${bricks.length} bricks recorded<br>25 cols × 33 rows + 6×8 stem`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════
+let matches = [];
+document.getElementById('search').addEventListener('input', function () {
+  const q = this.value.trim().toLowerCase();
+  clearHilights();
+  closeDetail();
+
+  if (!q) { document.getElementById('rinfo').textContent = ''; renderList(); return; }
+
+  matches = bricks.filter(b => b.lines.some(l => l.toLowerCase().includes(q)));
+  document.getElementById('rinfo').textContent =
+    matches.length ? `${matches.length} match${matches.length > 1 ? 'es' : ''}` : 'No matches';
+
+  renderList(matches);
+  matches.forEach(b => {
+    const el = document.getElementById(b.id);
+    if (el) el.classList.add('hi');
+    const li = document.querySelector(`.li[data-id="${b.id}"]`);
+    if (li) li.classList.add('hi');
+  });
+
+  if (matches.length === 1)       selectBrick(matches[0].id);
+  else if (matches.length > 0)    flyTo(matches[0]);
+});
+
+function clearHilights() {
+  document.querySelectorAll('.brick.hi,.brick.act').forEach(e => e.classList.remove('hi','act'));
+  document.querySelectorAll('.li.hi').forEach(e => e.classList.remove('hi'));
+}
+
+// ═══════════════════════════════════════════════════════════
+// SELECT / DETAIL / FLY
+// ═══════════════════════════════════════════════════════════
+let selId = null;
+function selectBrick(id) {
+  if (selId) {
+    const prev = document.getElementById(selId);
+    if (prev) { prev.classList.remove('act'); prev.classList.add('hi'); }
+  }
+  selId = id;
+  const b = brickById[id];
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('hi'); el.classList.add('act'); }
+  showDetail(b);
+  flyTo(b);
+  document.querySelectorAll('.li').forEach(l => l.classList.remove('hi'));
+  const li = document.querySelector(`.li[data-id="${id}"]`);
+  if (li) { li.classList.add('hi'); li.scrollIntoView({ block: 'nearest' }); }
+}
+
+function showDetail(b) {
+  document.getElementById('dpname').textContent = b.lines[0];
+  document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${esc(l)}</div>`).join('');
+  document.getElementById('dppos').textContent =
+    `Row ${b.row + 1} of ${MROWS} · Col ${b.col + 1} of ${MCOLS}` +
+    (b.row >= SROW0 ? ' · STEM' : '');
+  document.getElementById('dp').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('dp').classList.remove('open');
+  if (selId) {
+    const el = document.getElementById(selId);
+    if (el) el.classList.remove('act');
+    selId = null;
+  }
+}
+
+function flyTo(b) {
+  const cx = bx(b.col, b.row) + BW / 2;
+  const cy = by(b.row) + BH / 2;
+  const vp = document.getElementById('vp');
+  const ts = Math.min(6, Math.max(scale, 2.8));
+  panX = vp.clientWidth  / 2 - cx * ts;
+  panY = vp.clientHeight / 2 - cy * ts;
+  scale = ts;
+  applyT();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAN / ZOOM
+// ═══════════════════════════════════════════════════════════
+let scale = 1, panX = 0, panY = 0;
+let drg = false, dsx, dsy, dpx, dpy;
+
+const vpEl     = document.getElementById('vp');
+const canvasEl = document.getElementById('canvas');
+
+function applyT() {
+  canvasEl.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+  canvasEl.style.transformOrigin = '0 0';
+}
+
+function zoom(f, cx, cy) {
+  const r = vpEl.getBoundingClientRect();
+  cx = cx ?? r.width / 2; cy = cy ?? r.height / 2;
+  const ix = (cx - panX) / scale, iy = (cy - panY) / scale;
+  scale = Math.max(0.12, Math.min(10, scale * f));
+  panX = cx - ix * scale; panY = cy - iy * scale;
+  applyT();
+}
+
+function resetView() {
+  const r = vpEl.getBoundingClientRect();
+  scale = Math.min(r.width / CW, r.height / CH) * 0.9;
+  panX = (r.width  - CW * scale) / 2;
+  panY = (r.height - CH * scale) / 2;
+  applyT();
+}
+
+vpEl.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = vpEl.getBoundingClientRect();
+  zoom(e.deltaY < 0 ? 1.12 : 1/1.12, e.clientX - r.left, e.clientY - r.top);
+}, { passive: false });
+
+vpEl.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  drg = true; vpEl.classList.add('drag');
+  dsx = e.clientX; dsy = e.clientY; dpx = panX; dpy = panY;
+});
+window.addEventListener('mousemove', e => {
+  if (!drg) return;
+  panX = dpx + (e.clientX - dsx); panY = dpy + (e.clientY - dsy); applyT();
+});
+window.addEventListener('mouseup', () => { drg = false; vpEl.classList.remove('drag'); });
+
+// Touch pan
+let tpx, tpy;
+vpEl.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  drg = true;
+  dsx = e.touches[0].clientX; dsy = e.touches[0].clientY; dpx = panX; dpy = panY;
+}, { passive: true });
+vpEl.addEventListener('touchmove', e => {
+  if (!drg || e.touches.length !== 1) return;
+  panX = dpx + (e.touches[0].clientX - dsx);
+  panY = dpy + (e.touches[0].clientY - dsy);
+  applyT();
+}, { passive: true });
+vpEl.addEventListener('touchend', () => { drg = false; });
+
+// Pinch-to-zoom
+let pinchD0 = null;
+vpEl.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    pinchD0 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                         e.touches[0].clientY - e.touches[1].clientY);
+  }
+}, { passive: true });
+vpEl.addEventListener('touchmove', e => {
+  if (e.touches.length === 2 && pinchD0 !== null) {
+    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                         e.touches[0].clientY - e.touches[1].clientY);
+    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    const r  = vpEl.getBoundingClientRect();
+    zoom(d / pinchD0, cx - r.left, cy - r.top);
+    pinchD0 = d;
+  }
+}, { passive: true });
+vpEl.addEventListener('touchend', () => { pinchD0 = null; });
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════
+function exportCSV() {
+  const header = 'name,line2,line3,row,col\n';
+  const rows = bricks.map(b =>
+    [`"${b.lines[0]}"`, `"${b.lines[1] || ''}"`, `"${b.lines[2] || ''}"`, b.row + 1, b.col + 1].join(',')
+  ).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'donor_bricks_section1.csv'; a.click();
+  toast('CSV downloaded');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — LOGIN / LOGOUT
+// ═══════════════════════════════════════════════════════════
+// Default password: SWU_Monument  (change ADMIN_PASS to update)
+const ADMIN_PASS = 'SWU_Monument';
+let adminMode = false;
+
+function openAdminLogin() {
+  if (adminMode) { toast('Already in admin mode'); return; }
+  const p = prompt('Enter admin password:');
+  if (p === null) return;
+  if (p === ADMIN_PASS) {
+    adminMode = true;
+    document.getElementById('adminBar').style.display = 'flex';
+    toast('Admin mode active');
+  } else {
+    toast('Incorrect password');
+  }
+}
+
+function logoutAdmin() {
+  adminMode = false;
+  document.getElementById('adminBar').style.display = 'none';
+  setEditMode(false);
+  document.getElementById('editToggle').checked = false;
+  toast('Logged out');
+}
+
+function setEditMode(on) {
+  if (on) {
+    document.body.classList.add('edit-mode');
+  } else {
+    document.body.classList.remove('edit-mode', 'place-mode');
+    const pb = document.getElementById('placeBtn');
+    if (pb) pb.classList.remove('pbtn-on');
+    closeDetail();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); openAdminLogin(); }
+  if (e.key === 'Escape') closeEditModal();
+});
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — EDIT MODAL
+// ═══════════════════════════════════════════════════════════
+let editTarget = null;
+
+function openEditModal(b, el, row, col) {
+  editTarget = { brick: b, row: b ? b.row : row, col: b ? b.col : col, el };
+  document.getElementById('el1').value = b ? (b.lines[0] || '') : '';
+  document.getElementById('el2').value = b ? (b.lines[1] || '') : '';
+  document.getElementById('el3').value = b ? (b.lines[2] || '') : '';
+  document.getElementById('el4').value = b ? (b.lines[3] || '') : '';
+  document.getElementById('el5').value = b ? (b.lines[4] || '') : '';
+  document.getElementById('el6').value = b ? (b.lines[5] || '') : '';
+  document.getElementById('el7').value = b ? (b.lines[6] || '') : '';
+  document.getElementById('el8').value = b ? (b.lines[7] || '') : '';
+  const cs = b ? (b.size    || 1) : 1;
+  const rs = b ? (b.rowspan || 1) : 1;
+  document.getElementById('esize').value = cs + ',' + rs;
+  document.getElementById('epos').textContent =
+    `Row ${(editTarget.row)+1}, Column ${(editTarget.col)+1}`;
+  document.getElementById('editOverlay').classList.add('open');
+  document.getElementById('el1').focus();
+}
+
+function closeEditModal() {
+  document.getElementById('editOverlay').classList.remove('open');
+  editTarget = null;
+}
+
+function clearBrickEdit() {
+  ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('esize').value = '1,1';
+}
+
+function saveBrickEdit() {
+  if (!editTarget) return;
+  const { row, col, el } = editTarget;
+  const l1 = document.getElementById('el1').value.trim().toUpperCase();
+  const l2 = document.getElementById('el2').value.trim().toUpperCase();
+  const l3 = document.getElementById('el3').value.trim().toUpperCase();
+  const l4 = document.getElementById('el4').value.trim().toUpperCase();
+  const l5 = document.getElementById('el5').value.trim().toUpperCase();
+  const l6 = document.getElementById('el6').value.trim().toUpperCase();
+  const l7 = document.getElementById('el7').value.trim().toUpperCase();
+  const l8 = document.getElementById('el8').value.trim().toUpperCase();
+  const sizeParts = document.getElementById('esize').value.split(',').map(Number);
+  const colspan = sizeParts[0] || 1;
+  const rowspan = sizeParts[1] || 1;
+  const lines = [l1, l2, l3, l4, l5, l6, l7, l8].filter(Boolean);
+  const key = row + ',' + col;
+
+  // Update in-memory brick
+  if (brickMap[key]) {
+    const b = brickById[brickMap[key]];
+    b.lines = lines; b.name = lines[0] || ''; b.size = colspan; b.rowspan = rowspan;
+  } else if (lines.length) {
+    const nb = { id: 'e_' + key, row, col, lines, size: colspan, rowspan, name: lines[0] };
+    bricks.push(nb); brickById[nb.id] = nb; brickMap[key] = nb.id;
+  }
+
+  localEdits[key] = { lines, size: colspan, rowspan };
+  allEdits[key]   = { lines, size: colspan, rowspan };
+  saveLocalEdits();
+  if (GAS_URL) gasSet(SECTION_ID, key, lines[0]||'', lines[1]||'', lines[2]||'', colspan, lines[3]||'', lines[4]||'', lines[5]||'', lines[6]||'', lines[7]||'');
+
+  // Re-render the monument (needed for size/rowspan changes)
+  rebuildOccupied();
+  rebuildStraightRows();
+  document.getElementById('mon').innerHTML = '';
+  renderMonument();
+  renderList();
+  closeEditModal();
+  toast('Brick saved!');
+}
+
+function resetAllEdits() {
+  if (!confirm('Reset ALL admin edits for Section 1? This cannot be undone.')) return;
+  localStorage.removeItem(EDITS_KEY);
+  toast('Edits reset — reloading…');
+  setTimeout(() => location.reload(), 900);
+}
+
+document.getElementById('editOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('editOverlay')) closeEditModal();
+});
+document.getElementById('editOverlay').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) saveBrickEdit();
+});
+
+// ═══════════════════════════════════════════════════════════
+// APPLY EDITS + GAS SYNC
+// ═══════════════════════════════════════════════════════════
+function applyEditsAndRender() {
+  Object.keys(allEdits).forEach(key => {
+    const id = brickMap[key];
+    if (id) {
+      const b = brickById[id];
+      const e = allEdits[key];
+      b.lines = (e.lines || []).filter(Boolean);
+      b.name  = b.lines[0] || '';
+      if (e.size)    b.size    = e.size;
+      if (e.rowspan) b.rowspan = e.rowspan;
+    } else if (allEdits[key]?.lines?.[0]) {
+      const [r, c] = key.split(',').map(Number);
+      if (valid(r, c)) {
+        const e = allEdits[key];
+        const nb = { id: 'e_' + key, row: r, col: c,
+          lines: e.lines.filter(Boolean), size: e.size||1,
+          rowspan: e.rowspan||1, name: e.lines[0] };
+        bricks.push(nb); brickById[nb.id] = nb; brickMap[key] = nb.id;
+      }
+    }
+  });
+  rebuildOccupied();
+  rebuildStraightRows();
+  renderMonument();
+  renderList();
+}
+
+function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
+  if (!GAS_URL) return;
+  const cb = '_gsCb' + Date.now();
+  const s = document.createElement('script');
+  window[cb] = function() { delete window[cb]; s.parentNode && s.parentNode.removeChild(s); };
+  const p = new URLSearchParams({ action:'set', section, key, l1:l1||'', l2:l2||'', l3:l3||'', l4:l4||'', l5:l5||'', l6:l6||'', l7:l7||'', l8:l8||'', size:size||1, callback:cb });
+  s.src = GAS_URL + '?' + p;
+  document.head.appendChild(s);
+}
+
+function initWithGAS() {
+  const go = () => {
+    allEdits = Object.assign({}, INITIAL_EDITS, remoteEdits, localEdits);
+    applyEditsAndRender();
+    setTimeout(resetView, 60);
+  };
+  if (!GAS_URL) { go(); return; }
+  const cb = '_gsInit' + Date.now();
+  const s = document.createElement('script');
+  const t = setTimeout(() => { if (window[cb]) { delete window[cb]; go(); } }, 5000);
+  window[cb] = function(data) {
+    clearTimeout(t); remoteEdits = data || {};
+    delete window[cb]; s.parentNode && s.parentNode.removeChild(s); go();
+  };
+  s.onerror = function() { clearTimeout(t); delete window[cb]; go(); };
+  s.src = GAS_URL + '?action=get&section=' + SECTION_ID + '&callback=' + cb;
+  document.head.appendChild(s);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — EXPORT UPDATED HTML
+// ═══════════════════════════════════════════════════════════
+function exportHTML() {
+  const merged = Object.assign({}, INITIAL_EDITS, localEdits);
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  html = html.replace(
+    'const INITIAL_EDITS = {};',
+    'const INITIAL_EDITS = ' + JSON.stringify(merged, null, 2) + ';'
+  );
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'monument_section1_updated.html';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('monument_section1_updated.html downloaded!');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DRAG TO REPOSITION (admin edit mode, size-1 bricks only)
+// ═══════════════════════════════════════════════════════════
+let _db = null, _del = null, _dGhost = null;
+let _dsx = 0, _dsy = 0, _dragging = false;
+let _dtRow = -1, _dtCol = -1, _dtEl = null;
+
+function startBrickDrag(e, b, el) {
+  _db = b; _del = el;
+  _dsx = e.clientX; _dsy = e.clientY; _dragging = false;
+
+  function onMove(ev) {
+    const dx = ev.clientX - _dsx, dy = ev.clientY - _dsy;
+    if (!_dragging && Math.hypot(dx, dy) > 6) {
+      _dragging = true;
+      document.body.classList.add('drag-active');
+      _dGhost = document.createElement('div');
+      _dGhost.className = 'drag-ghost';
+      _dGhost.style.width = BW + 'px';
+      _dGhost.style.height = BH + 'px';
+      b.lines.forEach(line => {
+        const sp = document.createElement('div');
+        sp.className = 'bl'; sp.textContent = line;
+        _dGhost.appendChild(sp);
+      });
+      document.body.appendChild(_dGhost);
+      fitBrick(_dGhost);
+      _del.style.opacity = '0.25';
+    }
+    if (_dragging && _dGhost) {
+      _dGhost.style.left = (ev.clientX - BW / 2) + 'px';
+      _dGhost.style.top  = (ev.clientY - BH / 2) + 'px';
+      updateDragHighlight(ev.clientX, ev.clientY);
+    }
+  }
+
+  function onUp() {
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    document.body.classList.remove('drag-active');
+    if (_dragging) {
+      if (_dtRow >= 0 && valid(_dtRow, _dtCol)) {
+        finalizeBrickMove(_dtRow, _dtCol);
+      } else {
+        if (_del) _del.style.opacity = '';
+      }
+      if (_dGhost) { _dGhost.remove(); _dGhost = null; }
+      clearDragHighlight();
+    } else {
+      // no movement → treat as click → open edit modal
+      openEditModal(b, el);
+    }
+    _dragging = false; _db = null; _del = null;
+  }
+
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+}
+
+function screenToSlot(cx, cy) {
+  const r = vpEl.getBoundingClientRect();
+  const lx = (cx - r.left - panX) / scale;
+  const ly = (cy - r.top  - panY) / scale;
+  const row = Math.round((ly - PAD) / SY);
+  const staggered = row % 2 === 1 && !straightRows.has(row);
+  const col = Math.round((lx - PAD - (staggered ? STAG : 0)) / SX);
+  return { row, col };
+}
+
+function updateDragHighlight(cx, cy) {
+  const { row, col } = screenToSlot(cx, cy);
+  if (row === _dtRow && col === _dtCol) return;
+  clearDragHighlight();
+  if (!valid(row, col)) return;
+  if (_db && row === _db.row && col === _db.col) return;
+  _dtRow = row; _dtCol = col;
+  _dtEl = document.querySelector(`.brick[data-row="${row}"][data-col="${col}"]`);
+  if (_dtEl) _dtEl.classList.add('drop-target');
+}
+
+function clearDragHighlight() {
+  if (_dtEl) { _dtEl.classList.remove('drop-target'); _dtEl = null; }
+  _dtRow = -1; _dtCol = -1;
+}
+
+function finalizeBrickMove(toRow, toCol) {
+  const fromKey = `${_db.row},${_db.col}`;
+  const toKey   = `${toRow},${toCol}`;
+  if (fromKey === toKey) { if (_del) _del.style.opacity = ''; return; }
+
+  const fromB = _db;
+  const toBid = brickMap[toKey];
+  const toB   = toBid ? brickById[toBid] : null;
+
+  // Swap in brickMap
+  if (toB) {
+    brickMap[fromKey] = toB.id;
+    toB.row = fromB.row; toB.col = fromB.col;
+  } else {
+    delete brickMap[fromKey];
+  }
+  brickMap[toKey] = fromB.id;
+  fromB.row = toRow; fromB.col = toCol;
+
+  // Persist as edits (so moves survive reload)
+  localEdits[toKey] = { lines: fromB.lines, size: fromB.size };
+  allEdits[toKey]   = localEdits[toKey];
+  if (toB) {
+    localEdits[fromKey] = { lines: toB.lines, size: toB.size };
+    allEdits[fromKey]   = localEdits[fromKey];
+  } else {
+    delete localEdits[fromKey];
+    delete allEdits[fromKey];
+  }
+  saveLocalEdits();
+
+  if (GAS_URL) {
+    gasSet(SECTION_ID, toKey, fromB.lines[0]||'', fromB.lines[1]||'', fromB.lines[2]||'', fromB.size, fromB.lines[3]||'', fromB.lines[4]||'', fromB.lines[5]||'', fromB.lines[6]||'', fromB.lines[7]||'');
+    if (toB) gasSet(SECTION_ID, fromKey, toB.lines[0]||'', toB.lines[1]||'', toB.lines[2]||'', toB.size, toB.lines[3]||'', toB.lines[4]||'', toB.lines[5]||'', toB.lines[6]||'', toB.lines[7]||'');
+    else     gasSet(SECTION_ID, fromKey, '', '', '', 1, '', '', '', '', '');
+  }
+
+  // Re-render
+  rebuildOccupied();
+  rebuildStraightRows();
+  document.getElementById('mon').innerHTML = '';
+  renderMonument();
+  renderList();
+  toast('Brick moved!');
+}
+
+// ── Place Brick mode ──────────────────────────────────────
+function togglePlaceMode() {
+  const on = document.body.classList.toggle('place-mode');
+  document.getElementById('placeBtn').classList.toggle('pbtn-on', on);
+  if (on) {
+    document.getElementById('editToggle').checked = true;
+    setEditMode(true);
+    toast('📍 Click any glowing empty slot to add a brick');
+  } else {
+    toast('Place mode off');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+initWithGAS();
+window.addEventListener('resize', resetView);
+</script>
+</body>
+</html>
