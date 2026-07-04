@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Southwestern University Donor Brick Monument â Section 3</title>
+<title>Southwestern University Donor Brick Monument – Section 3</title>
 <style>
 :root {
   --brick-bg:      #c8714a;
@@ -144,7 +144,7 @@ body.edit-mode .brick:not(.empty):not(.filler) { cursor: grab; box-shadow: 0 0 0
 body.edit-mode .brick:not(.empty):not(.filler):active { cursor: grabbing; }
 body.edit-mode .brick:not(.empty):not(.filler):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); }
 body.edit-mode .brick:not(.empty):not(.filler)::after {
-  content: 'â'; position: absolute; top: 1px; right: 2px;
+  content: '✏'; position: absolute; top: 1px; right: 2px;
   font-size: 6px; color: rgba(255,152,0,.8); pointer-events: none;
 }
 body.edit-mode .brick.empty:not(.filler) { cursor: cell; opacity: 0.7; box-shadow: 0 0 0 1px rgba(255,152,0,.3) inset; }
@@ -245,25 +245,25 @@ body.place-mode .brick.empty:not(.filler):hover {
 <header>
   <div class="logo"><img src="https://swupiratesathletics.com/images/logos/site/site.png" alt="SWU Pirates" style="height:36px;width:auto;"></div>
   <div class="htext">
-    <h1>Southwestern University Donor Brick Monument â Section 3</h1>
+    <h1>Southwestern University Donor Brick Monument — Section 3</h1>
   </div>
-  <div class="hstats" id="hstats" style="display:none">Loadingâ¦</div>
-  <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">â Admin</button>
+  <div class="hstats" id="hstats" style="display:none">Loading…</div>
+  <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
 </header>
 
 <div class="adminbar" id="adminBar" style="display:none">
-  <span class="admin-badge">â ADMIN MODE</span>
+  <span class="admin-badge">⚙ ADMIN MODE</span>
   <label><input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks</label>
   <span style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
-  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">ð¥ Export Updated HTML</button>
-  <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">ð Reset Edits</button>
-  <button class="cb" onclick="logoutAdmin()">ð Logout</button>
+  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
+  <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
+  <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
 </div>
 
 <div class="toolbar">
   <div class="sw">
-    <span class="si">ð</span>
-    <input id="search" type="text" placeholder="Search name, class year, inscriptionâ¦" autocomplete="off">
+    <span class="si">🔍</span>
+    <input id="search" type="text" placeholder="Search name, class year, inscription…" autocomplete="off">
   </div>
   <span id="rinfo"></span>
   <div class="tabs">
@@ -271,7 +271,7 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="tab" onclick="location.href='section2.html'">Section 2</div>
     <div class="tab on">Section 3</div>
   </div>
-  <button class="cb" onclick="resetView()">â Reset view</button>
+  <button class="cb" onclick="resetView()">⊙ Reset view</button>
 </div>
 
 <div class="main">
@@ -283,11 +283,11 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="canvas" id="canvas"><div class="mon" id="mon"></div></div>
     <div class="zctrl">
       <button class="zb" onclick="zoom(1.25)">+</button>
-      <button class="zb" onclick="zoom(0.8)">â</button>
-      <button class="zb" onclick="resetView()" style="font-size:11px">â</button>
+      <button class="zb" onclick="zoom(0.8)">−</button>
+      <button class="zb" onclick="resetView()" style="font-size:11px">⊙</button>
     </div>
     <div class="dp" id="dp">
-      <span class="dpx" onclick="closeDetail()">â</span>
+      <span class="dpx" onclick="closeDetail()">✕</span>
       <h4 id="dpname"></h4>
       <div class="dt" id="dptext"></div>
       <div class="dpos" id="dppos"></div>
@@ -297,7 +297,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <div class="emodal-overlay" id="editOverlay">
   <div class="emodal">
-    <h3>â Edit Brick</h3>
+    <h3>✏ Edit Brick</h3>
     <div class="epos" id="epos"></div>
     <label>Line 1 (primary name / title)</label>
     <input type="text" id="el1" placeholder="Primary inscription line">
@@ -320,9 +320,9 @@ body.place-mode .brick.empty:not(.filler):hover {
 <div id="toast"></div>
 
 <script>
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// LAYOUT CONSTANTS â Section 3: flat 15Ã20 grid
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
+// LAYOUT CONSTANTS — Section 3: flat 15Ø20 grid
+// ═══════════════════════════════════════════════════════════
 const UNIT = 44;
 const GAP  = 4;
 const PAD  = 18;
@@ -338,10 +338,10 @@ function by(r)  { return PAD + r * UNIT; }
 function bW(cs) { return cs * UNIT - GAP; }
 function bH(rs) { return rs * UNIT - GAP; }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// LAYOUT â from Google Sheets Section 3
+// ═══════════════════════════════════════════════════════════
+// LAYOUT — from Google Sheets Section 3
 // [row_off, col_off, rowspan, colspan]
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 const LAYOUT = [
   // Row group 0
   [ 0, 0,2,2],[ 0, 2,2,1],[ 0, 3,2,2],[ 0, 5,2,2],[ 0, 7,2,1],
@@ -367,19 +367,19 @@ const LAYOUT = [
   // Row group 7
   [14, 0,2,2],[14, 2,2,1],[14, 3,2,2],[14, 5,2,1],[14, 6,2,1],
   [14, 7,2,2],[14, 9,2,1],[14,10,2,1],[14,11,2,2],[14,13,2,1],[14,14,2,1],
-  // Row group 8 â mixed: tall bricks + stacked std pairs
+  // Row group 8 — mixed: tall bricks + stacked std pairs
   [16, 0,2,1],[16, 1,2,2],[16, 3,1,2],[16, 5,2,2],[16, 7,1,2],
   [16, 9,2,2],[16,11,1,2],[16,13,2,2],
   [17, 3,1,2],[17, 7,1,2],[17,11,1,2],
-  // Row group 9 â full tall + stacked std + trailing filler
+  // Row group 9 — full tall + stacked std + trailing filler
   [18, 0,2,2],[18, 2,2,2],[18, 4,1,2],[18, 6,2,2],[18, 8,1,2],
   [18,10,2,2],[18,12,1,2],[18,14,2,1],
   [19, 4,1,2],[19, 8,1,2],[19,12,1,2],
 ];
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// ADMIN â edits baked in at export time (empty by default)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
+// ADMIN — edits baked in at export time (empty by default)
+// ═══════════════════════════════════════════════════════════
 const INITIAL_EDITS = {
   "18,0": {
     "lines": [
@@ -894,9 +894,9 @@ const INITIAL_EDITS = {
 const SECTION_ID = 3;
 const GAS_URL    = 'https://script.google.com/macros/s/AKfycbxbKbla6zp7MPRsRo-3HxNA2baLJu6UI9VCaEyUxLITzzG0wOXexYY1_GObi_ahezBs/exec';
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // BUILD DATA STRUCTURES
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 const brickMap  = {};
 const brickById = {};
 const bricks    = [];
@@ -911,9 +911,9 @@ LAYOUT.forEach(([r, c, rs, cs], i) => {
   }
 });
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // ADMIN PERSISTENCE
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 const EDITS_KEY = 'brickEdits_s3';
 let localEdits  = JSON.parse(localStorage.getItem(EDITS_KEY) || '{}');
 let remoteEdits = {};
@@ -931,9 +931,9 @@ function applyEdits() {
   });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // RENDER MONUMENT
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 function renderMonument() {
   const mon = document.getElementById('mon');
   mon.innerHTML = '';
@@ -945,7 +945,7 @@ function renderMonument() {
   bg.style.cssText = `left:0;top:0;width:${CW}px;height:${CH}px;`;
   mon.appendChild(bg);
 
-  [['â² Garden / North Border', -16], ['â¼ Walkway / South', CH + 2]].forEach(([txt, top]) => {
+  [['▲ Garden / North Border', -16], ['▼ Walkway / South', CH + 2]].forEach(([txt, top]) => {
     const lbl = document.createElement('div');
     lbl.className = 'orient';
     lbl.style.cssText = `left:0;top:${top}px;width:${CW}px;`;
@@ -987,7 +987,7 @@ function renderMonument() {
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded Â· Section 3`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 3`;
 }
 
 function fitBrick(el) {
@@ -1004,9 +1004,9 @@ function fitBrick(el) {
   }
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // SIDEBAR
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 function buildList(list) {
   const container = document.getElementById('blist');
   container.innerHTML = '';
@@ -1014,8 +1014,8 @@ function buildList(list) {
   list.forEach(b => {
     const el = document.createElement('div');
     el.className = 'li';
-    el.innerHTML = `<div class="ln">${b.lines[0]||'â'}</div>` +
-      (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' Â· ')}</div>` : '') +
+    el.innerHTML = `<div class="ln">${b.lines[0]||'—'}</div>` +
+      (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' · ')}</div>` : '') +
       `<div class="lp">Grid ${b.row},${b.col}</div>`;
     el.addEventListener('click', () => scrollToBrick(b));
     container.appendChild(el);
@@ -1036,9 +1036,9 @@ function highlightBricks(matches) {
   document.querySelectorAll('.brick[data-id]').forEach(el => { if (ids.has(el.dataset.id)) el.classList.add('hi'); });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // DETAIL PANEL
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 let activeBrick = null;
 function onBrickClick(b, el) {
   closeDetail();
@@ -1046,7 +1046,7 @@ function onBrickClick(b, el) {
   activeBrick = b;
   document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
   el.classList.add('act');
-  document.getElementById('dpname').textContent = b.lines[0] || 'â';
+  document.getElementById('dpname').textContent = b.lines[0] || '—';
   document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
   document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
   document.getElementById('dp').classList.add('open');
@@ -1074,16 +1074,16 @@ function scrollToBrick(b) {
   applyTransform();
   setTimeout(() => {
     el.classList.add('act');
-    document.getElementById('dpname').textContent = b.lines[0] || 'â';
+    document.getElementById('dpname').textContent = b.lines[0] || '—';
     document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
     document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
     document.getElementById('dp').classList.add('open');
   }, 60);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // PAN & ZOOM
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 let scale = 1, panX = 0, panY = 0, dragging = false, dragSx, dragSy, dragPx, dragPy;
 
 function applyTransform() {
@@ -1141,9 +1141,9 @@ vp.addEventListener('touchmove', e => {
 }, { passive: false });
 vp.addEventListener('touchend', () => { dragging = false; lastDist = 0; });
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // SEARCH
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 let searchTimer;
 document.getElementById('search').addEventListener('input', e => {
   clearTimeout(searchTimer);
@@ -1154,9 +1154,9 @@ document.getElementById('search').addEventListener('input', e => {
   }, 200);
 });
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // EXPORT CSV
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 function exportCSV() {
   const rows = [['Row','Col','Rowspan','Colspan','Line1','Line2','Line3','Line4','Line5','Line6','Line7','Line8']];
   bricks.forEach(b => rows.push([b.row, b.col, b.rowspan, b.colspan, ...Array.from({length:8}, (_,i) => b.lines[i]||'')]));
@@ -1166,9 +1166,9 @@ function exportCSV() {
   a.download = 'section3_bricks.csv'; a.click();
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // TOAST
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -1176,9 +1176,9 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// ADMIN â LOGIN / LOGOUT / MODES
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
+// ADMIN — LOGIN / LOGOUT / MODES
+// ═══════════════════════════════════════════════════════════
 const ADMIN_PASS = 'SWU_Monument';
 let adminMode = false;
 
@@ -1200,14 +1200,14 @@ function setEditMode(on) {
 function togglePlaceMode() {
   const on = document.body.classList.toggle('place-mode');
   document.getElementById('placeBtn').classList.toggle('pbtn-on', on);
-  if (on) { document.getElementById('editToggle').checked = true; setEditMode(true); toast('ð Click any glowing empty slot to add a brick'); }
+  if (on) { document.getElementById('editToggle').checked = true; setEditMode(true); toast('📍 Click any glowing empty slot to add a brick'); }
   else toast('Place mode off');
 }
 document.addEventListener('keydown', e => { if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); openAdminLogin(); } });
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// ADMIN â EDIT MODAL
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
+// ADMIN — EDIT MODAL
+// ═══════════════════════════════════════════════════════════
 let editTarget = null;
 
 function openEditModal(b, el) {
@@ -1215,8 +1215,8 @@ function openEditModal(b, el) {
   ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach((id, i) =>
     document.getElementById(id).value = b ? (b.lines[i] || '') : '');
   const cs = b ? b.colspan : 2, rs = b ? b.rowspan : 1;
-  const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col Ã 2 row)' : cs === 2 && rs === 1 ? 'Standard (2 col Ã 1 row)' : cs + ' col Ã ' + rs + ' row';
-  document.getElementById('ebricktype').textContent = 'ð§± Brick type: ' + typeLabel;
+  const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col × 2 row)' : cs === 2 && rs === 1 ? 'Standard (2 col × 1 row)' : cs + ' col × ' + rs + ' row';
+  document.getElementById('ebricktype').textContent = '🧱 Brick type: ' + typeLabel;
   document.getElementById('epos').textContent = b ? `Grid position: ${b.row}, ${b.col}` : '';
   document.getElementById('editOverlay').classList.add('open');
   document.getElementById('el1').focus();
@@ -1238,13 +1238,13 @@ function saveBrickEdit() {
   buildList(bricks.filter(b => b.lines.length));
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded Â· Section 3`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 3`;
   closeEditModal(); toast('Brick saved!');
 }
 function clearBrickEdit() { ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach(id => document.getElementById(id).value = ''); }
 function resetAllEdits() {
   if (!confirm('Reset ALL admin edits for Section 3? This cannot be undone.')) return;
-  localStorage.removeItem(EDITS_KEY); toast('Edits reset â reloading...');
+  localStorage.removeItem(EDITS_KEY); toast('Edits reset — reloading...');
   setTimeout(() => location.reload(), 900);
 }
 
@@ -1254,9 +1254,9 @@ document.getElementById('editOverlay').addEventListener('keydown', e => {
   if (e.key === 'Escape') closeEditModal();
 });
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // GAS HELPERS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
   if (!GAS_URL) return;
   const cb = '_gsCb' + Date.now(), s = document.createElement('script');
@@ -1265,9 +1265,9 @@ function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
   s.src = GAS_URL + '?' + p; document.head.appendChild(s);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // DRAG-DROP
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 const vpEl = document.getElementById('vp');
 let _db = null, _del = null, _dGhost = null, _dsx = 0, _dsy = 0, _dragging = false;
 let _dtRow = -1, _dtCol = -1, _dtEl = null;
@@ -1335,9 +1335,9 @@ function finalizeBrickMove(toRow, toCol) {
   document.getElementById('mon').innerHTML = ''; renderMonument(); buildList(bricks.filter(b => b.lines.length)); toast('Brick moved!');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // INIT WITH GAS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 function initWithGAS() {
   const go = () => {
     allEdits = Object.assign({}, INITIAL_EDITS, remoteEdits, localEdits);
@@ -1352,9 +1352,9 @@ function initWithGAS() {
   document.head.appendChild(s);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // EXPORT UPDATED HTML
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 function exportHTML() {
   const merged = Object.assign({}, INITIAL_EDITS, localEdits);
   let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
