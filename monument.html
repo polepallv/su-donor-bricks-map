@@ -33,7 +33,7 @@ header {
   padding: 14px 20px; display: flex; align-items: center; gap: 14px;
   box-shadow: 0 3px 10px rgba(0,0,0,.5); flex-shrink: 0;
 }
-.logo { font-size: 28px; }
+.logo { font-size: 28px; margin-right: 16px; }
 .header-text h1 { font-size: 20px; font-weight: normal; }
 .header-text p { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 2px; }
 
@@ -51,12 +51,6 @@ header {
 .search-wrap input:focus { border-color: var(--accent); }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
 #result-info { font-size: 13px; color: var(--accent); min-width: 120px; }
-.ctrl-btn {
-  background: var(--surface2); border: 1px solid #5a3a20; color: var(--text);
-  padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit;
-  transition: background .15s; white-space: nowrap;
-}
-.ctrl-btn:hover { background: #5a3a20; }
 .tab-bar { display: flex; gap: 0; margin-left: 8px; }
 .tab { padding: 7px 14px; cursor: pointer; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; }
 .tab:hover { color: var(--text); }
@@ -212,7 +206,7 @@ header {
 <header>
   <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University" style="height:40px;width:auto;"></div>
   <div class="header-text">
-    <h1>Southwestern University Donor Brick Monument — Section 1</h1>
+    <h1>Donor Brick Monument — Section 1</h1>
   </div>
 </header>
 
@@ -227,7 +221,6 @@ header {
     <div class="tab" onclick="location.href='section2.html'">Section 2</div>
     <div class="tab" onclick="location.href='section3.html'">Section 3</div>
   </div>
-  <button class="ctrl-btn" onclick="resetView()">⊙ Reset view</button>
 </div>
 
 <div class="main">

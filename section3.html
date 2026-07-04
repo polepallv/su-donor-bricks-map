@@ -33,11 +33,12 @@ header {
   padding: 12px 20px; display: flex; align-items: center; gap: 14px;
   box-shadow: 0 3px 10px rgba(0,0,0,.5); flex-shrink: 0;
 }
-.logo { font-size: 26px; }
+.logo { font-size: 26px; margin-right: 16px; }
 .htext h1 { font-size: 19px; font-weight: normal; }
 .htext p  { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; }
 .hstats   { margin-left: auto; text-align: right; font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.6; }
 .hadmin-btn {
+  margin-left: auto;
   background: rgba(0,0,0,.3); border: 1px solid rgba(255,152,0,.5);
   color: rgba(255,255,255,.6); padding: 5px 9px; border-radius: 6px;
   cursor: pointer; font-size: 11px; font-family: inherit; transition: all .2s;
@@ -245,7 +246,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 <header>
   <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University" style="height:36px;width:auto;"></div>
   <div class="htext">
-    <h1>Southwestern University Donor Brick Monument — Section 3</h1>
+    <h1>Donor Brick Monument — Section 3</h1>
   </div>
   <div class="hstats" id="hstats" style="display:none">Loading…</div>
   <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
@@ -271,7 +272,6 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="tab" onclick="location.href='section2.html'">Section 2</div>
     <div class="tab on">Section 3</div>
   </div>
-  <button class="cb" onclick="resetView()">⊙ Reset view</button>
 </div>
 
 <div class="main">
