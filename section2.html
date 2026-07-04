@@ -1088,25 +1088,7 @@ function finalizeBrickMove(toRow, toCol) {
 
   // Persist swapped state
   if (fromB.lines.length) { localEdits[fromKey] = { lines: fromB.lines }; allEdits[fromKey] = { lines: fromB.lines }; }
-  else                    { delete localEdits[fromKey]; delete allEdits[fromKââââââââââââââââââââââââââââââââââââââââââââ
-// SEARCH
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-let searchTimer;
-document.getElementById('search').addEventListener('input', e => {
-  clearTimeout(searchTimer);
-  const q = e.target.value.trim();
-  searchTimer = setTimeout(() => {
-    if (!q) {
-      document.getElementById('rinfo').textContent = '';
-      highlightBricks([]);
-      buildList(bricks.filter(b => b.lines.length));
-    } else {
-      updateList(q);
-    }
-  }, 200);
-});
-
-// âââââââââââââââey]; }
+  else                    { delete localEdits[fromKey]; delete allEdits[fromKey]; }
   if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines };   allEdits[toKey]   = { lines: toB.lines };   }
   else                    { delete localEdits[toKey];   delete allEdits[toKey];   }
   saveLocalEdits();
@@ -1125,6 +1107,24 @@ document.getElementById('search').addEventListener('input', e => {
   buildList(bricks.filter(b => b.lines.length));
   toast('Brick moved!');
 }
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SEARCH
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+let searchTimer;
+document.getElementById('search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  const q = e.target.value.trim();
+  searchTimer = setTimeout(() => {
+    if (!q) {
+      document.getElementById('rinfo').textContent = '';
+      highlightBricks([]);
+      buildList(bricks.filter(b => b.lines.length));
+    } else {
+      updateList(q);
+    }
+  }, 200);
+});
 
 // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // INIT WITH GAS
