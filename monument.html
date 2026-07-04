@@ -36,7 +36,6 @@ header {
 .logo { font-size: 28px; }
 .header-text h1 { font-size: 20px; font-weight: normal; }
 .header-text p { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 2px; }
-.header-stats { margin-left: auto; text-align: right; font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.6; }
 
 /* ─── TOOLBAR ─────────────────────── */
 .toolbar {
@@ -215,7 +214,6 @@ header {
   <div class="header-text">
     <h1>Southwestern University Donor Brick Monument — Section 1</h1>
   </div>
-  <div class="header-stats" id="header-stats">Loading…</div>
 </header>
 
 <div class="toolbar">
@@ -641,8 +639,6 @@ function renderList(filtered) {
     </div>
   `).join('');
   document.getElementById('recorded-count').textContent = bricks.length;
-  document.getElementById('header-stats').innerHTML =
-    `${bricks.length} bricks recorded<br>${GRID_ROWS*GRID_COLS - bricks.length} unrecorded`;
 }
 
 // ═══════════════════════════════════════════════════
