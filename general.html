@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Donor Brick Monument – General Info</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
 :root {
   --accent: #e8a050;
@@ -77,7 +78,13 @@ header {
   border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.4);
   background: var(--surface);
 }
-.map-wrap iframe { width: 100%; height: 420px; border: 0; display: block; }
+#section-map { width: 100%; height: 420px; }
+.section-label {
+  background: var(--surface); color: var(--text); border: 1px solid var(--surface2);
+  font-family: Georgia, serif; font-size: 13px; padding: 3px 8px;
+  border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.section-label::before { border-top-color: var(--surface2); }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
@@ -144,10 +151,32 @@ header {
     <h2>Find the Sections</h2>
     <p>The map below shows where each section of the monument is located on campus.</p>
     <div class="map-wrap">
-      <iframe src="https://www.google.com/maps/d/u/1/embed?mid=17_BetyKz5zGhrZXCIavGknWROAHR9ts&ehbc=2E312F" loading="lazy" title="Map of donor brick monument sections"></iframe>
+      <div id="section-map" role="img" aria-label="Map of donor brick monument sections"></div>
     </div>
   </section>
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+const SECTIONS = [
+  { name: 'Section 1', lat: 30.6353485, lng: -97.6658105 },
+  { name: 'Section 2', lat: 30.6355534, lng: -97.6655637 },
+  { name: 'Section 3', lat: 30.6356411, lng: -97.6654349 },
+];
+
+const map = L.map('section-map', { scrollWheelZoom: false }).setView([30.635514, -97.665603], 19);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+}).addTo(map);
+
+SECTIONS.forEach(s => {
+  L.marker([s.lat, s.lng]).addTo(map)
+    .bindTooltip(s.name, { permanent: true, direction: 'top', className: 'section-label', offset: [0, -8] })
+    .openTooltip();
+});
+</script>
 
 </body>
 </html>
