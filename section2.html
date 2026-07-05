@@ -34,7 +34,8 @@ header {
   padding: 12px 20px; display: flex; align-items: center; gap: 14px;
   box-shadow: 0 3px 10px rgba(0,0,0,.5); flex-shrink: 0;
 }
-.logo { font-size: 26px; margin-right: 16px; }
+.logo { font-size: 26px; margin-right: 16px; flex-shrink: 0; }
+.logo img { height: 36px; width: auto; display: block; }
 .htext h1 { font-size: 19px; font-weight: normal; }
 .htext p  { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; }
 .hstats   { margin-left: auto; text-align: right; font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.6; }
@@ -309,12 +310,35 @@ body.place-mode .brick.empty:not(.filler):hover {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+
+/* ── MOBILE ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  header { padding: 8px 12px; gap: 8px; }
+  .logo img { height: 24px; }
+  .htext h1 { font-size: 13px; line-height: 1.3; }
+  .hadmin-btn { padding: 4px 7px; font-size: 10px; }
+
+  .adminbar { flex-wrap: wrap; padding: 6px 10px; gap: 8px; }
+  .admin-hint { display: none; }
+  .cb { padding: 5px 8px; font-size: 11px; }
+
+  .toolbar { padding: 6px 10px; }
+  .sw { min-width: 140px; }
+
+  .dp {
+    left: 8px; right: 8px; max-width: none; min-width: 0;
+    padding: 16px 40px 14px 16px;
+  }
+  .legend { font-size: 9px; padding: 7px 9px; }
+
+  .emodal { width: calc(100vw - 32px); min-width: 0; padding: 18px; }
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University" style="height:36px;width:auto;"></div>
+  <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University"></div>
   <div class="htext">
     <h1>Donor Brick Monument — Section 2</h1>
   </div>
@@ -328,7 +352,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   <label>
     <input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks
   </label>
-  <span style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
+  <span class="admin-hint" style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
   <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
   <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
   <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
