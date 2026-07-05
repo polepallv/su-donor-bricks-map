@@ -14,8 +14,8 @@
  *  6. Who has access: Anyone
  *  7. Click Deploy and copy the URL (ends in /exec).
  *  8. Open monument.html, section2.html, and section3.html.
- *     Find the line:  const GAS_URL = '';
- *     Replace '' with your URL (in single quotes):
+ *     Find the line:  const GAS_URL = '...';
+ *     Replace the existing value with your new URL (in single quotes):
  *       const GAS_URL = 'https://script.google.com/macros/s/ABC.../exec';
  *  9. Save and re-host all three HTML files.
  *     From now on, every admin edit is saved to Google Sheets
@@ -37,11 +37,11 @@
  *    → Returns fn({"r,c": {lines:[…], size:1}, …})
  *
  *  Save an edit:
- *    ?action=set&section=1&key=5,3&l1=NAME&l2=LINE2&l3=LINE3&size=1&callback=fn
+ *    ?action=set&section=1&key=5,3&l1=NAME&l2=LINE2&l3=LINE3&l4=&l5=&l6=&l7=&l8=&size=1&callback=fn
  *    → Upserts a row in the BrickEdits sheet, returns fn({ok:true})
  *
  *  The Sheet ("BrickEdits") has columns:
- *    section | key | line1 | line2 | line3 | size | updated
+ *    section | key | line1 | line2 | line3 | line4 | line5 | line6 | line7 | line8 | size | updated
  */
 
 // ── Sheet name ──────────────────────────────────────────────
@@ -53,8 +53,13 @@ const COL_KEY     = 1;
 const COL_L1      = 2;
 const COL_L2      = 3;
 const COL_L3      = 4;
-const COL_SIZE    = 5;
-const COL_UPDATED = 6;
+const COL_L4      = 5;
+const COL_L5      = 6;
+const COL_L6      = 7;
+const COL_L7      = 8;
+const COL_L8      = 9;
+const COL_SIZE    = 10;
+const COL_UPDATED = 11;
 
 /**
  * Handle all incoming requests.
@@ -105,7 +110,8 @@ function handleGet(p) {
     if (String(row[COL_SECTION]) !== section) continue;
 
     const key   = String(row[COL_KEY]);
-    const lines = [row[COL_L1], row[COL_L2], row[COL_L3]]
+    const lines = [row[COL_L1], row[COL_L2], row[COL_L3], row[COL_L4],
+                   row[COL_L5], row[COL_L6], row[COL_L7], row[COL_L8]]
                     .map(v => String(v || ''))
                     .filter(Boolean);
     const size  = parseInt(row[COL_SIZE]) || 1;
@@ -126,6 +132,11 @@ function handleSet(p) {
   const l1      = String(p.l1      || '');
   const l2      = String(p.l2      || '');
   const l3      = String(p.l3      || '');
+  const l4      = String(p.l4      || '');
+  const l5      = String(p.l5      || '');
+  const l6      = String(p.l6      || '');
+  const l7      = String(p.l7      || '');
+  const l8      = String(p.l8      || '');
   const size    = parseInt(p.size) || 1;
 
   if (!section || !key) throw new Error('Missing section or key');
@@ -142,7 +153,7 @@ function handleSet(p) {
     }
   }
 
-  const newRow = [section, key, l1, l2, l3, size, new Date().toISOString()];
+  const newRow = [section, key, l1, l2, l3, l4, l5, l6, l7, l8, size, new Date().toISOString()];
 
   if (foundRow > 0) {
     sheet.getRange(foundRow, 1, 1, newRow.length).setValues([newRow]);
@@ -163,9 +174,10 @@ function getSheet() {
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
     // Write header row
-    sheet.appendRow(['section', 'key', 'line1', 'line2', 'line3', 'size', 'updated']);
+    sheet.appendRow(['section', 'key', 'line1', 'line2', 'line3', 'line4',
+                      'line5', 'line6', 'line7', 'line8', 'size', 'updated']);
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, 1, 7).setFontWeight('bold');
+    sheet.getRange(1, 1, 1, 12).setFontWeight('bold');
   }
 
   return sheet;
@@ -181,7 +193,7 @@ function testSetup() {
   Logger.log('Row count: ' + sheet.getLastRow());
 
   // Insert a test edit
-  handleSet({ section:'1', key:'0,0', l1:'TEST BRICK', l2:'SETUP WORKS', l3:'', size:'1' });
+  handleSet({ section:'1', key:'0,0', l1:'TEST BRICK', l2:'SETUP WORKS', l3:'', l4:'', l5:'', l6:'', l7:'', l8:'', size:'1' });
   Logger.log('Test write OK');
 
   // Read it back
