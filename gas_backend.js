@@ -13,7 +13,7 @@
  *  5. Execute as: Me (your Google account)
  *  6. Who has access: Anyone
  *  7. Click Deploy and copy the URL (ends in /exec).
- *  8. Open monument.html, section2.html, and section3.html.
+ *  8. Open section1.html, section2.html, and section3.html.
  *     Find the line:  const GAS_URL = '...';
  *     Replace the existing value with your new URL (in single quotes):
  *       const GAS_URL = 'https://script.google.com/macros/s/ABC.../exec';
