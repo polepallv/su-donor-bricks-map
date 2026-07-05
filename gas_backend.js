@@ -97,11 +97,15 @@ function doGet(e) {
 /**
  * GET all edits for a section.
  * Returns { "row,col": { lines: [...], size: N }, ... }
+ *
+ * Uses getDisplayValues() rather than getValues() so that any cell
+ * Sheets may have auto-converted to a date/number still reads back
+ * as the text that's actually displayed, not a raw Date/Number object.
  */
 function handleGet(p) {
   const section = String(p.section || '');
   const sheet   = getSheet();
-  const data    = sheet.getDataRange().getValues();
+  const data    = sheet.getDataRange().getDisplayValues();
 
   const result  = {};
   // Start at row 1 to skip header
@@ -125,6 +129,10 @@ function handleGet(p) {
 /**
  * SET (upsert) one brick edit.
  * Finds existing row for section+key; updates it or appends a new row.
+ *
+ * The target range's number format is forced to plain text ('@') before
+ * writing, so Sheets doesn't auto-convert date-like inscription text
+ * (e.g. "AUGUST 16, 2008") into an actual Date value.
  */
 function handleSet(p) {
   const section = String(p.section || '');
@@ -153,13 +161,12 @@ function handleSet(p) {
     }
   }
 
-  const newRow = [section, key, l1, l2, l3, l4, l5, l6, l7, l8, size, new Date().toISOString()];
+  const newRow  = [section, key, l1, l2, l3, l4, l5, l6, l7, l8, size, new Date().toISOString()];
+  const rowIdx  = foundRow > 0 ? foundRow : sheet.getLastRow() + 1;
+  const range   = sheet.getRange(rowIdx, 1, 1, newRow.length);
 
-  if (foundRow > 0) {
-    sheet.getRange(foundRow, 1, 1, newRow.length).setValues([newRow]);
-  } else {
-    sheet.appendRow(newRow);
-  }
+  range.setNumberFormat('@'); // plain text, prevents Sheets auto-converting dates/numbers
+  range.setValues([newRow]);
 
   return { ok: true };
 }
