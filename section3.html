@@ -182,15 +182,21 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 .dp {
   position: absolute; bottom: 14px; left: 14px; z-index: 50;
-  background: rgba(24,10,2,.94); border: 1px solid var(--surface2);
-  border-radius: 10px; padding: 13px 17px; max-width: 270px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.7); display: none;
+  background: rgba(24,10,2,.96); border: 1px solid var(--surface2);
+  border-radius: 12px; padding: 20px 48px 18px 22px; min-width: 240px; max-width: 360px;
+  box-shadow: 0 10px 34px rgba(0,0,0,.75); display: none;
 }
 .dp.open { display: block; }
-.dp h4 { font-size: 14px; color: var(--accent); margin-bottom: 5px; }
-.dp .dt { font-size: 12px; line-height: 1.6; color: var(--text); }
-.dp .dpos { font-size: 10px; color: var(--muted); margin-top: 5px; }
-.dpx { position: absolute; top: 7px; right: 9px; cursor: pointer; color: var(--muted); font-size: 15px; }
+.dp .dt { font-size: 14px; line-height: 1.75; color: var(--text); }
+.dp .dt div { margin-bottom: 3px; }
+.dp .dt div:last-child { margin-bottom: 0; }
+.dp .dpos { font-size: 10px; color: var(--muted); margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--surface2); }
+.dpx {
+  position: absolute; top: 10px; right: 12px; cursor: pointer; color: var(--muted); font-size: 15px;
+  width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.dpx:hover { background: var(--surface2); color: var(--text); }
 
 .legend {
   position: absolute; top: 8px; right: 8px; z-index: 50;
@@ -289,7 +295,6 @@ body.place-mode .brick.empty:not(.filler):hover {
     </div>
     <div class="dp" id="dp">
       <span class="dpx" onclick="closeDetail()">✕</span>
-      <h4 id="dpname"></h4>
       <div class="dt" id="dptext"></div>
       <div class="dpos" id="dppos"></div>
     </div>
@@ -1047,8 +1052,7 @@ function onBrickClick(b, el) {
   activeBrick = b;
   document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
   el.classList.add('act');
-  document.getElementById('dpname').textContent = b.lines[0] || '—';
-  document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
+  document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${l}</div>`).join('');
   document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
   document.getElementById('dp').classList.add('open');
   highlightSidebarItem(b.id);
@@ -1075,8 +1079,7 @@ function scrollToBrick(b) {
   applyTransform();
   setTimeout(() => {
     el.classList.add('act');
-    document.getElementById('dpname').textContent = b.lines[0] || '—';
-    document.getElementById('dptext').innerHTML = b.lines.slice(1).map(l => `<div>${l}</div>`).join('');
+    document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${l}</div>`).join('');
     document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
     document.getElementById('dp').classList.add('open');
   }, 60);

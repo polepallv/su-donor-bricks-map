@@ -66,13 +66,33 @@ header {
 .gallery img {
   width: 100%; height: auto; border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,.4); display: block;
+  cursor: zoom-in; transition: transform .15s;
 }
+.gallery img:hover { transform: scale(1.02); }
 .gallery figcaption {
   text-align: center; font-size: 14px; color: var(--muted); margin-top: 8px;
 }
 @media (max-width: 640px) {
   .gallery { grid-template-columns: 1fr; }
 }
+
+.lightbox-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.88);
+  display: none; align-items: center; justify-content: center;
+  z-index: 400; padding: 60px 40px; cursor: zoom-out;
+}
+.lightbox-overlay.open { display: flex; }
+.lightbox-overlay img {
+  max-width: 100%; max-height: 100%; border-radius: 8px;
+  box-shadow: 0 12px 50px rgba(0,0,0,.6); cursor: default;
+}
+.lightbox-close {
+  position: fixed; top: 22px; right: 28px; width: 42px; height: 42px;
+  border-radius: 50%; background: var(--surface); border: 1px solid var(--surface2);
+  color: var(--text); font-size: 20px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 401; transition: background .15s;
+}
+.lightbox-close:hover { background: var(--surface2); }
 
 .map-wrap {
   border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.4);
@@ -133,15 +153,15 @@ header {
     <h2>Gallery</h2>
     <div class="gallery">
       <figure>
-        <img src="assets/general_gallery_section1.jpg" alt="Section 1 of the donor brick walkway">
+        <img src="assets/general_gallery_section1.jpg" alt="Section 1 of the donor brick walkway" onclick="openLightbox(this)">
         <figcaption>Section 1</figcaption>
       </figure>
       <figure>
-        <img src="assets/general_gallery_section2.jpg" alt="Section 2 of the donor brick walkway">
+        <img src="assets/general_gallery_section2.jpg" alt="Section 2 of the donor brick walkway" onclick="openLightbox(this)">
         <figcaption>Section 2</figcaption>
       </figure>
       <figure>
-        <img src="assets/general_gallery_section3.jpg" alt="Section 3 of the donor brick walkway">
+        <img src="assets/general_gallery_section3.jpg" alt="Section 3 of the donor brick walkway" onclick="openLightbox(this)">
         <figcaption>Section 3</figcaption>
       </figure>
     </div>
@@ -156,7 +176,26 @@ header {
   </section>
 </div>
 
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close" onclick="closeLightbox()">✕</span>
+  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+function openLightbox(imgEl) {
+  const lightboxImg = document.getElementById('lightbox-img');
+  lightboxImg.src = imgEl.src;
+  lightboxImg.alt = imgEl.alt;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+});
+</script>
 <script>
 const SECTIONS = [
   { name: 'Section 1', lat: 30.6353485, lng: -97.6658105 },
