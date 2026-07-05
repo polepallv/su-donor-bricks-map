@@ -24,7 +24,8 @@ header {
   padding: 14px 20px; display: flex; align-items: center; gap: 14px;
   box-shadow: 0 3px 10px rgba(0,0,0,.5);
 }
-.logo { font-size: 28px; margin-right: 16px; }
+.logo { font-size: 28px; margin-right: 16px; flex-shrink: 0; }
+.logo img { height: 40px; width: auto; display: block; }
 .header-text h1 { font-size: 20px; font-weight: normal; }
 
 /* ─── TOOLBAR ─────────────────────── */
@@ -109,12 +110,26 @@ header {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+
+/* ─── MOBILE ─────────────────────── */
+@media (max-width: 480px) {
+  header { padding: 10px 14px; gap: 10px; }
+  .logo img { height: 28px; }
+  .header-text h1 { font-size: 15px; line-height: 1.3; }
+  .toolbar { padding: 8px 10px; justify-content: flex-start; overflow-x: auto; }
+  .tab { padding: 9px 11px; font-size: 12px; white-space: nowrap; }
+  .content { padding: 24px 16px 60px; }
+  .content h2 { font-size: 19px; }
+  #section-map { height: 300px; }
+  .lightbox-overlay { padding: 20px 12px; }
+  .lightbox-close { top: 12px; right: 12px; width: 38px; height: 38px; }
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University" style="height:40px;width:auto;"></div>
+  <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University"></div>
   <div class="header-text">
     <h1>Donor Brick Monument</h1>
   </div>
