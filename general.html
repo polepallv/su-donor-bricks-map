@@ -57,11 +57,20 @@ header {
 .content p:last-child { margin-bottom: 0; }
 
 .gallery {
-  display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 20px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px;
+}
+.gallery figure {
+  margin: 0;
 }
 .gallery img {
   width: 100%; height: auto; border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4); display: block;
+}
+.gallery figcaption {
+  text-align: center; font-size: 14px; color: var(--muted); margin-top: 8px;
+}
+@media (max-width: 640px) {
+  .gallery { grid-template-columns: 1fr; }
 }
 
 .map-wrap {
@@ -116,7 +125,18 @@ header {
   <section>
     <h2>Gallery</h2>
     <div class="gallery">
-      <img src="assets/general_gallery1.jpg" alt="Donor brick walkway detail">
+      <figure>
+        <img src="assets/general_gallery_section1.jpg" alt="Section 1 of the donor brick walkway">
+        <figcaption>Section 1</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/general_gallery_section2.jpg" alt="Section 2 of the donor brick walkway">
+        <figcaption>Section 2</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/general_gallery_section3.jpg" alt="Section 3 of the donor brick walkway">
+        <figcaption>Section 3</figcaption>
+      </figure>
     </div>
   </section>
 
