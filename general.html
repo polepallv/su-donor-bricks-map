@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donor Brick Monument – General Info</title>
+<style>
+:root {
+  --accent: #e8a050;
+  --bg: #1e1208;
+  --surface: #2e1c0e;
+  --surface2: #3e2a18;
+  --text: #f0e4d0;
+  --muted: #9a7050;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ─── HEADER ─────────────────────── */
+header {
+  background: linear-gradient(135deg, #8b3a1e, #c8714a);
+  padding: 14px 20px; display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.5);
+}
+.logo { font-size: 28px; margin-right: 16px; }
+.header-text h1 { font-size: 20px; font-weight: normal; }
+
+/* ─── TOOLBAR ─────────────────────── */
+.toolbar {
+  background: var(--surface); border-bottom: 1px solid var(--surface2);
+  padding: 10px 16px; display: flex; gap: 10px; align-items: center; justify-content: flex-end;
+}
+.tab-bar { display: flex; gap: 0; }
+.tab { padding: 7px 14px; cursor: pointer; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ─── CONTENT ─────────────────────── */
+.content {
+  max-width: 880px; margin: 0 auto; padding: 40px 24px 80px;
+}
+.hero {
+  width: 100%; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5); margin-bottom: 32px;
+}
+.hero img { width: 100%; height: auto; display: block; }
+
+.content h2 {
+  font-size: 22px; font-weight: normal; color: var(--accent);
+  margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--surface2);
+}
+.content section { margin-bottom: 44px; }
+.content p {
+  font-size: 15px; line-height: 1.75; color: var(--text); margin-bottom: 14px;
+}
+.content p:last-child { margin-bottom: 0; }
+
+.gallery {
+  display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 20px;
+}
+.gallery img {
+  width: 100%; height: auto; border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
+
+.map-wrap {
+  border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  background: var(--surface);
+}
+.map-wrap iframe { width: 100%; height: 420px; border: 0; display: block; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University" style="height:40px;width:auto;"></div>
+  <div class="header-text">
+    <h1>Donor Brick Monument</h1>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="tab-bar">
+    <div class="tab active">General</div>
+    <div class="tab" onclick="location.href='monument.html'">Section 1</div>
+    <div class="tab" onclick="location.href='section2.html'">Section 2</div>
+    <div class="tab" onclick="location.href='section3.html'">Section 3</div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="hero">
+    <img src="assets/general_hero.jpg" alt="Donor brick walkway at Southwestern University">
+  </div>
+
+  <section>
+    <h2>About the Monument</h2>
+    <p>
+      The Donor Brick Monument is a lasting tribute to the alumni, families, and friends
+      whose generosity has shaped Southwestern University. Each engraved brick marks a
+      personal connection to campus — a graduating class, a fraternity or sorority, a
+      memory, or a name given in someone's honor.
+    </p>
+    <p>
+      The monument spans three sections along the walkway, together holding hundreds of
+      individually inscribed bricks. This site lets you search the collection, browse each
+      section's layout, and find exactly where a particular brick sits.
+    </p>
+  </section>
+
+  <section>
+    <h2>Gallery</h2>
+    <div class="gallery">
+      <img src="assets/general_gallery1.jpg" alt="Donor brick walkway detail">
+    </div>
+  </section>
+
+  <section>
+    <h2>Find the Sections</h2>
+    <p>The map below shows where each section of the monument is located on campus.</p>
+    <div class="map-wrap">
+      <iframe src="https://www.google.com/maps/d/u/1/embed?mid=17_BetyKz5zGhrZXCIavGknWROAHR9ts&ehbc=2E312F" loading="lazy" title="Map of donor brick monument sections"></iframe>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
