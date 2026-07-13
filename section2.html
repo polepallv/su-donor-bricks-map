@@ -1071,8 +1071,11 @@ function buildList(list) {
 
 function updateList(query) {
   if (!query) { buildList(bricks.filter(b => b.lines.length)); return; }
-  const q = query.toLowerCase();
-  const results = bricks.filter(b => b.lines.some(l => l.toLowerCase().includes(q)));
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const results = bricks.filter(b => {
+    const joined = b.lines.join(' ').toLowerCase();
+    return words.every(w => joined.includes(w));
+  });
   document.getElementById('rinfo').textContent = results.length + ' found';
   highlightBricks(results);
   buildList(results);
