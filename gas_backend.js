@@ -98,14 +98,18 @@ function doGet(e) {
  * GET all edits for a section.
  * Returns { "row,col": { lines: [...], size: N }, ... }
  *
- * Uses getDisplayValues() rather than getValues() so that any cell
- * Sheets may have auto-converted to a date/number still reads back
- * as the text that's actually displayed, not a raw Date/Number object.
+ * Uses getValues() (raw stored values), not getDisplayValues(): Sheets'
+ * display layer silently hides a leading apostrophe on any cell (its
+ * universal "treat as text" convention), which would otherwise strip
+ * a real leading apostrophe from inscription text like "'88" or "'13".
+ * The write side (handleSet) already forces plain-text number format
+ * before writing, which is what actually prevents date/number
+ * auto-conversion — getDisplayValues() here was redundant and harmful.
  */
 function handleGet(p) {
   const section = String(p.section || '');
   const sheet   = getSheet();
-  const data    = sheet.getDataRange().getDisplayValues();
+  const data    = sheet.getDataRange().getValues();
 
   const result  = {};
   // Start at row 1 to skip header
