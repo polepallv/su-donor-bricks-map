@@ -34,7 +34,10 @@
  *
  *  Fetch edits:
  *    ?action=get&section=1&callback=fn
- *    → Returns fn({"r,c": {lines:[…], size:1}, …})
+ *    → Returns fn({"r,c": {lines:[…], size:1, updated:"2026-...Z"}, …})
+ *    The `updated` timestamp lets the frontend prefer whichever of a
+ *    browser's local edit or the shared sheet's edit is actually newer,
+ *    instead of a local edit permanently overriding the shared one.
  *
  *  Save an edit:
  *    ?action=set&section=1&key=5,3&l1=NAME&l2=LINE2&l3=LINE3&l4=&l5=&l6=&l7=&l8=&size=1&callback=fn
@@ -122,9 +125,10 @@ function handleGet(p) {
                    row[COL_L5], row[COL_L6], row[COL_L7], row[COL_L8]]
                     .map(v => String(v || ''))
                     .filter(Boolean);
-    const size  = parseInt(row[COL_SIZE]) || 1;
+    const size    = parseInt(row[COL_SIZE]) || 1;
+    const updated = String(row[COL_UPDATED] || '');
 
-    result[key] = { lines, size };
+    result[key] = { lines, size, updated };
   }
 
   return result;
