@@ -63,7 +63,8 @@ header {
 /* ── TOOLBAR ─────────────────────────────────────────── */
 .toolbar {
   background: var(--surface); border-bottom: 1px solid var(--surface2);
-  padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex-shrink: 0;
+  padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
+  overflow-x: auto;
 }
 .sw { position: relative; flex: 1; min-width: 180px; }
 .sw input {
@@ -80,9 +81,9 @@ header {
   transition: background .15s; white-space: nowrap;
 }
 .cb:hover { background: #5a3a20; }
-.tabs { display: flex; margin-left: 6px; }
+.tabs { display: flex; margin-left: 6px; flex-shrink: 0; }
 .tab { padding: 6px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
-       border-bottom: 2px solid transparent; transition: all .2s; }
+       border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
 
@@ -368,6 +369,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 </div>
 
 <div class="toolbar">
+  <div class="tab" onclick="location.href='inscriptions.html'">Inscriptions List</div>
   <div class="sw">
     <span class="si">🔍</span>
     <input id="search" type="text" placeholder="Search name, class year, inscription…" autocomplete="off">
