@@ -110,11 +110,6 @@ header {
 .canvas { position: absolute; transform-origin: 0 0; }
 .mon { position: relative; }
 .bench-body { position: absolute; background: var(--bench-body); border: 5px solid var(--bench-border); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
-.orient {
-  position: absolute; pointer-events: none;
-  font-size: 9px; font-family: sans-serif; letter-spacing: 1.5px;
-  text-transform: uppercase; color: #7a5c38; text-align: center;
-}
 .floor { position: absolute; background: var(--floor-color); border: 1px solid var(--floor-border); }
 .pergola {
   position: absolute; box-sizing: border-box; border: 7px solid var(--pergola-color);
@@ -126,18 +121,11 @@ header {
 }
 .pergola-leg { position: absolute; width: 18px; height: 18px; background: var(--pergola-color); border-radius: 2px; }
 .ctx-building {
-  position: absolute; background: #4a3a2a; border: 1px solid #2e2015; border-radius: 4px;
+  position: absolute; background: var(--bench-border); border: 1px solid #8a8168; border-radius: 4px;
   display: flex; align-items: center; justify-content: center; text-align: center;
-  color: #e8d8c0; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  color: #2e2818; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
   font-family: sans-serif; padding: 4px;
 }
-.ctx-hedge { position: absolute; background: #2f4a26; border: 1px solid #1c2e17; border-radius: 4px; }
-.ctx-sidewalk { position: absolute; background: #4a4a48; border: 1px solid #333; border-radius: 2px; }
-.ctx-label {
-  position: absolute; pointer-events: none; font-size: 9px; font-family: sans-serif;
-  letter-spacing: 1.5px; text-transform: uppercase; color: #cfcfc8; text-align: center;
-}
-
 .brick {
   position: absolute; background: var(--brick-bg); border: 1px solid var(--brick-border);
   border-radius: 2px; display: flex; flex-direction: column; align-items: center;
@@ -203,15 +191,6 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
 }
 .dpx:hover { background: var(--surface2); color: var(--text); }
 
-.legend {
-  position: absolute; top: 8px; right: 8px; z-index: 50;
-  background: rgba(24,10,2,.88); border: 1px solid var(--surface2);
-  border-radius: 8px; padding: 9px 11px; font-size: 10px;
-}
-.lgi { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
-.lgi:last-child { margin-bottom: 0; }
-.lgs { width: 18px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-
 #toast {
   position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
   background: var(--accent); color: var(--bg); padding: 8px 20px; border-radius: 20px;
@@ -269,8 +248,6 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
     left: 8px; right: 8px; max-width: none; min-width: 0;
     padding: 16px 40px 14px 16px;
   }
-  .legend { font-size: 9px; padding: 7px 9px; }
-
   .emodal { width: calc(100vw - 32px); min-width: 0; padding: 18px; }
 }
 </style>
@@ -303,10 +280,10 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
   <span id="rinfo"></span>
   <div class="tabs">
     <div class="tab" onclick="location.href='general.html'">General</div>
+    <div class="tab on">McCombs Pergola Benches</div>
     <div class="tab" onclick="location.href='section1.html'">McCombs Pergola Brick Garden</div>
     <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
     <div class="tab" onclick="location.href='section3.html'">Lois Perkins Peace Garden East</div>
-    <div class="tab on">McCombs Pergola Benches</div>
   </div>
 </div>
 
@@ -317,13 +294,6 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
   </aside>
   <div class="vp" id="vp">
     <div class="canvas" id="canvas"><div class="mon" id="mon"></div></div>
-    <div class="legend">
-      <div class="lgi"><span class="lgs" style="background:var(--bench-body);border:2px solid var(--bench-border)"></span> Bench (white stone)</div>
-      <div class="lgi"><span class="lgs" style="background:var(--floor-color);border:1px solid var(--floor-border)"></span> Concrete floor</div>
-      <div class="lgi"><span class="lgs" style="background:transparent;border:2px solid var(--pergola-color)"></span> Pergola</div>
-      <div class="lgi"><span class="lgs" style="background:var(--brick-bg)"></span> Inscribed plaque</div>
-      <div class="lgi"><span class="lgs" style="background:var(--brick-empty)"></span> Empty plaque</div>
-    </div>
     <div class="zctrl">
       <button class="zb" onclick="zoom(1.25)">+</button>
       <button class="zb" onclick="zoom(0.8)">−</button>
@@ -376,12 +346,16 @@ const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 500
 const BENCH_MARGIN   = 18;    // white-stone bench body is larger than the plaques it carries
 const CORNER_GAP     = 130;   // open space between adjacent bench ends at each corner
 
-const OFFSET_X = 90, OFFSET_Y = 90; // room for the surrounding context bands
+const OFFSET_X = 90, OFFSET_Y = 170; // room for the (taller) surrounding context band
 
-const WEST_X  = OFFSET_X, WEST_Y = OFFSET_Y;
+const WEST_X  = OFFSET_X;
 const NORTH_X = WEST_X + BENCH_THICK + CORNER_GAP;
 const NORTH_Y = OFFSET_Y;
 const SOUTH_X = NORTH_X;
+// The west bench is centered between the north and south benches, with an
+// equal CORNER_GAP-sized gap above (below the north bench) and below (above
+// the south bench) — not flush with the north bench's row.
+const WEST_Y  = NORTH_Y + BENCH_THICK + CORNER_GAP;
 const SOUTH_Y = WEST_Y + BENCH_LEN + CORNER_GAP;
 
 const BENCHES = [
@@ -390,46 +364,46 @@ const BENCHES = [
   { id: 'S', name: 'South Bench', orientation: 'h', x: SOUTH_X, y: SOUTH_Y },
 ];
 
-// Grey concrete floor filling the space the three benches enclose — it (and
-// the pergola inside it) extends further east than the benches, into the
-// open side.
-const FLOOR_EAST_EXTRA = 160;
+// Grey concrete floor — big enough that each bench sits entirely on it with
+// a little gap of floor showing behind (outside) it, and extends further
+// east than the benches (and the pergola inside it), into the open side.
+const FLOOR_BEHIND_GAP = 30;   // floor visible behind each bench's outer edge
+const FLOOR_EAST_EXTRA  = 400; // how far past the benches the floor reaches east
 const FLOOR = {
-  x: WEST_X + BENCH_THICK,
-  y: NORTH_Y + BENCH_THICK,
-  w: (NORTH_X + BENCH_LEN + FLOOR_EAST_EXTRA) - (WEST_X + BENCH_THICK),
-  h: SOUTH_Y - (NORTH_Y + BENCH_THICK),
+  x: (WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
+  y: (NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
+  w: (NORTH_X + BENCH_LEN + FLOOR_EAST_EXTRA) - ((WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP),
+  h: ((SOUTH_Y + BENCH_THICK + BENCH_MARGIN) + FLOOR_BEHIND_GAP) - ((NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP),
 };
 
 // Black rectangular pergola frame in the center — 6 legs, 3 along each of
 // its longer (north/south-facing) sides, which run parallel to the north
-// and south benches.
-const PERGOLA_INSET_X = 60, PERGOLA_INSET_Y = 50;
+// and south benches. It's inset from the benches' inner edges (not the
+// floor's, which is sized around the benches) and stretched east to read
+// as a clearly elongated rectangle rather than a square.
+const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 290;
 const PERGOLA = {
-  x: FLOOR.x + PERGOLA_INSET_X,
-  y: FLOOR.y + PERGOLA_INSET_Y,
-  w: FLOOR.w - PERGOLA_INSET_X * 2,
-  h: FLOOR.h - PERGOLA_INSET_Y * 2,
+  x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
+  y: (NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y,
+  w: (NORTH_X + BENCH_LEN + PERGOLA_EAST_EXTRA) - ((WEST_X + BENCH_THICK) + PERGOLA_INSET_X),
+  h: (SOUTH_Y - PERGOLA_INSET_Y) - ((NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y),
 };
 const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y },
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y + PERGOLA.h },
 ]);
 
-// Surrounding context: McCombs Campus Center to the north, sidewalk to the
-// east, grass hedges to the west, Section 1 continues to the south.
-const CTX_BUILDING = { x: 40, y: 10, w: 0 /* set below */, h: 50 };
-const CTX_HEDGE = { x: 10, y: WEST_Y - BENCH_MARGIN, w: 50, h: BENCH_LEN + BENCH_MARGIN * 2 };
-const CTX_SIDEWALK = {
-  x: FLOOR.x + FLOOR.w + 10,
-  y: NORTH_Y - BENCH_MARGIN,
-  w: 80,
-  h: (SOUTH_Y + BENCH_THICK + BENCH_MARGIN) - (NORTH_Y - BENCH_MARGIN),
+// Surrounding context: McCombs Campus Center to the north — tall, stretching
+// further north (up) rather than encroaching toward the floor, and exactly
+// as wide as the concrete floor below it.
+const CTX_BUILDING_H = 110, CTX_BUILDING_GAP = 12;
+const CTX_BUILDING = {
+  x: FLOOR.x, y: (FLOOR.y - CTX_BUILDING_GAP) - CTX_BUILDING_H,
+  w: FLOOR.w, h: CTX_BUILDING_H,
 };
 
-const CW = CTX_SIDEWALK.x + CTX_SIDEWALK.w + 10;
-const CH = SOUTH_Y + BENCH_THICK + BENCH_MARGIN + 60; // + room for the Section 1 label below
-CTX_BUILDING.w = CW - 80;
+const CW = FLOOR.x + FLOOR.w + 30;
+const CH = FLOOR.y + FLOOR.h + 30;
 
 function plaquePos(bench, i) {
   if (bench.orientation === 'h') {
@@ -518,32 +492,6 @@ function renderMonument() {
   building.textContent = 'McCombs Campus Center';
   mon.appendChild(building);
 
-  const hedge = document.createElement('div');
-  hedge.className = 'ctx-hedge';
-  hedge.style.cssText = `left:${CTX_HEDGE.x}px;top:${CTX_HEDGE.y}px;width:${CTX_HEDGE.w}px;height:${CTX_HEDGE.h}px;`;
-  mon.appendChild(hedge);
-  const hedgeLbl = document.createElement('div');
-  hedgeLbl.className = 'ctx-label';
-  hedgeLbl.style.cssText = `left:${CTX_HEDGE.x - 2}px; top:${CTX_HEDGE.y + CTX_HEDGE.h / 2 - 60}px; width:16px; height:120px; writing-mode: vertical-rl;`;
-  hedgeLbl.textContent = 'Grass Hedges';
-  mon.appendChild(hedgeLbl);
-
-  const sidewalk = document.createElement('div');
-  sidewalk.className = 'ctx-sidewalk';
-  sidewalk.style.cssText = `left:${CTX_SIDEWALK.x}px;top:${CTX_SIDEWALK.y}px;width:${CTX_SIDEWALK.w}px;height:${CTX_SIDEWALK.h}px;`;
-  mon.appendChild(sidewalk);
-  const sidewalkLbl = document.createElement('div');
-  sidewalkLbl.className = 'ctx-label';
-  sidewalkLbl.style.cssText = `left:${CTX_SIDEWALK.x + CTX_SIDEWALK.w / 2 - 8}px; top:${CTX_SIDEWALK.y + CTX_SIDEWALK.h / 2 - 60}px; width:16px; height:120px; writing-mode: vertical-rl;`;
-  sidewalkLbl.textContent = 'Sidewalk';
-  mon.appendChild(sidewalkLbl);
-
-  const southLbl = document.createElement('div');
-  southLbl.className = 'ctx-label';
-  southLbl.style.cssText = `left:${(NORTH_X + NORTH_X + BENCH_LEN) / 2 - 160}px; top:${SOUTH_Y + BENCH_THICK + BENCH_MARGIN + 16}px; width:320px; height:16px;`;
-  southLbl.textContent = '↓ South: McCombs Pergola Brick Garden (Section 1)';
-  mon.appendChild(southLbl);
-
   // ── grey concrete floor ──
   const floor = document.createElement('div');
   floor.className = 'floor';
@@ -573,14 +521,6 @@ function renderMonument() {
     }
     mon.appendChild(el);
   });
-
-  const pergolaEastEdge = PERGOLA.x + PERGOLA.w;
-  const floorEastEdge = FLOOR.x + FLOOR.w;
-  const openLbl = document.createElement('div');
-  openLbl.className = 'orient';
-  openLbl.style.cssText = `left:${(pergolaEastEdge + floorEastEdge) / 2 - 8}px; top:${(NORTH_Y + SOUTH_Y + BENCH_THICK) / 2 - 60}px; width:16px; height:120px; writing-mode: vertical-rl;`;
-  openLbl.textContent = '· OPEN SIDE (EAST) ·';
-  mon.appendChild(openLbl);
 
   bricks.forEach(b => {
     const bench = BENCHES.find(x => x.id === b.bench);
