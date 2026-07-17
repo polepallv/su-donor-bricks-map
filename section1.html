@@ -986,7 +986,7 @@ function saveBrickEdit() {
 
   b.lines = lines; b.name = lines[0] || '';
 
-  localEdits[key] = { lines };
+  localEdits[key] = { lines, savedAt: Date.now() };
   allEdits[key]   = { lines };
   saveLocalEdits();
 
@@ -1144,9 +1144,10 @@ function finalizeBrickMove(toRow, toCol) {
   toB.lines   = fl;         toB.name  = fn;
 
   // Persist swapped state
-  if (fromB.lines.length) { localEdits[fromKey] = { lines: fromB.lines }; allEdits[fromKey] = { lines: fromB.lines }; }
+  const swapTime = Date.now();
+  if (fromB.lines.length) { localEdits[fromKey] = { lines: fromB.lines, savedAt: swapTime }; allEdits[fromKey] = { lines: fromB.lines }; }
   else                    { delete localEdits[fromKey]; delete allEdits[fromKey]; }
-  if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines };   allEdits[toKey]   = { lines: toB.lines };   }
+  if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines,   savedAt: swapTime }; allEdits[toKey]   = { lines: toB.lines };   }
   else                    { delete localEdits[toKey];   delete allEdits[toKey];   }
   saveLocalEdits();
 
@@ -1186,9 +1187,29 @@ document.getElementById('search').addEventListener('input', e => {
 // ═══════════════════════════════════════════════════════════
 // INIT WITH GAS
 // ═══════════════════════════════════════════════════════════
+// A browser's own local edit only overrides the shared sheet's edit for
+// the same brick if the local edit is actually newer (by savedAt vs. the
+// sheet's updated timestamp). Otherwise a stale local copy — e.g. from
+// months-old testing on one browser — would permanently mask fresher
+// data every other visitor already sees. Local edits with no shared
+// counterpart at all (never synced) are always kept, so nothing made
+// while offline/before GAS was configured is ever silently lost.
+function mergeEdits(initial, remote, local) {
+  const merged = Object.assign({}, initial, remote);
+  for (const key in local) {
+    const localEdit  = local[key];
+    const remoteEdit = remote[key];
+    if (!remoteEdit) { merged[key] = localEdit; continue; }
+    const localTime  = localEdit.savedAt || 0;
+    const remoteTime = remoteEdit.updated ? Date.parse(remoteEdit.updated) : 0;
+    if (localTime > remoteTime) merged[key] = localEdit;
+  }
+  return merged;
+}
+
 function initWithGAS() {
   const go = () => {
-    allEdits = Object.assign({}, INITIAL_EDITS, remoteEdits, localEdits);
+    allEdits = mergeEdits(INITIAL_EDITS, remoteEdits, localEdits);
     applyEdits();
     renderMonument();
     buildList(bricks.filter(b => b.lines.length));
