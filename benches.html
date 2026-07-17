@@ -6,14 +6,14 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Southwestern University Donor Brick Monument – Lois Perkins Peace Garden East</title>
+<title>Southwestern University Donor Brick Monument – McCombs Pergola Benches</title>
 <style>
 :root {
   --brick-bg:      #c8714a;
   --brick-border:  #a0502e;
-  --brick-mortar:  #c9aa80;
-  --brick-text:    #3a1a08;
   --brick-empty:   #b8724f;
+  --bench-body:    #cfc9ba;
+  --bench-border:  #a8a08e;
   --soil:          #1a0e06;
   --accent:        #e8a050;
   --bg:            #1e1208;
@@ -77,7 +77,7 @@ header {
   transition: background .15s; white-space: nowrap;
 }
 .cb:hover { background: #5a3a20; }
-.tabs { display: flex; margin-left: 6px; }
+.tabs { display: flex; margin-left: 6px; flex-wrap: wrap; }
 .tab { padding: 6px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; }
 .tab:hover { color: var(--text); }
@@ -106,7 +106,7 @@ header {
 .vp.drag { cursor: grabbing; }
 .canvas { position: absolute; transform-origin: 0 0; }
 .mon { position: relative; }
-.mbg { position: absolute; background: var(--brick-mortar); border-radius: 3px; }
+.bench-body { position: absolute; background: var(--bench-body); border: 1px solid var(--bench-border); border-radius: 6px; }
 .orient {
   position: absolute; pointer-events: none;
   font-size: 9px; font-family: sans-serif; letter-spacing: 1.5px;
@@ -121,14 +121,12 @@ header {
 }
 .brick:hover { transform: scale(1.07); box-shadow: 0 3px 14px rgba(0,0,0,.55); z-index: 10; }
 .brick .bl {
-  font-weight: bold; letter-spacing: 0.3px; color: var(--brick-text); line-height: 1.25;
+  font-weight: bold; letter-spacing: 0.3px; color: #3a1a08; line-height: 1.25;
   font-family: 'Times New Roman', serif; text-transform: uppercase; display: block;
   width: 100%; text-align: center; white-space: nowrap; overflow: hidden;
 }
 .brick.empty { background: var(--brick-empty); border-color: #9a5030; cursor: default; opacity: 0.5; }
 .brick.empty:hover { transform: none; box-shadow: none; }
-.brick.filler { background: var(--brick-bg); border-color: var(--brick-border); opacity: 0.65; cursor: default; pointer-events: none; }
-.brick.filler:hover { transform: none !important; box-shadow: none !important; }
 .brick.hi {
   background: var(--hi-bg) !important; border-color: var(--hi-border) !important;
   box-shadow: 0 0 0 2px var(--hi-border), 0 0 14px rgba(249,168,37,.6) !important; z-index: 20;
@@ -145,36 +143,14 @@ header {
 }
 .brick.act .bl { color: #1a0800 !important; }
 
-body.edit-mode .brick:not(.empty):not(.filler) { cursor: grab; box-shadow: 0 0 0 1px rgba(255,152,0,.4) inset; }
-body.edit-mode .brick:not(.empty):not(.filler):active { cursor: grabbing; }
-body.edit-mode .brick:not(.empty):not(.filler):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); }
-body.edit-mode .brick:not(.empty):not(.filler)::after {
+body.edit-mode .brick:not(.empty) { cursor: pointer; box-shadow: 0 0 0 1px rgba(255,152,0,.4) inset; }
+body.edit-mode .brick:not(.empty):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); }
+body.edit-mode .brick:not(.empty)::after {
   content: '✏'; position: absolute; top: 1px; right: 2px;
   font-size: 6px; color: rgba(255,152,0,.8); pointer-events: none;
 }
-body.edit-mode .brick.empty:not(.filler) { cursor: cell; opacity: 0.7; box-shadow: 0 0 0 1px rgba(255,152,0,.3) inset; }
-body.edit-mode .brick.empty:not(.filler):hover { opacity: 1; box-shadow: 0 0 0 2px var(--admin-accent); transform: scale(1.05); }
-body.edit-mode .brick.filler, body.place-mode .brick.filler { pointer-events: none !important; }
-
-.drag-ghost {
-  position: fixed; z-index: 500; pointer-events: none; background: var(--brick-bg);
-  border: 2px solid var(--admin-accent); border-radius: 3px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; padding: 2px 3px; text-align: center;
-  opacity: 0.9; box-shadow: 0 8px 28px rgba(0,0,0,.8); transform: scale(1.12) rotate(-2deg);
-}
-.brick.drop-target {
-  box-shadow: 0 0 0 3px var(--admin-accent), 0 0 18px rgba(255,152,0,.7) !important;
-  background: rgba(255,152,0,.3) !important; z-index: 25; transition: none !important;
-}
-body.drag-active * { cursor: grabbing !important; user-select: none; }
-.pbtn-on { background: rgba(76,175,80,.2) !important; color: #4caf50 !important; border-color: #4caf50 !important; }
-body.place-mode .brick.empty:not(.filler) {
-  background: rgba(76,175,80,.2) !important; border-color: rgba(76,175,80,.6) !important;
-  opacity: 1 !important; cursor: crosshair !important;
-}
-body.place-mode .brick.empty:not(.filler):hover {
-  background: rgba(76,175,80,.45) !important; transform: scale(1.06); box-shadow: 0 0 0 2px #4caf50 !important;
-}
+body.edit-mode .brick.empty { cursor: cell; opacity: 0.7; box-shadow: 0 0 0 1px rgba(255,152,0,.3) inset; }
+body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admin-accent); transform: scale(1.05); }
 
 .zctrl { position: absolute; bottom: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
 .zb {
@@ -208,6 +184,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   border-radius: 8px; padding: 9px 11px; font-size: 10px;
 }
 .lgi { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.lgi:last-child { margin-bottom: 0; }
 .lgs { width: 18px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
 #toast {
@@ -244,7 +221,6 @@ body.place-mode .brick.empty:not(.filler):hover {
 .ebtn-cancel:hover { background: #5a3a20; }
 .ebtn-clear { background: none; color: #ff6060; border: 1px solid #ff6060; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; transition: all .15s; margin-right: auto; }
 .ebtn-clear:hover { background: rgba(255,96,96,.1); }
-.emodal .ebricktype { font-size: 10px; color: var(--muted); margin-top: 10px; background: var(--bg); border-radius: 5px; padding: 5px 9px; }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
@@ -279,7 +255,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 <header>
   <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University"></div>
   <div class="htext">
-    <h1>Donor Brick Monument — Lois Perkins Peace Garden East</h1>
+    <h1>Donor Brick Monument — McCombs Pergola Benches</h1>
   </div>
   <div class="hstats" id="hstats" style="display:none">Loading…</div>
   <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
@@ -287,8 +263,8 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <div class="adminbar" id="adminBar" style="display:none">
   <span class="admin-badge">⚙ ADMIN MODE</span>
-  <label><input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks</label>
-  <span class="admin-hint" style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
+  <label><input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit plaques</label>
+  <span class="admin-hint" style="font-size:11px;color:var(--muted)">Click any plaque to edit its inscription</span>
   <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
   <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
   <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
@@ -304,18 +280,23 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="tab" onclick="location.href='general.html'">General</div>
     <div class="tab" onclick="location.href='section1.html'">McCombs Pergola Brick Garden</div>
     <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
-    <div class="tab on">Lois Perkins Peace Garden East</div>
-    <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
+    <div class="tab" onclick="location.href='section3.html'">Lois Perkins Peace Garden East</div>
+    <div class="tab on">McCombs Pergola Benches</div>
   </div>
 </div>
 
 <div class="main">
   <aside class="sidebar">
-    <h3>Recorded Bricks (<span id="rcnt">0</span>)</h3>
+    <h3>Recorded Plaques (<span id="rcnt">0</span>)</h3>
     <div id="blist"></div>
   </aside>
   <div class="vp" id="vp">
     <div class="canvas" id="canvas"><div class="mon" id="mon"></div></div>
+    <div class="legend">
+      <div class="lgi"><span class="lgs" style="background:var(--bench-body);border:1px solid var(--bench-border)"></span> Bench</div>
+      <div class="lgi"><span class="lgs" style="background:var(--brick-bg)"></span> Inscribed plaque</div>
+      <div class="lgi"><span class="lgs" style="background:var(--brick-empty)"></span> Empty plaque</div>
+    </div>
     <div class="zctrl">
       <button class="zb" onclick="zoom(1.25)">+</button>
       <button class="zb" onclick="zoom(0.8)">−</button>
@@ -331,7 +312,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <div class="emodal-overlay" id="editOverlay">
   <div class="emodal">
-    <h3>✏ Edit Brick</h3>
+    <h3>✏ Edit Plaque</h3>
     <div class="epos" id="epos"></div>
     <label>Line 1 (primary name / title)</label>
     <input type="text" id="el1" placeholder="Primary inscription line">
@@ -342,9 +323,8 @@ body.place-mode .brick.empty:not(.filler):hover {
     <label>Line 6</label><input type="text" id="el6" placeholder="Sixth line (optional)">
     <label>Line 7</label><input type="text" id="el7" placeholder="Seventh line (optional)">
     <label>Line 8</label><input type="text" id="el8" placeholder="Eighth line (optional)">
-    <div class="ebricktype" id="ebricktype"></div>
     <div class="ebtns">
-      <button class="ebtn-clear" onclick="clearBrickEdit()">Clear brick</button>
+      <button class="ebtn-clear" onclick="clearBrickEdit()">Clear plaque</button>
       <button class="ebtn-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="ebtn-save" onclick="saveBrickEdit()">Save Changes</button>
     </div>
@@ -355,577 +335,38 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// LAYOUT CONSTANTS — Lois Perkins Peace Garden East: flat 15Ø20 grid
+// LAYOUT — McCombs Pergola Benches
+// Three freestanding benches trace three sides of a square (the
+// fourth, east, side is open). None of the benches meet at the
+// corners — each stops well short, with a visible gap. Each bench
+// carries 5 plaques, evenly spaced, facing into the shared center.
 // ═══════════════════════════════════════════════════════════
-const UNIT = 44;
-const GAP  = 4;
-const PAD  = 18;
+const GAP           = 4;     // visual seam between adjacent plaques
+const PLAQUE_PITCH   = 100;   // center-to-center spacing along a bench
+const PLAQUE_COUNT   = 5;
+const BENCH_THICK    = 60;    // bench depth (and plaque's short dimension)
+const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 500
 
-const NUM_COLS = 15;
-const NUM_ROWS = 20;
-
-const CW = 2 * PAD + NUM_COLS * UNIT;   // 696px
-const CH = 2 * PAD + NUM_ROWS * UNIT;   // 916px
-
-function bx(c)  { return PAD + c * UNIT; }
-function by(r)  { return PAD + r * UNIT; }
-function bW(cs) { return cs * UNIT - GAP; }
-function bH(rs) { return rs * UNIT - GAP; }
-
-// ═══════════════════════════════════════════════════════════
-// LAYOUT — from Google Sheets Lois Perkins Peace Garden East
-// [row_off, col_off, rowspan, colspan]
-// ═══════════════════════════════════════════════════════════
-const LAYOUT = [
-  // Row group 0
-  [ 0, 0,2,2],[ 0, 2,2,1],[ 0, 3,2,2],[ 0, 5,2,2],[ 0, 7,2,1],
-  [ 0, 8,2,2],[ 0,10,2,2],[ 0,12,2,1],[ 0,13,2,2],
-  // Row group 1
-  [ 2, 0,2,2],[ 2, 2,2,2],[ 2, 4,2,1],[ 2, 5,2,2],[ 2, 7,2,2],
-  [ 2, 9,2,1],[ 2,10,2,2],[ 2,12,2,2],[ 2,14,2,1],
-  // Row group 2
-  [ 4, 0,2,1],[ 4, 1,2,1],[ 4, 2,2,2],[ 4, 4,2,1],[ 4, 5,2,1],
-  [ 4, 6,2,2],[ 4, 8,2,1],[ 4, 9,2,1],[ 4,10,2,2],[ 4,12,2,1],[ 4,13,2,2],
-  // Row group 3
-  [ 6, 0,2,2],[ 6, 2,2,1],[ 6, 3,2,1],[ 6, 4,2,2],[ 6, 6,2,1],
-  [ 6, 7,2,1],[ 6, 8,2,2],[ 6,10,2,1],[ 6,11,2,1],[ 6,12,2,2],[ 6,14,2,1],
-  // Row group 4
-  [ 8, 0,2,1],[ 8, 1,2,2],[ 8, 3,2,1],[ 8, 4,2,1],[ 8, 5,2,2],
-  [ 8, 7,2,1],[ 8, 8,2,1],[ 8, 9,2,2],[ 8,11,2,1],[ 8,12,2,1],[ 8,13,2,2],
-  // Row group 5
-  [10, 0,2,2],[10, 2,2,1],[10, 3,2,2],[10, 5,2,1],[10, 6,2,1],
-  [10, 7,2,2],[10, 9,2,1],[10,10,2,1],[10,11,2,2],[10,13,2,1],[10,14,2,1],
-  // Row group 6
-  [12, 0,2,1],[12, 1,2,2],[12, 3,2,1],[12, 4,2,1],[12, 5,2,2],
-  [12, 7,2,1],[12, 8,2,1],[12, 9,2,2],[12,11,2,1],[12,12,2,1],[12,13,2,2],
-  // Row group 7
-  [14, 0,2,2],[14, 2,2,1],[14, 3,2,2],[14, 5,2,1],[14, 6,2,1],
-  [14, 7,2,2],[14, 9,2,1],[14,10,2,1],[14,11,2,2],[14,13,2,1],[14,14,2,1],
-  // Row group 8 — mixed: tall bricks + stacked std pairs
-  [16, 0,2,1],[16, 1,2,2],[16, 3,1,2],[16, 5,2,2],[16, 7,1,2],
-  [16, 9,2,2],[16,11,1,2],[16,13,2,2],
-  [17, 3,1,2],[17, 7,1,2],[17,11,1,2],
-  // Row group 9 — full tall + stacked std + trailing filler
-  [18, 0,2,2],[18, 2,2,2],[18, 4,1,2],[18, 6,2,2],[18, 8,1,2],
-  [18,10,2,2],[18,12,1,2],[18,14,2,1],
-  [19, 4,1,2],[19, 8,1,2],[19,12,1,2],
+const BENCHES = [
+  { id: 'N', name: 'North Bench', orientation: 'h', x: 160, y: 40  },
+  { id: 'W', name: 'West Bench',  orientation: 'v', x: 40,  y: 100 },
+  { id: 'S', name: 'South Bench', orientation: 'h', x: 160, y: 660 },
 ];
+
+const CW = 740, CH = 780;
+
+function plaquePos(bench, i) {
+  if (bench.orientation === 'h') {
+    return { left: bench.x + i * PLAQUE_PITCH, top: bench.y, w: PLAQUE_PITCH - GAP, h: BENCH_THICK };
+  }
+  return { left: bench.x, top: bench.y + i * PLAQUE_PITCH, w: BENCH_THICK, h: PLAQUE_PITCH - GAP };
+}
 
 // ═══════════════════════════════════════════════════════════
 // ADMIN — edits baked in at export time (empty by default)
 // ═══════════════════════════════════════════════════════════
-const INITIAL_EDITS = {
-  "18,0": {
-    "lines": [
-      "CHER AND DAVID",
-      "JACOBS"
-    ]
-  },
-  "18,2": {
-    "lines": [
-      "W. GEOFFREY MORRIS",
-      "2016",
-      "HAYNES & TERESA",
-      "MORRIS",
-      "PLGC CHAIRS"
-    ]
-  },
-  "18,4": {
-    "lines": [
-      "SARAH SURGEONER",
-      "CLASS OF 2017",
-      "ΑΞΔ"
-    ]
-  },
-  "19,4": {
-    "lines": [
-      "JOSHUA PAGE",
-      "CLASS OF 2015",
-      "STUDENT LEADER",
-      "OF THE YEAR"
-    ]
-  },
-  "18,6": {
-    "lines": [
-      "GREAT MEMORIES OF:",
-      "BEN SHERMAN",
-      "SCOTT REIKOFSKI",
-      "WELDON CROWLEY",
-      "GEORGE & BARBARA",
-      "BRIGHTWELL",
-      "WITH LOVE,",
-      "STEFANIE W/ AN \"F\""
-    ]
-  },
-  "18,8": {
-    "lines": [
-      "KATI DUTCHER",
-      "ΔΔΔ",
-      "CLASS OF 2016"
-    ]
-  },
-  "19,8": {
-    "lines": [
-      "COLTON WILLIAMS",
-      "CLASS OF 2017",
-      "FOOTBALL #25",
-      "GO PIRATES!"
-    ]
-  },
-  "18,10": {
-    "lines": [
-      "HENRY GUEVARA",
-      "CLASS OF 1979",
-      "NANCY GUEVARA",
-      "CLASS OF 1982"
-    ]
-  },
-  "18,12": {
-    "lines": [
-      "IN MEMORY OF",
-      "CHARLES BURLESON",
-      "CLASS OF 1961"
-    ]
-  },
-  "19,12": {
-    "lines": [
-      "RONNIE & ROXY",
-      "SHERWOOD",
-      "ΠΚΑ - Δ Z 12/31/77"
-    ]
-  },
-  "16,13": {
-    "lines": [
-      "SUCCESS IS",
-      "ACHIEVED THROUGH",
-      "SERVICE TO OTHERS"
-    ]
-  },
-  "16,11": {
-    "lines": [
-      "GUS CRIMM",
-      "CLASS OF 2014",
-      "HILLARY RICHARD",
-      "CLASS OF 2015"
-    ]
-  },
-  "17,11": {
-    "lines": [
-      "MADISON, YOU ARE",
-      "THE AUTHOR OF YOUR",
-      "LIFE STORY. MAKE",
-      "IT GREAT. LOVE MOM"
-    ]
-  },
-  "16,9": {
-    "lines": [
-      "IN HONOR AND",
-      "APPRECIATION OF",
-      "BOB DUPUY '69",
-      "GIVEN BY TMF",
-      "\"SERVING THE WELL-",
-      "BEING OF HUMANITY\""
-    ]
-  },
-  "16,7": {
-    "lines": [
-      "IN MEMORY OF",
-      "GEORGIA MALONE",
-      "JIM & CAROL WILSON"
-    ]
-  },
-  "17,7": {
-    "lines": [
-      "CLAIRE E. SMITH",
-      "CLASS OF 2015",
-      "ZETA TAU ALPHA",
-      "Λ '12"
-    ]
-  },
-  "16,5": {
-    "lines": [
-      "STEVE AND JOAN",
-      "LUFBURROW",
-      "CLASS OF 1981",
-      "PI KAPPA ALPHA",
-      "ZETA TAU ALPHA"
-    ]
-  },
-  "16,3": {
-    "lines": [
-      "IN HONOR OF",
-      "MARY CAT HOSCH",
-      "CLASS OF 2016"
-    ]
-  },
-  "17,3": {
-    "lines": [
-      "ALPHA DELTA PI",
-      "ZETA '92",
-      "\"PASS THE CONCH\""
-    ]
-  },
-  "16,1": {
-    "lines": [
-      "MILTON S. JORDAN",
-      "CLASS OF 1962",
-      "ANNE E. JORDAN",
-      "CLASS OF BSU",
-      "GO BUCS!",
-      "GO BRONCOS!"
-    ]
-  },
-  "14,0": {
-    "lines": [
-      "GIVEN IN HONOR OF",
-      "DIANNE STAUFFER",
-      "HOWELL",
-      "CLASS OF 1968",
-      "FROM YOUR SISTER",
-      "WITH LOVE"
-    ]
-  },
-  "14,3": {
-    "lines": [
-      "BASS, VIOLIN, 280Z",
-      "JOHN AMOS, SRV.",
-      "CHAPMAN, DENMAN.",
-      "WENDY & WAYNE...",
-      "AN ORBIT, TOGETHER",
-      "CLASS OF '89"
-    ]
-  },
-  "14,7": {
-    "lines": [
-      "ALPHA PHI OMEGA",
-      "APO - AGK CHAPTER",
-      "EST. 1991",
-      "LEADERSHIP",
-      "FRIENDSHIP",
-      "SERVICE"
-    ]
-  },
-  "14,11": {
-    "lines": [
-      "DAN STULTZ",
-      "FAMILY"
-    ]
-  },
-  "12,13": {
-    "lines": [
-      "IN MEMORY OF",
-      "SUSAN WATFORD",
-      "PARKER BROWN",
-      "1950-2004",
-      "CLASS OF 1973",
-      "LOVED BY HER",
-      "SISTERS OF",
-      "ALPHA DELTA PI"
-    ]
-  },
-  "12,9": {
-    "lines": [
-      "IN MEMORY OF:",
-      "REV. DR.",
-      "CHARLES E.",
-      "LAING SR",
-      "MRS. PEGGY ANN",
-      "LAING"
-    ]
-  },
-  "12,5": {
-    "lines": [
-      "MARGARET",
-      "WESTON",
-      "STRAW",
-      "CHRISTIAN ED MJ",
-      "PHI MU",
-      "CLASS 1951"
-    ]
-  },
-  "12,1": {
-    "lines": [
-      "ALPHA KAPPA ALPHA",
-      "UPSILON ALPHA CHAPTER",
-      "CHARTERED 2015",
-      "PEARLFECTLY",
-      "POLISHED PEARLS",
-      "LOVE, DR. A. MOORE"
-    ]
-  },
-  "10,0": {
-    "lines": [
-      "EDWARD MUNDEN",
-      "H. ED \"SONNY\" MUNDEN",
-      "DOROTHY BRADBURY",
-      "PEARL A. NEAS",
-      "JANE MUNDEN FLORES",
-      "DOROTHY G CALDWELL"
-    ]
-  },
-  "10,3": {
-    "lines": [
-      "ELLEN AND HANK",
-      "BACHMANN",
-      "TOGETHER FOREVER",
-      "CLASSES OF 1975",
-      "AND",
-      "1974"
-    ]
-  },
-  "10,7": {
-    "lines": [
-      "LYNN SELLS WILLIS",
-      "CLASS OF 1981",
-      "ΔΔΔ",
-      "GREG WILLIS",
-      "CLASS OF 1980",
-      "KA"
-    ]
-  },
-  "10,11": {
-    "lines": [
-      "PETER & TARA",
-      "HUBNER 2004",
-      "\"I KNOW NOT",
-      "ALL THAT",
-      "MAY BE COMING.",
-      "BUT BE IT WHAT",
-      "IT WILL, I'LL GO",
-      "TO IT LAUGHING.\""
-    ]
-  },
-  "8,13": {
-    "lines": [
-      "DIANNE CANNON",
-      "SIMPSON",
-      "CLASS OF 1973",
-      "ALPHA DELTA PI",
-      "PROUD OF THE",
-      "SOUTHWESTERN",
-      "LEGACY"
-    ]
-  },
-  "8,9": {
-    "lines": [
-      "\"THE COUNCIL\"",
-      "CLASS OF 2011",
-      "CHRIS CHURCHWELL",
-      "NICHOLAS COX",
-      "ERIC KEGLEY",
-      "ALAN LOWRY",
-      "CHRISTOPHER LOWRY"
-    ]
-  },
-  "8,5": {
-    "lines": [
-      "KATHERINE CAMPBELL",
-      "&",
-      "JERROD BAIN",
-      "CLASS OF 2004"
-    ]
-  },
-  "8,1": {
-    "lines": [
-      "JULIA A. CLARK",
-      "CLASS OF 1986",
-      "ZETA TAU ALPHA"
-    ]
-  },
-  "6,0": {
-    "lines": [
-      "MACKENZIE MILLICAN",
-      "\"MACK\"",
-      "SU WOMEN'S SOCCER",
-      "2013-2017",
-      "SISTER - FRIEND",
-      "TEAMMATE - TEACHER"
-    ]
-  },
-  "6,4": {
-    "lines": [
-      "DAN STULTZ",
-      "FAMILY"
-    ]
-  },
-  "6,8": {
-    "lines": [
-      "JULIE C. HEINITSH",
-      "CLASS OF 1978",
-      "ALPHA DELTA PI"
-    ]
-  },
-  "6,12": {
-    "lines": [
-      "IN HONOR OF",
-      "CHARLES & MARGARET",
-      "SCHORRE"
-    ]
-  },
-  "4,13": {
-    "lines": [
-      "DON SCARBROUGH",
-      "CLASS OF 1938",
-      "MEGAPHONE, ΦΔΘ",
-      "GRACE JOSEY PYKA",
-      "CLASS OF 2005",
-      "STUFO, ΦBK",
-      "PROUD PIRATES",
-      "LOVE YOU. GRANDPA"
-    ]
-  },
-  "4,10": {
-    "lines": [
-      "TIM, BETH, AUDREY,",
-      "AND ERIK LOVAAS",
-      "2015"
-    ]
-  },
-  "4,6": {
-    "lines": [
-      "KAREN",
-      "HANSON-FLOWERS",
-      "1975 ZTA",
-      "REBECCA BERYL",
-      "FLOWERS",
-      "2013 ΑΔΠ"
-    ]
-  },
-  "4,2": {
-    "lines": [
-      "OUR LOVE AFFAIR",
-      "STARTED HERE",
-      "IN 1986",
-      "ELYN VAUGHAN HONTS",
-      "AND",
-      "WILLIAM H. MCCALL"
-    ]
-  },
-  "2,0": {
-    "lines": [
-      "\"TO DO WHAT OUGHT",
-      "TO BE DONE BUT",
-      "WOULD NOT HAVE",
-      "BEEN DONE UNLESS I",
-      "DID IT, I THOUGHT TO",
-      "BE MY DUTY.\" ΦΔΘ",
-      "IN MEMORY OF",
-      "JIM ANDREWS, '04"
-    ]
-  },
-  "2,2": {
-    "lines": [
-      "KIM TIPTON",
-      "GAMMA ZETA CHAPTER",
-      "DELTA ZETA",
-      "CLASS OF 1976"
-    ]
-  },
-  "2,5": {
-    "lines": [
-      "SOPHIA MARIA",
-      "DAUGHTER OF",
-      "DRS. GEORGE & NIKI",
-      "LEONTARITIS",
-      "CARAYANNOPOULOS",
-      "\"AIEN ARISTEUEIN\"!"
-    ]
-  },
-  "2,7": {
-    "lines": [
-      "THE WORLD IS BUT",
-      "A CANVAS TO OUR",
-      "IMAGINATION-HENRY",
-      "DAVID THOREAU",
-      "STEVE AND ROBYN",
-      "(GREB) BURCHFIEL",
-      "CLASS OF 1989"
-    ]
-  },
-  "2,10": {
-    "lines": [
-      "IN MEMORY OF",
-      "ANA MARIA WOLD",
-      "YOUR DAUGHTER",
-      "CHRISTINA WOLD",
-      "CLASS OF 91"
-    ]
-  },
-  "2,12": {
-    "lines": [
-      "IN GRATITUDE",
-      "FOR THE",
-      "SOUTHWESTERN",
-      "EXPERIENCE",
-      "AND",
-      "COMMUNITY",
-      "BOB AND VIRGINIA",
-      "DUPUY"
-    ]
-  },
-  "0,13": {
-    "lines": [
-      "IN REMEMBRANCE OF",
-      "SAM MERRILL '03",
-      "TENN LEGEND",
-      "HUSBAN & FATHER",
-      "FRIEND TO ALL",
-      "ΠΚΑ AO 2000"
-    ]
-  },
-  "0,10": {
-    "lines": [
-      "MOM,",
-      "WE PROMISE TO",
-      "LIVE A LIFE THAT",
-      "WILL DO JUSTICE TO",
-      "ALL THE SACRIFICES",
-      "YOU'VE MADE...",
-      "NIKKI ('97) &",
-      "MONICA VERMA ('03)"
-    ]
-  },
-  "0,8": {
-    "lines": [
-      "WITH JOYFUL MEMORY",
-      "OF MY WIFE",
-      "JUDY LOVE KENESSON",
-      "CLASS OF 1965",
-      "HUNTLEY KENESSON",
-      "CLASS OF 1963"
-    ]
-  },
-  "0,5": {
-    "lines": [
-      "SARA LUCERO MOORE",
-      "1995 ZTA LAMDBA '93",
-      "DENNIS MOORE 1995",
-      "ΠΚΑ AO '92",
-      "JEFF WALDROP 2005",
-      "ΚΣ IOTA '02",
-      "JOANN WALDROP STAFF",
-      "RAINA MUSSO 2016"
-    ]
-  },
-  "0,3": {
-    "lines": [
-      "IT ALL STARTED AT SU",
-      "STACI AND PHIL",
-      "THE BRENNERS",
-      "'05 AND '07"
-    ]
-  },
-  "0,0": {
-    "lines": [
-      "REV. MORRIS BRATTON",
-      "CLASS OF 1947",
-      "PLAYED IN BOTH",
-      "SUNBOWL FOOTBALL",
-      "GAMES 1944 1945"
-    ]
-  }
-};
-const SECTION_ID = 3;
+const INITIAL_EDITS = {};
+const SECTION_ID = 4;
 const GAS_URL    = 'https://script.google.com/macros/s/AKfycbwVLoO4GPku1q0QrMr1lPw7bLvBeh8gcDDWx_DLkylWq_GHgBYYQ173SFNmFsmbxT7w/exec';
 
 // ═══════════════════════════════════════════════════════════
@@ -935,20 +376,23 @@ const brickMap  = {};
 const brickById = {};
 const bricks    = [];
 
-LAYOUT.forEach(([r, c, rs, cs], i) => {
-  if (cs >= 2) {
-    const id  = 'b' + i;
-    const obj = { id, row: r, col: c, rowspan: rs, colspan: cs, lines: [], name: '' };
+BENCHES.forEach(bench => {
+  for (let i = 0; i < PLAQUE_COUNT; i++) {
+    const key = bench.id + ',' + i;
+    const id  = 'p_' + key;
+    const obj = { id, bench: bench.id, benchName: bench.name, idx: i, lines: [], name: '' };
     bricks.push(obj);
     brickById[id] = obj;
-    brickMap[r + ',' + c] = id;
+    brickMap[key] = id;
   }
 });
+
+function posLabel(b) { return `${b.benchName}, Plaque ${b.idx + 1}`; }
 
 // ═══════════════════════════════════════════════════════════
 // ADMIN PERSISTENCE
 // ═══════════════════════════════════════════════════════════
-const EDITS_KEY = 'brickEdits_s3';
+const EDITS_KEY = 'brickEdits_benches';
 let localEdits  = JSON.parse(localStorage.getItem(EDITS_KEY) || '{}');
 let remoteEdits = {};
 let allEdits    = {};
@@ -965,8 +409,25 @@ function applyEdits() {
   });
 }
 
+// A browser's own local edit only overrides the shared sheet's edit for
+// the same plaque if the local edit is actually newer (by savedAt vs.
+// the sheet's updated timestamp). See section1/2/3.html for the same
+// logic and rationale.
+function mergeEdits(initial, remote, local) {
+  const merged = Object.assign({}, initial, remote);
+  for (const key in local) {
+    const localEdit  = local[key];
+    const remoteEdit = remote[key];
+    if (!remoteEdit) { merged[key] = localEdit; continue; }
+    const localTime  = localEdit.savedAt || 0;
+    const remoteTime = remoteEdit.updated ? Date.parse(remoteEdit.updated) : 0;
+    if (localTime > remoteTime) merged[key] = localEdit;
+  }
+  return merged;
+}
+
 // ═══════════════════════════════════════════════════════════
-// RENDER MONUMENT
+// RENDER
 // ═══════════════════════════════════════════════════════════
 function renderMonument() {
   const mon = document.getElementById('mon');
@@ -974,54 +435,47 @@ function renderMonument() {
   mon.style.width  = CW + 'px';
   mon.style.height = CH + 'px';
 
-  const bg = document.createElement('div');
-  bg.className = 'mbg';
-  bg.style.cssText = `left:0;top:0;width:${CW}px;height:${CH}px;`;
-  mon.appendChild(bg);
-
-  [['▲ Garden / North Border', -16], ['▼ Walkway / South', CH + 2]].forEach(([txt, top]) => {
-    const lbl = document.createElement('div');
-    lbl.className = 'orient';
-    lbl.style.cssText = `left:0;top:${top}px;width:${CW}px;`;
-    lbl.textContent = txt;
-    mon.appendChild(lbl);
+  BENCHES.forEach(bench => {
+    const el = document.createElement('div');
+    el.className = 'bench-body';
+    if (bench.orientation === 'h') {
+      el.style.cssText = `left:${bench.x}px;top:${bench.y}px;width:${BENCH_LEN}px;height:${BENCH_THICK}px;`;
+    } else {
+      el.style.cssText = `left:${bench.x}px;top:${bench.y}px;width:${BENCH_THICK}px;height:${BENCH_LEN}px;`;
+    }
+    mon.appendChild(el);
   });
 
-  LAYOUT.forEach(([r, c, rs, cs]) => {
-    const isFiller = cs === 1;
-    const b = isFiller ? null : brickById[brickMap[r + ',' + c]];
+  const openLbl = document.createElement('div');
+  openLbl.className = 'orient';
+  openLbl.style.cssText = `left:${CW - 34}px; top:${CH / 2 - 60}px; width:16px; height:120px; writing-mode: vertical-rl;`;
+  openLbl.textContent = '· OPEN SIDE (EAST) ·';
+  mon.appendChild(openLbl);
 
+  bricks.forEach(b => {
+    const bench = BENCHES.find(x => x.id === b.bench);
+    const pos = plaquePos(bench, b.idx);
     const el = document.createElement('div');
-    el.className = isFiller ? 'brick filler' : ('brick' + (b && b.lines.length ? '' : ' empty'));
-    el.style.left   = bx(c) + 'px';
-    el.style.top    = by(r) + 'px';
-    el.style.width  = bW(cs) + 'px';
-    el.style.height = bH(rs) + 'px';
-    el.dataset.row  = r;
-    el.dataset.col  = c;
+    el.className = 'brick' + (b.lines.length ? '' : ' empty');
+    el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px';
+    el.style.width = pos.w + 'px'; el.style.height = pos.h + 'px';
+    el.id = b.id; el.dataset.id = b.id;
 
-    if (!isFiller && b) {
-      el.id = b.id; el.dataset.id = b.id;
-      b.lines.forEach(ln => {
-        const s = document.createElement('span');
-        s.className = 'bl'; s.textContent = ln; el.appendChild(s);
-      });
-      el.addEventListener('mousedown', e => {
-        if (e.button !== 0 || !document.body.classList.contains('edit-mode')) return;
-        e.stopPropagation(); startBrickDrag(e, b, el);
-      });
-      el.addEventListener('click', () => {
-        if (document.body.classList.contains('edit-mode') || document.body.classList.contains('place-mode')) openEditModal(b, el);
-        else if (b.lines.length) onBrickClick(b, el);
-      });
-      if (b.lines.length) fitBrick(el);
-    }
+    b.lines.forEach(ln => {
+      const s = document.createElement('span');
+      s.className = 'bl'; s.textContent = ln; el.appendChild(s);
+    });
+    el.addEventListener('click', () => {
+      if (document.body.classList.contains('edit-mode')) openEditModal(b, el);
+      else if (b.lines.length) onBrickClick(b, el);
+    });
+    if (b.lines.length) fitBrick(el);
     mon.appendChild(el);
   });
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Lois Perkins Peace Garden East`;
+  document.getElementById('hstats').textContent = `${recorded} plaques recorded · McCombs Pergola Benches`;
 }
 
 function fitBrick(el) {
@@ -1050,7 +504,7 @@ function buildList(list) {
     el.className = 'li';
     el.innerHTML = `<div class="ln">${b.lines[0]||'—'}</div>` +
       (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' · ')}</div>` : '') +
-      `<div class="lp">Grid ${b.row},${b.col}</div>`;
+      `<div class="lp">${posLabel(b)}</div>`;
     el.addEventListener('click', () => scrollToBrick(b));
     container.appendChild(el);
   });
@@ -1084,7 +538,7 @@ function onBrickClick(b, el) {
   document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
   el.classList.add('act');
   document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${l}</div>`).join('');
-  document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
+  document.getElementById('dppos').textContent = posLabel(b);
   document.getElementById('dp').classList.add('open');
   highlightSidebarItem(b.id);
 }
@@ -1104,14 +558,16 @@ function scrollToBrick(b) {
   closeDetail();
   const el = document.querySelector(`.brick[data-id="${b.id}"]`);
   if (!el) return;
+  const bench = BENCHES.find(x => x.id === b.bench);
+  const pos = plaquePos(bench, b.idx);
   const vp = document.getElementById('vp'), vpR = vp.getBoundingClientRect();
-  panX = vpR.width  / 2 - (bx(b.col) + bW(b.colspan) / 2) * scale;
-  panY = vpR.height / 2 - (by(b.row) + bH(b.rowspan) / 2) * scale;
+  panX = vpR.width  / 2 - (pos.left + pos.w / 2) * scale;
+  panY = vpR.height / 2 - (pos.top  + pos.h / 2) * scale;
   applyTransform();
   setTimeout(() => {
     el.classList.add('act');
     document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${l}</div>`).join('');
-    document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
+    document.getElementById('dppos').textContent = posLabel(b);
     document.getElementById('dp').classList.add('open');
   }, 60);
 }
@@ -1190,18 +646,6 @@ document.getElementById('search').addEventListener('input', e => {
 });
 
 // ═══════════════════════════════════════════════════════════
-// EXPORT CSV
-// ═══════════════════════════════════════════════════════════
-function exportCSV() {
-  const rows = [['Row','Col','Rowspan','Colspan','Line1','Line2','Line3','Line4','Line5','Line6','Line7','Line8']];
-  bricks.forEach(b => rows.push([b.row, b.col, b.rowspan, b.colspan, ...Array.from({length:8}, (_,i) => b.lines[i]||'')]));
-  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'section3_bricks.csv'; a.click();
-}
-
-// ═══════════════════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════════════════
 let toastTimer;
@@ -1230,13 +674,7 @@ function logoutAdmin() {
 }
 function setEditMode(on) {
   if (on) { document.body.classList.add('edit-mode'); }
-  else { document.body.classList.remove('edit-mode', 'place-mode'); const pb = document.getElementById('placeBtn'); if (pb) pb.classList.remove('pbtn-on'); closeDetail(); }
-}
-function togglePlaceMode() {
-  const on = document.body.classList.toggle('place-mode');
-  document.getElementById('placeBtn').classList.toggle('pbtn-on', on);
-  if (on) { document.getElementById('editToggle').checked = true; setEditMode(true); toast('📍 Click any glowing empty slot to add a brick'); }
-  else toast('Place mode off');
+  else { document.body.classList.remove('edit-mode'); closeDetail(); }
 }
 document.addEventListener('keydown', e => { if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); openAdminLogin(); } });
 
@@ -1249,10 +687,7 @@ function openEditModal(b, el) {
   editTarget = { brick: b, el };
   ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach((id, i) =>
     document.getElementById(id).value = b ? (b.lines[i] || '') : '');
-  const cs = b ? b.colspan : 2, rs = b ? b.rowspan : 1;
-  const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col × 2 row)' : cs === 2 && rs === 1 ? 'Standard (2 col × 1 row)' : cs + ' col × ' + rs + ' row';
-  document.getElementById('ebricktype').textContent = '🧱 Brick type: ' + typeLabel;
-  document.getElementById('epos').textContent = b ? `Grid position: ${b.row}, ${b.col}` : '';
+  document.getElementById('epos').textContent = b ? posLabel(b) : '';
   document.getElementById('editOverlay').classList.add('open');
   document.getElementById('el1').focus();
 }
@@ -1264,21 +699,21 @@ function saveBrickEdit() {
   const lines = ['el1','el2','el3','el4','el5','el6','el7','el8']
     .map(id => document.getElementById(id).value.trim().toUpperCase())
     .filter(Boolean);
-  const key = b.row + ',' + b.col;
+  const key = b.bench + ',' + b.idx;
   b.lines = lines; b.name = lines[0] || '';
   localEdits[key] = { lines, savedAt: Date.now() }; allEdits[key] = { lines }; saveLocalEdits();
-  if (GAS_URL) gasSet(SECTION_ID, key, lines[0]||'', lines[1]||'', lines[2]||'', b.colspan, lines[3]||'', lines[4]||'', lines[5]||'', lines[6]||'', lines[7]||'');
+  if (GAS_URL) gasSet(SECTION_ID, key, lines[0]||'', lines[1]||'', lines[2]||'', 2, lines[3]||'', lines[4]||'', lines[5]||'', lines[6]||'', lines[7]||'');
   document.getElementById('mon').innerHTML = '';
   renderMonument();
   buildList(bricks.filter(b => b.lines.length));
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Lois Perkins Peace Garden East`;
-  closeEditModal(); toast('Brick saved!');
+  document.getElementById('hstats').textContent = `${recorded} plaques recorded · McCombs Pergola Benches`;
+  closeEditModal(); toast('Plaque saved!');
 }
 function clearBrickEdit() { ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach(id => document.getElementById(id).value = ''); }
 function resetAllEdits() {
-  if (!confirm('Reset ALL admin edits for Lois Perkins Peace Garden East? This cannot be undone.')) return;
+  if (!confirm('Reset ALL admin edits for McCombs Pergola Benches? This cannot be undone.')) return;
   localStorage.removeItem(EDITS_KEY); toast('Edits reset — reloading...');
   setTimeout(() => location.reload(), 900);
 }
@@ -1301,99 +736,8 @@ function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// DRAG-DROP
-// ═══════════════════════════════════════════════════════════
-const vpEl = document.getElementById('vp');
-let _db = null, _del = null, _dGhost = null, _dsx = 0, _dsy = 0, _dragging = false;
-let _dtRow = -1, _dtCol = -1, _dtEl = null;
-
-function startBrickDrag(e, b, el) {
-  _db = b; _del = el; _dsx = e.clientX; _dsy = e.clientY; _dragging = false;
-  function onMove(ev) {
-    if (!_dragging && Math.hypot(ev.clientX - _dsx, ev.clientY - _dsy) > 6) {
-      _dragging = true; document.body.classList.add('drag-active');
-      _dGhost = document.createElement('div'); _dGhost.className = 'drag-ghost';
-      _dGhost.style.width = bW(b.colspan) + 'px'; _dGhost.style.height = bH(b.rowspan) + 'px';
-      b.lines.forEach(line => { const sp = document.createElement('span'); sp.className = 'bl'; sp.textContent = line; _dGhost.appendChild(sp); });
-      document.body.appendChild(_dGhost); fitBrick(_dGhost); _del.style.opacity = '0.25';
-    }
-    if (_dragging && _dGhost) {
-      _dGhost.style.left = (ev.clientX - bW(b.colspan) / 2) + 'px';
-      _dGhost.style.top  = (ev.clientY - bH(b.rowspan) / 2) + 'px';
-      updateDragHighlight(ev.clientX, ev.clientY);
-    }
-  }
-  function onUp() {
-    window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp);
-    document.body.classList.remove('drag-active');
-    if (_dragging) {
-      if (_dtRow >= 0 && validTextSlot(_dtRow, _dtCol)) finalizeBrickMove(_dtRow, _dtCol);
-      else if (_del) _del.style.opacity = '';
-      if (_dGhost) { _dGhost.remove(); _dGhost = null; }
-      clearDragHighlight();
-    } else { openEditModal(b, el); }
-    _dragging = false; _db = null; _del = null;
-  }
-  window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
-}
-
-function validTextSlot(row, col) { return brickMap.hasOwnProperty(row + ',' + col); }
-function screenToSlot(cx, cy) {
-  const r = vpEl.getBoundingClientRect();
-  return { row: Math.round(((cy - r.top - panY) / scale - PAD) / UNIT), col: Math.round(((cx - r.left - panX) / scale - PAD) / UNIT) };
-}
-function updateDragHighlight(cx, cy) {
-  const { row, col } = screenToSlot(cx, cy);
-  if (row === _dtRow && col === _dtCol) return;
-  clearDragHighlight();
-  if (!validTextSlot(row, col) || (_db && row === _db.row && col === _db.col)) return;
-  _dtRow = row; _dtCol = col;
-  _dtEl = document.querySelector(`.brick[data-row="${row}"][data-col="${col}"]`);
-  if (_dtEl) _dtEl.classList.add('drop-target');
-}
-function clearDragHighlight() { if (_dtEl) { _dtEl.classList.remove('drop-target'); _dtEl = null; } _dtRow = -1; _dtCol = -1; }
-
-function finalizeBrickMove(toRow, toCol) {
-  const fromKey = `${_db.row},${_db.col}`, toKey = `${toRow},${toCol}`;
-  if (fromKey === toKey) { if (_del) _del.style.opacity = ''; return; }
-  const fromB = _db, toB = brickById[brickMap[toKey]];
-  if (!toB) { if (_del) _del.style.opacity = ''; return; }
-  const fl = fromB.lines.slice(), fn = fromB.name;
-  fromB.lines = toB.lines; fromB.name = toB.name; toB.lines = fl; toB.name = fn;
-  const swapTime = Date.now();
-  if (fromB.lines.length) { localEdits[fromKey] = { lines: fromB.lines, savedAt: swapTime }; allEdits[fromKey] = { lines: fromB.lines }; } else { delete localEdits[fromKey]; delete allEdits[fromKey]; }
-  if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines,   savedAt: swapTime }; allEdits[toKey]   = { lines: toB.lines };   } else { delete localEdits[toKey];   delete allEdits[toKey];   }
-  saveLocalEdits();
-  if (GAS_URL) {
-    gasSet(SECTION_ID, fromKey, fromB.lines[0]||'', fromB.lines[1]||'', fromB.lines[2]||'', fromB.colspan, fromB.lines[3]||'', fromB.lines[4]||'', fromB.lines[5]||'', fromB.lines[6]||'', fromB.lines[7]||'');
-    gasSet(SECTION_ID, toKey,   toB.lines[0]||'',   toB.lines[1]||'',   toB.lines[2]||'',   toB.colspan,  toB.lines[3]||'',   toB.lines[4]||'',   toB.lines[5]||'',   toB.lines[6]||'',   toB.lines[7]||'');
-  }
-  document.getElementById('mon').innerHTML = ''; renderMonument(); buildList(bricks.filter(b => b.lines.length)); toast('Brick moved!');
-}
-
-// ═══════════════════════════════════════════════════════════
 // INIT WITH GAS
 // ═══════════════════════════════════════════════════════════
-// A browser's own local edit only overrides the shared sheet's edit for
-// the same brick if the local edit is actually newer (by savedAt vs. the
-// sheet's updated timestamp). Otherwise a stale local copy — e.g. from
-// months-old testing on one browser — would permanently mask fresher
-// data every other visitor already sees. Local edits with no shared
-// counterpart at all (never synced) are always kept, so nothing made
-// while offline/before GAS was configured is ever silently lost.
-function mergeEdits(initial, remote, local) {
-  const merged = Object.assign({}, initial, remote);
-  for (const key in local) {
-    const localEdit  = local[key];
-    const remoteEdit = remote[key];
-    if (!remoteEdit) { merged[key] = localEdit; continue; }
-    const localTime  = localEdit.savedAt || 0;
-    const remoteTime = remoteEdit.updated ? Date.parse(remoteEdit.updated) : 0;
-    if (localTime > remoteTime) merged[key] = localEdit;
-  }
-  return merged;
-}
-
 function initWithGAS() {
   const go = () => {
     allEdits = mergeEdits(INITIAL_EDITS, remoteEdits, localEdits);
@@ -1417,9 +761,9 @@ function exportHTML() {
   html = html.replace('const INITIAL_EDITS = {};', 'const INITIAL_EDITS = ' + JSON.stringify(merged, null, 2) + ';');
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob), a = document.createElement('a');
-  a.href = url; a.download = 'section3_updated.html';
+  a.href = url; a.download = 'benches_updated.html';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-  toast('section3_updated.html downloaded!');
+  toast('benches_updated.html downloaded!');
 }
 
 initWithGAS();
