@@ -364,7 +364,7 @@ const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 500
 const BENCH_MARGIN   = 18;    // white-stone bench body is larger than the plaques it carries
 const CORNER_GAP     = 130;   // open space between adjacent bench ends at each corner
 
-const OFFSET_X = 90, OFFSET_Y = 90; // room for the surrounding context band
+const OFFSET_X = 90, OFFSET_Y = 120; // room for the surrounding context band
 
 const WEST_X  = OFFSET_X;
 const NORTH_X = WEST_X + BENCH_THICK + CORNER_GAP;
@@ -382,26 +382,29 @@ const BENCHES = [
   { id: 'S', name: 'South Bench', orientation: 'h', x: SOUTH_X, y: SOUTH_Y },
 ];
 
-// Grey concrete floor filling the space the three benches enclose — it (and
-// the pergola inside it) extends further east than the benches, into the
-// open side.
-const FLOOR_EAST_EXTRA = 160;
+// Grey concrete floor — big enough that each bench sits entirely on it with
+// a little gap of floor showing behind (outside) it, and extends further
+// east than the benches (and the pergola inside it), into the open side.
+const FLOOR_BEHIND_GAP = 30;   // floor visible behind each bench's outer edge
+const FLOOR_EAST_EXTRA  = 400; // how far past the benches the floor reaches east
 const FLOOR = {
-  x: WEST_X + BENCH_THICK,
-  y: NORTH_Y + BENCH_THICK,
-  w: (NORTH_X + BENCH_LEN + FLOOR_EAST_EXTRA) - (WEST_X + BENCH_THICK),
-  h: SOUTH_Y - (NORTH_Y + BENCH_THICK),
+  x: (WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
+  y: (NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
+  w: (NORTH_X + BENCH_LEN + FLOOR_EAST_EXTRA) - ((WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP),
+  h: ((SOUTH_Y + BENCH_THICK + BENCH_MARGIN) + FLOOR_BEHIND_GAP) - ((NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP),
 };
 
 // Black rectangular pergola frame in the center — 6 legs, 3 along each of
 // its longer (north/south-facing) sides, which run parallel to the north
-// and south benches.
-const PERGOLA_INSET_X = 60, PERGOLA_INSET_Y = 50;
+// and south benches. It's inset from the benches' inner edges (not the
+// floor's, which is sized around the benches) and stretched east to read
+// as a clearly elongated rectangle rather than a square.
+const PERGOLA_INSET_X = 60, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 350;
 const PERGOLA = {
-  x: FLOOR.x + PERGOLA_INSET_X,
-  y: FLOOR.y + PERGOLA_INSET_Y,
-  w: FLOOR.w - PERGOLA_INSET_X * 2,
-  h: FLOOR.h - PERGOLA_INSET_Y * 2,
+  x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
+  y: (NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y,
+  w: (NORTH_X + BENCH_LEN + PERGOLA_EAST_EXTRA) - ((WEST_X + BENCH_THICK) + PERGOLA_INSET_X),
+  h: (SOUTH_Y - PERGOLA_INSET_Y) - ((NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y),
 };
 const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y },
@@ -411,8 +414,8 @@ const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
 // Surrounding context: McCombs Campus Center to the north.
 const CTX_BUILDING = { x: 40, y: 10, w: 0 /* set below */, h: 50 };
 
-const CW = FLOOR.x + FLOOR.w + 50;
-const CH = SOUTH_Y + BENCH_THICK + BENCH_MARGIN + 30;
+const CW = FLOOR.x + FLOOR.w + 30;
+const CH = FLOOR.y + FLOOR.h + 30;
 CTX_BUILDING.w = CW - 80;
 
 function plaquePos(bench, i) {
