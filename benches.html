@@ -116,7 +116,14 @@ header {
   text-transform: uppercase; color: #7a5c38; text-align: center;
 }
 .floor { position: absolute; background: var(--floor-color); border: 1px solid var(--floor-border); }
-.pergola { position: absolute; box-sizing: border-box; border: 7px solid var(--pergola-color); background: rgba(0,0,0,.06); }
+.pergola {
+  position: absolute; box-sizing: border-box; border: 7px solid var(--pergola-color);
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--pergola-color) 0px, var(--pergola-color) 7px,
+    transparent 7px, transparent 30px
+  );
+}
 .pergola-leg { position: absolute; width: 18px; height: 18px; background: var(--pergola-color); border-radius: 2px; }
 .ctx-building {
   position: absolute; background: #4a3a2a; border: 1px solid #2e2015; border-radius: 4px;
