@@ -381,7 +381,7 @@ const FLOOR = {
 // and south benches. It's inset from the benches' inner edges (not the
 // floor's, which is sized around the benches) and stretched east to read
 // as a clearly elongated rectangle rather than a square.
-const PERGOLA_INSET_X = 60, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 250;
+const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 290;
 const PERGOLA = {
   x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
   y: (NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y,
@@ -394,13 +394,16 @@ const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
 ]);
 
 // Surrounding context: McCombs Campus Center to the north — tall, stretching
-// further north (up) rather than encroaching toward the floor.
+// further north (up) rather than encroaching toward the floor, and exactly
+// as wide as the concrete floor below it.
 const CTX_BUILDING_H = 110, CTX_BUILDING_GAP = 12;
-const CTX_BUILDING = { x: 40, y: (FLOOR.y - CTX_BUILDING_GAP) - CTX_BUILDING_H, w: 0 /* set below */, h: CTX_BUILDING_H };
+const CTX_BUILDING = {
+  x: FLOOR.x, y: (FLOOR.y - CTX_BUILDING_GAP) - CTX_BUILDING_H,
+  w: FLOOR.w, h: CTX_BUILDING_H,
+};
 
 const CW = FLOOR.x + FLOOR.w + 30;
 const CH = FLOOR.y + FLOOR.h + 30;
-CTX_BUILDING.w = CW - 80;
 
 function plaquePos(bench, i) {
   if (bench.orientation === 'h') {
