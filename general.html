@@ -83,7 +83,7 @@ header {
 .lightbox-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.88);
   display: none; align-items: center; justify-content: center;
-  z-index: 400; padding: 60px 40px; cursor: zoom-out;
+  z-index: 1200; padding: 60px 40px; cursor: zoom-out;
 }
 .lightbox-overlay.open { display: flex; }
 .lightbox-overlay img {
@@ -94,7 +94,7 @@ header {
   position: fixed; top: 22px; right: 28px; width: 42px; height: 42px;
   border-radius: 50%; background: var(--surface); border: 1px solid var(--surface2);
   color: var(--text); font-size: 20px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; z-index: 401; transition: background .15s;
+  cursor: pointer; z-index: 1201; transition: background .15s;
 }
 .lightbox-close:hover { background: var(--surface2); }
 
@@ -141,10 +141,10 @@ header {
 <div class="toolbar">
   <div class="tab-bar">
     <div class="tab active">General</div>
+    <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
     <div class="tab" onclick="location.href='section1.html'">McCombs Pergola Brick Garden</div>
     <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
     <div class="tab" onclick="location.href='section3.html'">Lois Perkins Peace Garden East</div>
-    <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
   </div>
 </div>
 
@@ -171,6 +171,10 @@ header {
   <section>
     <h2>Gallery</h2>
     <div class="gallery">
+      <figure>
+        <img src="assets/general_gallery_benches.jpg" alt="McCombs Pergola Benches courtyard" onclick="openLightbox(this)">
+        <figcaption>McCombs Pergola Benches</figcaption>
+      </figure>
       <figure>
         <img src="assets/general_gallery_section1.jpg" alt="McCombs Pergola Brick Garden brick walkway" onclick="openLightbox(this)">
         <figcaption>McCombs Pergola Brick Garden</figcaption>
@@ -217,7 +221,8 @@ document.addEventListener('keydown', e => {
 </script>
 <script>
 const SECTIONS = [
-  { name: 'McCombs Pergola Brick Garden', lat: 30.6353485, lng: -97.6658105 },
+  { name: 'McCombs Pergola Benches', lat: 30.63539595377628, lng: -97.66586453217728 },
+  { name: 'McCombs Pergola Brick Garden', lat: 30.63535095076775, lng: -97.66581155855455 },
   { name: 'Lois Perkins Peace Garden West', lat: 30.6355534, lng: -97.6655637 },
   { name: 'Lois Perkins Peace Garden East', lat: 30.6356411, lng: -97.6654349 },
 ];
