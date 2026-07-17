@@ -121,9 +121,9 @@ header {
 }
 .pergola-leg { position: absolute; width: 18px; height: 18px; background: var(--pergola-color); border-radius: 2px; }
 .ctx-building {
-  position: absolute; background: #4a3a2a; border: 1px solid #2e2015; border-radius: 4px;
+  position: absolute; background: var(--bench-border); border: 1px solid #8a8168; border-radius: 4px;
   display: flex; align-items: center; justify-content: center; text-align: center;
-  color: #e8d8c0; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  color: #2e2818; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
   font-family: sans-serif; padding: 4px;
 }
 .brick {
@@ -191,15 +191,6 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
 }
 .dpx:hover { background: var(--surface2); color: var(--text); }
 
-.legend {
-  position: absolute; top: 8px; right: 8px; z-index: 50;
-  background: rgba(24,10,2,.88); border: 1px solid var(--surface2);
-  border-radius: 8px; padding: 9px 11px; font-size: 10px;
-}
-.lgi { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
-.lgi:last-child { margin-bottom: 0; }
-.lgs { width: 18px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-
 #toast {
   position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
   background: var(--accent); color: var(--bg); padding: 8px 20px; border-radius: 20px;
@@ -257,8 +248,6 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
     left: 8px; right: 8px; max-width: none; min-width: 0;
     padding: 16px 40px 14px 16px;
   }
-  .legend { font-size: 9px; padding: 7px 9px; }
-
   .emodal { width: calc(100vw - 32px); min-width: 0; padding: 18px; }
 }
 </style>
@@ -305,13 +294,6 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
   </aside>
   <div class="vp" id="vp">
     <div class="canvas" id="canvas"><div class="mon" id="mon"></div></div>
-    <div class="legend">
-      <div class="lgi"><span class="lgs" style="background:var(--bench-body);border:2px solid var(--bench-border)"></span> Bench (white stone)</div>
-      <div class="lgi"><span class="lgs" style="background:var(--floor-color);border:1px solid var(--floor-border)"></span> Concrete floor</div>
-      <div class="lgi"><span class="lgs" style="background:transparent;border:2px solid var(--pergola-color)"></span> Pergola</div>
-      <div class="lgi"><span class="lgs" style="background:var(--brick-bg)"></span> Inscribed plaque</div>
-      <div class="lgi"><span class="lgs" style="background:var(--brick-empty)"></span> Empty plaque</div>
-    </div>
     <div class="zctrl">
       <button class="zb" onclick="zoom(1.25)">+</button>
       <button class="zb" onclick="zoom(0.8)">−</button>
@@ -364,7 +346,7 @@ const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 500
 const BENCH_MARGIN   = 18;    // white-stone bench body is larger than the plaques it carries
 const CORNER_GAP     = 130;   // open space between adjacent bench ends at each corner
 
-const OFFSET_X = 90, OFFSET_Y = 120; // room for the surrounding context band
+const OFFSET_X = 90, OFFSET_Y = 170; // room for the (taller) surrounding context band
 
 const WEST_X  = OFFSET_X;
 const NORTH_X = WEST_X + BENCH_THICK + CORNER_GAP;
@@ -411,8 +393,10 @@ const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y + PERGOLA.h },
 ]);
 
-// Surrounding context: McCombs Campus Center to the north.
-const CTX_BUILDING = { x: 40, y: 10, w: 0 /* set below */, h: 50 };
+// Surrounding context: McCombs Campus Center to the north — tall, stretching
+// further north (up) rather than encroaching toward the floor.
+const CTX_BUILDING_H = 110, CTX_BUILDING_GAP = 12;
+const CTX_BUILDING = { x: 40, y: (FLOOR.y - CTX_BUILDING_GAP) - CTX_BUILDING_H, w: 0 /* set below */, h: CTX_BUILDING_H };
 
 const CW = FLOOR.x + FLOOR.w + 30;
 const CH = FLOOR.y + FLOOR.h + 30;
