@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Southwestern University Donor Brick Monument – Section 3</title>
+<title>Southwestern University Donor Brick Monument – Lois Perkins Peace Garden East</title>
 <style>
 :root {
   --brick-bg:      #c8714a;
@@ -279,7 +279,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 <header>
   <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University"></div>
   <div class="htext">
-    <h1>Donor Brick Monument — Section 3</h1>
+    <h1>Donor Brick Monument — Lois Perkins Peace Garden East</h1>
   </div>
   <div class="hstats" id="hstats" style="display:none">Loading…</div>
   <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
@@ -302,9 +302,9 @@ body.place-mode .brick.empty:not(.filler):hover {
   <span id="rinfo"></span>
   <div class="tabs">
     <div class="tab" onclick="location.href='general.html'">General</div>
-    <div class="tab" onclick="location.href='section1.html'">Section 1</div>
-    <div class="tab" onclick="location.href='section2.html'">Section 2</div>
-    <div class="tab on">Section 3</div>
+    <div class="tab" onclick="location.href='section1.html'">McCombs Pergola Brick Garden</div>
+    <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
+    <div class="tab on">Lois Perkins Peace Garden East</div>
   </div>
 </div>
 
@@ -354,7 +354,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// LAYOUT CONSTANTS — Section 3: flat 15Ø20 grid
+// LAYOUT CONSTANTS — Lois Perkins Peace Garden East: flat 15Ø20 grid
 // ═══════════════════════════════════════════════════════════
 const UNIT = 44;
 const GAP  = 4;
@@ -372,7 +372,7 @@ function bW(cs) { return cs * UNIT - GAP; }
 function bH(rs) { return rs * UNIT - GAP; }
 
 // ═══════════════════════════════════════════════════════════
-// LAYOUT — from Google Sheets Section 3
+// LAYOUT — from Google Sheets Lois Perkins Peace Garden East
 // [row_off, col_off, rowspan, colspan]
 // ═══════════════════════════════════════════════════════════
 const LAYOUT = [
@@ -1020,7 +1020,7 @@ function renderMonument() {
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 3`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Lois Perkins Peace Garden East`;
 }
 
 function fitBrick(el) {
@@ -1272,12 +1272,12 @@ function saveBrickEdit() {
   buildList(bricks.filter(b => b.lines.length));
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 3`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Lois Perkins Peace Garden East`;
   closeEditModal(); toast('Brick saved!');
 }
 function clearBrickEdit() { ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach(id => document.getElementById(id).value = ''); }
 function resetAllEdits() {
-  if (!confirm('Reset ALL admin edits for Section 3? This cannot be undone.')) return;
+  if (!confirm('Reset ALL admin edits for Lois Perkins Peace Garden East? This cannot be undone.')) return;
   localStorage.removeItem(EDITS_KEY); toast('Edits reset — reloading...');
   setTimeout(() => location.reload(), 900);
 }

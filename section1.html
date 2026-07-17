@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Southwestern University Donor Brick Monument – Section 1</title>
+<title>Southwestern University Donor Brick Monument – McCombs Pergola Brick Garden</title>
 <style>
 :root {
   --brick-bg:      #c8714a;
@@ -349,7 +349,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 <header>
   <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University"></div>
   <div class="htext">
-    <h1>Donor Brick Monument — Section 1</h1>
+    <h1>Donor Brick Monument — McCombs Pergola Brick Garden</h1>
   </div>
   <div class="hstats" id="hstats" style="display:none">Loading…</div>
   <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
@@ -375,9 +375,9 @@ body.place-mode .brick.empty:not(.filler):hover {
   <span id="rinfo"></span>
   <div class="tabs">
     <div class="tab" onclick="location.href='general.html'">General</div>
-    <div class="tab on">Section 1</div>
-    <div class="tab" onclick="location.href='section2.html'">Section 2</div>
-    <div class="tab" onclick="location.href='section3.html'">Section 3</div>
+    <div class="tab on">McCombs Pergola Brick Garden</div>
+    <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
+    <div class="tab" onclick="location.href='section3.html'">Lois Perkins Peace Garden East</div>
   </div>
 </div>
 
@@ -441,7 +441,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// LAYOUT CONSTANTS — Section 1: flat 52×43 grid
+// LAYOUT CONSTANTS — McCombs Pergola Brick Garden: flat 52×43 grid
 // Each spreadsheet column/row = UNIT pixels
 // ═══════════════════════════════════════════════════════════
 const UNIT = 44;       // pixel stride per grid unit (both x and y)
@@ -460,7 +460,7 @@ function bW(cs) { return cs * UNIT - GAP; }   // brick width from colspan
 function bH(rs) { return rs * UNIT - GAP; }   // brick height from rowspan
 
 // ═══════════════════════════════════════════════════════════
-// LAYOUT — from Google Sheets Section 1
+// LAYOUT — from Google Sheets McCombs Pergola Brick Garden
 // Each entry: [row_off, col_off, rowspan, colspan]
 //   colspan=1              → filler brick (narrow, no text, not editable)
 //   colspan=2, rowspan=2   → large text brick
@@ -644,7 +644,7 @@ function renderMonument() {
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 1`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · McCombs Pergola Brick Garden`;
 }
 
 // ── Auto-fit text inside each brick — each line independently ──
@@ -999,7 +999,7 @@ function saveBrickEdit() {
   buildList(bricks.filter(b => b.lines.length));
   const recorded = bricks.filter(b => b.lines.length > 0).length;
   document.getElementById('rcnt').textContent = recorded;
-  document.getElementById('hstats').textContent = `${recorded} bricks recorded · Section 1`;
+  document.getElementById('hstats').textContent = `${recorded} bricks recorded · McCombs Pergola Brick Garden`;
 
   closeEditModal();
   toast('Brick saved!');
@@ -1011,7 +1011,7 @@ function clearBrickEdit() {
 }
 
 function resetAllEdits() {
-  if (!confirm('Reset ALL admin edits for Section 1? This cannot be undone.')) return;
+  if (!confirm('Reset ALL admin edits for McCombs Pergola Brick Garden? This cannot be undone.')) return;
   localStorage.removeItem(EDITS_KEY);
   toast('Edits reset — reloading...');
   setTimeout(() => location.reload(), 900);
