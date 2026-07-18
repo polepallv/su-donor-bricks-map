@@ -688,7 +688,15 @@ function scrollToBrick(b) {
 let scale = 1, panX = 0, panY = 0, dragging = false, dragSx, dragSy, dragPx, dragPy;
 
 function applyTransform() {
-  document.getElementById('canvas').style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+  // panX/panY are kept as exact floats for the pan/zoom math (see zoom(),
+  // the wheel/drag/touch handlers), but rounded only here, at the point
+  // they're applied to the DOM. Trackpads and HiDPI displays report
+  // fractional pointer deltas, so panX/panY drift to fractional pixel
+  // values during a drag; translating by those raw fractions shifts the
+  // pergola's tightly-repeating 7px slats to a different sub-pixel
+  // anti-aliased offset almost every frame, which reads as a shimmer.
+  // Snapping the applied translate to whole pixels removes that jitter.
+  document.getElementById('canvas').style.transform = `translate(${Math.round(panX)}px,${Math.round(panY)}px) scale(${scale})`;
 }
 function resetView() {
   const vp = document.getElementById('vp'), vpW = vp.clientWidth, vpH = vp.clientHeight;
