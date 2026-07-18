@@ -165,13 +165,22 @@ function handleGet(p) {
  * strings in place — the caller is expected to have already trimmed
  * any meaningless trailing blanks, but interior blanks (a deliberately
  * skipped line) are written through as-is.
+ *
+ * Sheets treats a leading apostrophe on a written value as its own
+ * "force text" input marker and consumes it — even via setValues() on an
+ * already-plain-text-formatted cell, and even though a mid-string
+ * apostrophe (e.g. "CLASS OF '13") is untouched. A line that itself
+ * starts with an apostrophe (e.g. "'88 REUNION") needs an extra leading
+ * apostrophe on write so the one Sheets consumes isn't the real one.
  */
 function handleSet(p) {
   const section = String(p.section || '');
   const key     = String(p.key     || '');
   const lines   = [];
   for (let i = 1; i <= LINE_COUNT; i++) {
-    lines.push(String(p['l' + i] || ''));
+    let line = String(p['l' + i] || '');
+    if (line.charAt(0) === "'") line = "'" + line;
+    lines.push(line);
   }
   const size    = parseInt(p.size) || 1;
 
