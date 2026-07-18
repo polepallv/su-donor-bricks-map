@@ -66,7 +66,7 @@ header {
   padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
   overflow-x: auto;
 }
-.sw { position: relative; flex: 1; min-width: 180px; }
+.sw { position: relative; flex: 1; min-width: 230px; }
 .sw input {
   width: 100%; padding: 7px 12px 7px 34px;
   background: var(--bg); border: 1px solid var(--surface2); border-radius: 18px;
@@ -327,7 +327,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   .cb { padding: 5px 8px; font-size: 11px; }
 
   .toolbar { padding: 6px 10px; }
-  .sw { min-width: 140px; }
+  .sw { min-width: 170px; }
 
   .dp {
     left: 8px; right: 8px; max-width: none; min-width: 0;
@@ -366,7 +366,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   <div class="tab" onclick="location.href='inscriptions.html'">Inscriptions List</div>
   <div class="sw">
     <span class="si">🔍</span>
-    <input id="search" type="text" placeholder="Search name, class year, inscription…" autocomplete="off">
+    <input id="search" type="text" placeholder="Search name, class year, etc…" autocomplete="off">
   </div>
   <span id="rinfo"></span>
   <div class="tabs">
@@ -1588,6 +1588,16 @@ function mergeEdits(initial, remote, local) {
   return merged;
 }
 
+function highlightFromURL() {
+  const key = new URLSearchParams(location.search).get('highlight');
+  if (!key) return;
+  const id = brickMap[key];
+  if (!id) return;
+  const b = brickById[id];
+  if (!b) return;
+  scrollToBrick(b);
+}
+
 function initWithGAS() {
   const go = () => {
     allEdits = mergeEdits(INITIAL_EDITS, remoteEdits, localEdits);
@@ -1595,6 +1605,7 @@ function initWithGAS() {
     renderMonument();
     buildList(bricks.filter(b => b.lines.length));
     setTimeout(resetView, 50);
+    setTimeout(highlightFromURL, 150);
   };
   if (!GAS_URL) { go(); return; }
   const cb = '_gsInit' + Date.now();
