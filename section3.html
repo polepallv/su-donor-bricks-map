@@ -71,6 +71,7 @@ header {
 }
 .sw input:focus { border-color: var(--accent); }
 .si { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
+.sw-collapsed-label { display: none; }
 #rinfo { font-size: 12px; color: var(--accent); min-width: 100px; }
 .cb {
   background: var(--surface2); border: 1px solid #5a3a20; color: var(--text);
@@ -227,10 +228,12 @@ body.place-mode .brick.empty:not(.filler):hover {
 .emodal {
   background: var(--surface); border: 1px solid var(--admin-accent);
   border-radius: 12px; padding: 22px 26px; min-width: 320px; max-width: 460px;
+  max-height: 88vh; overflow-y: auto;
   box-shadow: 0 8px 40px rgba(0,0,0,.8);
 }
 .emodal h3 { font-size: 15px; color: var(--admin-accent); margin-bottom: 4px; }
-.emodal .epos { font-size: 10px; color: var(--muted); margin-bottom: 14px; }
+.emodal .epos { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+.emodal .ehint { font-size: 10px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
 .emodal label { display: block; font-size: 10px; color: var(--muted); margin: 8px 0 3px; text-transform: uppercase; letter-spacing: .8px; }
 .emodal input[type=text] {
   width: 100%; background: var(--bg); border: 1px solid var(--surface2);
@@ -263,7 +266,12 @@ body.place-mode .brick.empty:not(.filler):hover {
   .cb { padding: 5px 8px; font-size: 11px; }
 
   .toolbar { padding: 6px 10px; }
-  .sw { min-width: 170px; }
+  .sw { flex: 0 0 auto; width: 84px; min-width: 84px; overflow: hidden; transition: width .25s ease; cursor: pointer; }
+  .sw.expanded { flex: 1 0 100%; width: 100%; min-width: 0; cursor: text; }
+  .sw input { opacity: 0; pointer-events: none; }
+  .sw.expanded input { opacity: 1; pointer-events: auto; }
+  .sw-collapsed-label { display: inline; position: absolute; left: 32px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; white-space: nowrap; }
+  .sw.expanded .sw-collapsed-label { display: none; }
 
   .dp {
     left: 8px; right: 8px; max-width: none; min-width: 0;
@@ -297,8 +305,9 @@ body.place-mode .brick.empty:not(.filler):hover {
 
 <div class="toolbar">
   <div class="tab" onclick="location.href='inscriptions.html'">Inscriptions List</div>
-  <div class="sw">
+  <div class="sw" id="sw">
     <span class="si">🔍</span>
+    <span class="sw-collapsed-label">Search</span>
     <input id="search" type="text" placeholder="Search name, class year, etc…" autocomplete="off">
   </div>
   <span id="rinfo"></span>
@@ -335,6 +344,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   <div class="emodal">
     <h3>✏ Edit Brick</h3>
     <div class="epos" id="epos"></div>
+    <div class="ehint">Wrap text in *asterisks* for <em>italics</em>. Leave a line blank to skip it — later lines won't shift up to fill the gap.</div>
     <label>Line 1 (primary name / title)</label>
     <input type="text" id="el1" placeholder="Primary inscription line">
     <label>Line 2</label><input type="text" id="el2" placeholder="Second line (optional)">
@@ -344,6 +354,10 @@ body.place-mode .brick.empty:not(.filler):hover {
     <label>Line 6</label><input type="text" id="el6" placeholder="Sixth line (optional)">
     <label>Line 7</label><input type="text" id="el7" placeholder="Seventh line (optional)">
     <label>Line 8</label><input type="text" id="el8" placeholder="Eighth line (optional)">
+    <label>Line 9</label><input type="text" id="el9" placeholder="Ninth line (optional)">
+    <label>Line 10</label><input type="text" id="el10" placeholder="Tenth line (optional)">
+    <label>Line 11</label><input type="text" id="el11" placeholder="Eleventh line (optional)">
+    <label>Line 12</label><input type="text" id="el12" placeholder="Twelfth line (optional)">
     <div class="ebricktype" id="ebricktype"></div>
     <div class="ebtns">
       <button class="ebtn-clear" onclick="clearBrickEdit()">Clear brick</button>
@@ -957,12 +971,32 @@ let allEdits    = {};
 
 function saveLocalEdits() { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }
 
+// ═══════════════════════════════════════════════════════════
+// LINE FORMATTING — up to 12 lines per brick; *text* renders as
+// italics. HTML-escaped first so a name containing < & > can't break
+// the markup, then the *…* markdown-style italics are applied.
+// ═══════════════════════════════════════════════════════════
+const LINE_IDS = ['el1','el2','el3','el4','el5','el6','el7','el8','el9','el10','el11','el12'];
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function formatLine(s) {
+  return escapeHtml(s || '').replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+// Drops only trailing blanks (nothing meaningful after the last
+// inscribed line); a blank in the middle stays exactly where it is.
+function trimTrailingBlanks(lines) {
+  const out = lines.map(l => l || '');
+  while (out.length && !out[out.length - 1]) out.pop();
+  return out;
+}
+
 function applyEdits() {
   Object.keys(allEdits).forEach(key => {
     const id = brickMap[key];
     if (!id) return;
     const b = brickById[id], e = allEdits[key];
-    b.lines = (e.lines || []).filter(Boolean);
+    b.lines = trimTrailingBlanks(e.lines || []);
     b.name  = b.lines[0] || '';
   });
 }
@@ -1006,7 +1040,7 @@ function renderMonument() {
       el.id = b.id; el.dataset.id = b.id;
       b.lines.forEach(ln => {
         const s = document.createElement('span');
-        s.className = 'bl'; s.textContent = ln; el.appendChild(s);
+        s.className = 'bl'; s.innerHTML = formatLine(ln) || '&nbsp;'; el.appendChild(s);
       });
       el.addEventListener('mousedown', e => {
         if (e.button !== 0 || !document.body.classList.contains('edit-mode')) return;
@@ -1050,8 +1084,9 @@ function buildList(list) {
   list.forEach(b => {
     const el = document.createElement('div');
     el.className = 'li';
-    el.innerHTML = `<div class="ln">${b.lines[0]||'—'}</div>` +
-      (b.lines[1] ? `<div class="ls">${b.lines.slice(1).join(' · ')}</div>` : '') +
+    const rest = b.lines.slice(1).filter(Boolean);
+    el.innerHTML = `<div class="ln">${formatLine(b.lines[0]) || '—'}</div>` +
+      (rest.length ? `<div class="ls">${rest.map(formatLine).join(' · ')}</div>` : '') +
       `<div class="lp">Grid ${b.row},${b.col}</div>`;
     el.addEventListener('click', () => scrollToBrick(b));
     container.appendChild(el);
@@ -1085,7 +1120,7 @@ function onBrickClick(b, el) {
   activeBrick = b;
   document.querySelectorAll('.brick.act').forEach(e => e.classList.remove('act'));
   el.classList.add('act');
-  document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${l}</div>`).join('');
+  document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${formatLine(l) || '&nbsp;'}</div>`).join('');
   document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
   document.getElementById('dp').classList.add('open');
   highlightSidebarItem(b.id);
@@ -1112,7 +1147,7 @@ function scrollToBrick(b) {
   applyTransform();
   setTimeout(() => {
     el.classList.add('act');
-    document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${l}</div>`).join('');
+    document.getElementById('dptext').innerHTML = b.lines.map(l => `<div>${formatLine(l) || '&nbsp;'}</div>`).join('');
     document.getElementById('dppos').textContent = `Grid ${b.row}, ${b.col}`;
     document.getElementById('dp').classList.add('open');
   }, 60);
@@ -1182,6 +1217,23 @@ vp.addEventListener('touchend', () => { dragging = false; lastDist = 0; });
 // SEARCH
 // ═══════════════════════════════════════════════════════════
 let searchTimer;
+// Mobile: search starts collapsed to a small "Search" pill so at least
+// one section tab is visible alongside it; tapping it expands to the full
+// input (pushing tabs into the scrollable area), and it re-collapses on
+// blur if left empty.
+const swBox = document.getElementById('sw');
+swBox.addEventListener('click', () => {
+  if (window.innerWidth <= 480 && !swBox.classList.contains('expanded')) {
+    swBox.classList.add('expanded');
+    document.getElementById('search').focus();
+  }
+});
+document.getElementById('search').addEventListener('blur', () => {
+  if (window.innerWidth <= 480 && !document.getElementById('search').value) {
+    swBox.classList.remove('expanded');
+  }
+});
+
 document.getElementById('search').addEventListener('input', e => {
   clearTimeout(searchTimer);
   const q = e.target.value.trim();
@@ -1249,7 +1301,7 @@ let editTarget = null;
 
 function openEditModal(b, el) {
   editTarget = { brick: b, el };
-  ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach((id, i) =>
+  LINE_IDS.forEach((id, i) =>
     document.getElementById(id).value = b ? (b.lines[i] || '') : '');
   const cs = b ? b.colspan : 2, rs = b ? b.rowspan : 1;
   const typeLabel = cs === 2 && rs === 2 ? 'Large (2 col × 2 row)' : cs === 2 && rs === 1 ? 'Standard (2 col × 1 row)' : cs + ' col × ' + rs + ' row';
@@ -1263,13 +1315,13 @@ function closeEditModal() { document.getElementById('editOverlay').classList.rem
 function saveBrickEdit() {
   if (!editTarget || !editTarget.brick) return;
   const b = editTarget.brick;
-  const lines = ['el1','el2','el3','el4','el5','el6','el7','el8']
-    .map(id => document.getElementById(id).value.trim().toUpperCase())
-    .filter(Boolean);
+  const lines = trimTrailingBlanks(
+    LINE_IDS.map(id => document.getElementById(id).value.trim().toUpperCase())
+  );
   const key = b.row + ',' + b.col;
   b.lines = lines; b.name = lines[0] || '';
   localEdits[key] = { lines, savedAt: Date.now() }; allEdits[key] = { lines }; saveLocalEdits();
-  if (GAS_URL) gasSet(SECTION_ID, key, lines[0]||'', lines[1]||'', lines[2]||'', b.colspan, lines[3]||'', lines[4]||'', lines[5]||'', lines[6]||'', lines[7]||'');
+  if (GAS_URL) gasSet(SECTION_ID, key, lines, b.colspan);
   document.getElementById('mon').innerHTML = '';
   renderMonument();
   buildList(bricks.filter(b => b.lines.length));
@@ -1278,7 +1330,7 @@ function saveBrickEdit() {
   document.getElementById('hstats').textContent = `${recorded} bricks recorded · Lois Perkins Peace Garden East`;
   closeEditModal(); toast('Brick saved!');
 }
-function clearBrickEdit() { ['el1','el2','el3','el4','el5','el6','el7','el8'].forEach(id => document.getElementById(id).value = ''); }
+function clearBrickEdit() { LINE_IDS.forEach(id => document.getElementById(id).value = ''); }
 function resetAllEdits() {
   if (!confirm('Reset ALL admin edits for Lois Perkins Peace Garden East? This cannot be undone.')) return;
   localStorage.removeItem(EDITS_KEY); toast('Edits reset — reloading...');
@@ -1294,11 +1346,13 @@ document.getElementById('editOverlay').addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════
 // GAS HELPERS
 // ═══════════════════════════════════════════════════════════
-function gasSet(section, key, l1, l2, l3, size, l4, l5, l6, l7, l8) {
+function gasSet(section, key, lines, size) {
   if (!GAS_URL) return;
   const cb = '_gsCb' + Date.now(), s = document.createElement('script');
   window[cb] = function() { delete window[cb]; s.parentNode && s.parentNode.removeChild(s); };
-  const p = new URLSearchParams({ action:'set', section, key, l1:l1||'', l2:l2||'', l3:l3||'', l4:l4||'', l5:l5||'', l6:l6||'', l7:l7||'', l8:l8||'', size:size||2, callback:cb });
+  const params = { action: 'set', section, key, size: size || 2, callback: cb };
+  for (let i = 0; i < 12; i++) params['l' + (i + 1)] = lines[i] || '';
+  const p = new URLSearchParams(params);
   s.src = GAS_URL + '?' + p; document.head.appendChild(s);
 }
 
@@ -1367,8 +1421,8 @@ function finalizeBrickMove(toRow, toCol) {
   if (toB.lines.length)   { localEdits[toKey]   = { lines: toB.lines,   savedAt: swapTime }; allEdits[toKey]   = { lines: toB.lines };   } else { delete localEdits[toKey];   delete allEdits[toKey];   }
   saveLocalEdits();
   if (GAS_URL) {
-    gasSet(SECTION_ID, fromKey, fromB.lines[0]||'', fromB.lines[1]||'', fromB.lines[2]||'', fromB.colspan, fromB.lines[3]||'', fromB.lines[4]||'', fromB.lines[5]||'', fromB.lines[6]||'', fromB.lines[7]||'');
-    gasSet(SECTION_ID, toKey,   toB.lines[0]||'',   toB.lines[1]||'',   toB.lines[2]||'',   toB.colspan,  toB.lines[3]||'',   toB.lines[4]||'',   toB.lines[5]||'',   toB.lines[6]||'',   toB.lines[7]||'');
+    gasSet(SECTION_ID, fromKey, fromB.lines, fromB.colspan);
+    gasSet(SECTION_ID, toKey, toB.lines, toB.colspan);
   }
   document.getElementById('mon').innerHTML = ''; renderMonument(); buildList(bricks.filter(b => b.lines.length)); toast('Brick moved!');
 }

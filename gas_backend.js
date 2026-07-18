@@ -38,13 +38,16 @@
  *    The `updated` timestamp lets the frontend prefer whichever of a
  *    browser's local edit or the shared sheet's edit is actually newer,
  *    instead of a local edit permanently overriding the shared one.
+ *    `lines` is returned exactly as stored — including blank entries in
+ *    the middle of the array — so a deliberately blank line stays put
+ *    instead of later lines shifting up to fill the gap.
  *
  *  Save an edit:
- *    ?action=set&section=1&key=5,3&l1=NAME&l2=LINE2&l3=LINE3&l4=&l5=&l6=&l7=&l8=&size=1&callback=fn
+ *    ?action=set&section=1&key=5,3&l1=NAME&l2=&l3=LINE3&…&l12=&size=1&callback=fn
  *    → Upserts a row in the BrickEdits sheet, returns fn({ok:true})
  *
  *  The Sheet ("BrickEdits") has columns:
- *    section | key | line1 | line2 | line3 | line4 | line5 | line6 | line7 | line8 | size | updated
+ *    section | key | line1..line12 | size | updated
  */
 
 // ── Sheet name ──────────────────────────────────────────────
@@ -61,8 +64,13 @@ const COL_L5      = 6;
 const COL_L6      = 7;
 const COL_L7      = 8;
 const COL_L8      = 9;
-const COL_SIZE    = 10;
-const COL_UPDATED = 11;
+const COL_L9      = 10;
+const COL_L10     = 11;
+const COL_L11     = 12;
+const COL_L12     = 13;
+const COL_SIZE    = 14;
+const COL_UPDATED = 15;
+const LINE_COUNT  = 12;
 
 /**
  * Handle all incoming requests.
@@ -108,6 +116,12 @@ function doGet(e) {
  * The write side (handleSet) already forces plain-text number format
  * before writing, which is what actually prevents date/number
  * auto-conversion — getDisplayValues() here was redundant and harmful.
+ *
+ * `lines` is NOT filtered down to just the non-blank entries: a blank
+ * entry in the middle of the array (e.g. a deliberately skipped line
+ * between two inscribed ones) is kept in place, so the frontend can
+ * render it as an intentional gap instead of everything after it
+ * shifting up to fill the hole.
  */
 function handleGet(p) {
   const section = String(p.section || '');
@@ -121,10 +135,15 @@ function handleGet(p) {
     if (String(row[COL_SECTION]) !== section) continue;
 
     const key   = String(row[COL_KEY]);
-    const lines = [row[COL_L1], row[COL_L2], row[COL_L3], row[COL_L4],
-                   row[COL_L5], row[COL_L6], row[COL_L7], row[COL_L8]]
-                    .map(v => String(v || ''))
-                    .filter(Boolean);
+    const lines = [
+      row[COL_L1],  row[COL_L2],  row[COL_L3],  row[COL_L4],
+      row[COL_L5],  row[COL_L6],  row[COL_L7],  row[COL_L8],
+      row[COL_L9],  row[COL_L10], row[COL_L11], row[COL_L12],
+    ].map(v => String(v || ''));
+    // Drop only trailing blanks (nothing meaningful after the last
+    // inscribed line) — interior blanks stay exactly where they are.
+    while (lines.length && !lines[lines.length - 1]) lines.pop();
+
     const size    = parseInt(row[COL_SIZE]) || 1;
     const updated = String(row[COL_UPDATED] || '');
 
@@ -141,18 +160,19 @@ function handleGet(p) {
  * The target range's number format is forced to plain text ('@') before
  * writing, so Sheets doesn't auto-convert date-like inscription text
  * (e.g. "AUGUST 16, 2008") into an actual Date value.
+ *
+ * Accepts up to 12 lines (l1..l12). Blank ones are stored as empty
+ * strings in place — the caller is expected to have already trimmed
+ * any meaningless trailing blanks, but interior blanks (a deliberately
+ * skipped line) are written through as-is.
  */
 function handleSet(p) {
   const section = String(p.section || '');
   const key     = String(p.key     || '');
-  const l1      = String(p.l1      || '');
-  const l2      = String(p.l2      || '');
-  const l3      = String(p.l3      || '');
-  const l4      = String(p.l4      || '');
-  const l5      = String(p.l5      || '');
-  const l6      = String(p.l6      || '');
-  const l7      = String(p.l7      || '');
-  const l8      = String(p.l8      || '');
+  const lines   = [];
+  for (let i = 1; i <= LINE_COUNT; i++) {
+    lines.push(String(p['l' + i] || ''));
+  }
   const size    = parseInt(p.size) || 1;
 
   if (!section || !key) throw new Error('Missing section or key');
@@ -169,7 +189,7 @@ function handleSet(p) {
     }
   }
 
-  const newRow  = [section, key, l1, l2, l3, l4, l5, l6, l7, l8, size, new Date().toISOString()];
+  const newRow  = [section, key].concat(lines, [size, new Date().toISOString()]);
   const rowIdx  = foundRow > 0 ? foundRow : sheet.getLastRow() + 1;
   const range   = sheet.getRange(rowIdx, 1, 1, newRow.length);
 
@@ -180,19 +200,35 @@ function handleSet(p) {
 }
 
 /**
- * Get (or create) the BrickEdits sheet.
+ * Get (or create) the BrickEdits sheet. If the sheet already exists from
+ * before the 12-line schema (8 line columns instead of 12), its header
+ * row is extended in place with the 4 missing line columns so existing
+ * data isn't disturbed.
  */
 function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
 
+  const headers = ['section', 'key',
+    'line1', 'line2', 'line3', 'line4', 'line5', 'line6',
+    'line7', 'line8', 'line9', 'line10', 'line11', 'line12',
+    'size', 'updated'];
+
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    // Write header row
-    sheet.appendRow(['section', 'key', 'line1', 'line2', 'line3', 'line4',
-                      'line5', 'line6', 'line7', 'line8', 'size', 'updated']);
+    sheet.appendRow(headers);
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, 1, 12).setFontWeight('bold');
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    return sheet;
+  }
+
+  // Upgrade an older 8-line sheet in place: if there are fewer header
+  // columns than expected, insert 4 blank columns before the old
+  // size/updated columns and relabel the whole header row.
+  const existingCols = sheet.getLastColumn();
+  if (existingCols > 0 && existingCols < headers.length) {
+    sheet.insertColumnsBefore(existingCols - 1, headers.length - existingCols);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
   }
 
   return sheet;
@@ -207,13 +243,20 @@ function testSetup() {
   Logger.log('Sheet found: ' + sheet.getName());
   Logger.log('Row count: ' + sheet.getLastRow());
 
-  // Insert a test edit
-  handleSet({ section:'1', key:'0,0', l1:'TEST BRICK', l2:'SETUP WORKS', l3:'', l4:'', l5:'', l6:'', l7:'', l8:'', size:'1' });
+  // Insert a test edit, with a deliberately blank line 2 to check that
+  // interior blanks round-trip correctly.
+  handleSet({ section: '1', key: '0,0', l1: 'TEST BRICK', l2: '', l3: 'SETUP WORKS', size: '1' });
   Logger.log('Test write OK');
 
   // Read it back
-  const result = handleGet({ section:'1' });
+  const result = handleGet({ section: '1' });
   Logger.log('Test read: ' + JSON.stringify(result));
+  const readBack = result['0,0'];
+  if (!readBack || readBack.lines[1] !== '') {
+    Logger.log('WARNING: blank interior line did not round-trip as expected!');
+  } else {
+    Logger.log('Interior blank line preserved correctly.');
+  }
 
   // Clean up test row
   const ss = SpreadsheetApp.getActiveSpreadsheet();
