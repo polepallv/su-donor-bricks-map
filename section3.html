@@ -63,7 +63,7 @@ header {
   padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
   overflow-x: auto;
 }
-.sw { position: relative; flex: 1; min-width: 230px; }
+.sw { position: relative; flex: 0 1 160px; min-width: 130px; }
 .sw input {
   width: 100%; padding: 7px 12px 7px 34px;
   background: var(--bg); border: 1px solid var(--surface2); border-radius: 18px;
@@ -72,15 +72,15 @@ header {
 .sw input:focus { border-color: var(--accent); }
 .si { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
 .sw-collapsed-label { display: none; }
-#rinfo { font-size: 12px; color: var(--accent); min-width: 100px; }
+#rinfo { font-size: 12px; color: var(--accent); }
 .cb {
   background: var(--surface2); border: 1px solid #5a3a20; color: var(--text);
   padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit;
   transition: background .15s; white-space: nowrap;
 }
 .cb:hover { background: #5a3a20; }
-.tabs { display: flex; margin-left: 6px; flex-shrink: 0; }
-.tab { padding: 6px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
+.tabs { display: flex; margin-left: 12px; flex-shrink: 0; }
+.tab { padding: 6px 8px; cursor: pointer; font-size: 12px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
