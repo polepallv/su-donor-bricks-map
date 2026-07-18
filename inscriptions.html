@@ -48,6 +48,7 @@ header {
 }
 .sw input:focus { border-color: var(--accent); }
 .si { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
+.sw-collapsed-label { display: none; }
 #rinfo { font-size: 12px; color: var(--accent); min-width: 90px; }
 .tabs { display: flex; margin-left: 6px; flex-shrink: 0; }
 .tab { padding: 7px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
@@ -95,7 +96,12 @@ header {
   .logo img { height: 24px; }
   .htext h1 { font-size: 13px; line-height: 1.3; }
   .toolbar { padding: 6px 10px; }
-  .sw { min-width: 170px; }
+  .sw { flex: 0 0 auto; width: 84px; min-width: 84px; overflow: hidden; transition: width .25s ease; cursor: pointer; }
+  .sw.expanded { flex: 1 0 100%; width: 100%; min-width: 0; cursor: text; }
+  .sw input { opacity: 0; pointer-events: none; }
+  .sw.expanded input { opacity: 1; pointer-events: auto; }
+  .sw-collapsed-label { display: inline; position: absolute; left: 32px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; white-space: nowrap; }
+  .sw.expanded .sw-collapsed-label { display: none; }
   .list-header { display: none; }
   .row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; }
   .row-section, .row-pos { width: auto; text-align: left; }
@@ -114,8 +120,9 @@ header {
 
 <div class="toolbar">
   <div class="master-tab">Inscriptions List</div>
-  <div class="sw">
+  <div class="sw" id="sw">
     <span class="si">🔍</span>
+    <span class="sw-collapsed-label">Search</span>
     <input id="search" type="text" placeholder="Search name, class year, etc…" autocomplete="off">
   </div>
   <span id="rinfo"></span>
@@ -1078,6 +1085,22 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbwVLoO4GPku1q0QrMr1lPw7
 
 const BENCH_NAMES = { N: 'North Bench', W: 'West Bench', S: 'South Bench' };
 
+// *text* renders as italics; HTML-escaped first so a name containing
+// < & > can't break the markup.
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function formatLine(s) {
+  return escapeHtml(s || '').replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+// Drops only trailing blanks (nothing meaningful after the last
+// inscribed line); a blank in the middle stays exactly where it is.
+function trimTrailingBlanks(lines) {
+  const out = lines.map(l => l || '');
+  while (out.length && !out[out.length - 1]) out.pop();
+  return out;
+}
+
 function formatPosition(sectionId, key) {
   const parts = String(key).split(',');
   if (sectionId === 4) {
@@ -1123,7 +1146,7 @@ async function loadAll() {
     const merged = Object.assign({}, s.fallback, data || {});
     Object.keys(merged).forEach(key => {
       const e = merged[key];
-      const lines = (e.lines || []).filter(Boolean);
+      const lines = trimTrailingBlanks(e.lines || []);
       if (!lines.length) return;
       records.push({ section: s.name, page: s.page, sectionId: s.id, key, lines });
     });
@@ -1171,7 +1194,7 @@ function render(records) {
     row.className = 'row';
     const highlightUrl = `${r.page}?highlight=${encodeURIComponent(r.key)}`;
     row.innerHTML =
-      `<div class="row-lines">${r.lines.map(l => `<div>${l}</div>`).join('')}</div>` +
+      `<div class="row-lines">${r.lines.map(l => `<div>${formatLine(l) || '&nbsp;'}</div>`).join('')}</div>` +
       `<div class="row-section"><a href="${highlightUrl}">${r.section}</a></div>` +
       `<div class="row-pos">${formatPosition(r.sectionId, r.key)}</div>`;
     list.appendChild(row);
@@ -1194,6 +1217,23 @@ function runSearch(q) {
 }
 
 let searchTimer;
+// Mobile: search starts collapsed to a small "Search" pill so at least
+// one section tab is visible alongside it; tapping it expands to the full
+// input (pushing tabs into the scrollable area), and it re-collapses on
+// blur if left empty.
+const swBox = document.getElementById('sw');
+swBox.addEventListener('click', () => {
+  if (window.innerWidth <= 480 && !swBox.classList.contains('expanded')) {
+    swBox.classList.add('expanded');
+    document.getElementById('search').focus();
+  }
+});
+document.getElementById('search').addEventListener('blur', () => {
+  if (window.innerWidth <= 480 && !document.getElementById('search').value) {
+    swBox.classList.remove('expanded');
+  }
+});
+
 document.getElementById('search').addEventListener('input', e => {
   clearTimeout(searchTimer);
   const q = e.target.value.trim();
