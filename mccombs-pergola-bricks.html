@@ -15,17 +15,17 @@
   --brick-text:    #3a1a08;
   --brick-empty:   #b8724f;
   --soil:          #1a0e06;
-  --accent:        #e8a050;
-  --bg:            #1e1208;
-  --surface:       #2e1c0e;
-  --surface2:      #3e2a18;
-  --text:          #f0e4d0;
-  --muted:         #9a7050;
+  --accent:        #f8c923;
+  --bg:            #0a0b09;
+  --surface:       #1a1a16;
+  --surface2:      #332f27;
+  --text:          #f2efe6;
+  --muted:         #a89f8e;
   --hi-bg:         #fff176;
   --hi-border:     #f9a825;
   --act-bg:        #ffeb3b;
   --act-border:    #ff6f00;
-  --admin-accent:  #ff9800;
+  --admin-accent:  #c9960a;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Georgia, serif; background: var(--bg); color: var(--text);
@@ -33,7 +33,7 @@ body { font-family: Georgia, serif; background: var(--bg); color: var(--text);
 
 /* ── HEADER ─────────────────────────────────────────── */
 header {
-  background: linear-gradient(135deg, #8b3a1e, #c8714a);
+  background: linear-gradient(135deg, #0a0b09, #2a2620);
   padding: 12px 20px; display: flex; align-items: center; gap: 14px;
   box-shadow: 0 3px 10px rgba(0,0,0,.5); flex-shrink: 0;
 }
@@ -44,11 +44,11 @@ header {
 .hstats   { margin-left: auto; text-align: right; font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.6; }
 .hadmin-btn {
   margin-left: auto;
-  background: rgba(0,0,0,.3); border: 1px solid rgba(255,152,0,.5);
+  background: rgba(0,0,0,.3); border: 1px solid rgba(201,150,10,.5);
   color: rgba(255,255,255,.6); padding: 5px 9px; border-radius: 6px;
   cursor: pointer; font-size: 11px; font-family: inherit; transition: all .2s;
 }
-.hadmin-btn:hover { background: rgba(255,152,0,.2); color: #ff9800; border-color: #ff9800; }
+.hadmin-btn:hover { background: rgba(201,150,10,.2); color: #c9960a; border-color: #c9960a; }
 
 /* ── ADMIN BAR ───────────────────────────────────────── */
 .adminbar {
@@ -66,7 +66,7 @@ header {
   padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
   overflow-x: auto;
 }
-.sw { position: relative; flex: 1; min-width: 230px; }
+.sw { position: relative; flex: 0 1 160px; min-width: 130px; }
 .sw input {
   width: 100%; padding: 7px 12px 7px 34px;
   background: var(--bg); border: 1px solid var(--surface2); border-radius: 18px;
@@ -75,15 +75,15 @@ header {
 .sw input:focus { border-color: var(--accent); }
 .si { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
 .sw-collapsed-label { display: none; }
-#rinfo { font-size: 12px; color: var(--accent); min-width: 100px; }
+#rinfo { font-size: 12px; color: var(--accent); }
 .cb {
   background: var(--surface2); border: 1px solid #5a3a20; color: var(--text);
   padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit;
   transition: background .15s; white-space: nowrap;
 }
 .cb:hover { background: #5a3a20; }
-.tabs { display: flex; margin-left: 6px; flex-shrink: 0; }
-.tab { padding: 6px 13px; cursor: pointer; font-size: 12px; color: var(--muted);
+.tabs { display: flex; margin-left: 12px; flex-shrink: 0; }
+.tab { padding: 6px 8px; cursor: pointer; font-size: 12px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
@@ -180,7 +180,7 @@ header {
 /* Admin edit mode */
 body.edit-mode .brick:not(.empty):not(.filler) {
   cursor: grab;
-  box-shadow: 0 0 0 1px rgba(255,152,0,.4) inset;
+  box-shadow: 0 0 0 1px rgba(201,150,10,.4) inset;
 }
 body.edit-mode .brick:not(.empty):not(.filler):active { cursor: grabbing; }
 body.edit-mode .brick:not(.empty):not(.filler):hover {
@@ -189,11 +189,11 @@ body.edit-mode .brick:not(.empty):not(.filler):hover {
 body.edit-mode .brick:not(.empty):not(.filler)::after {
   content: '✏';
   position: absolute; top: 1px; right: 2px;
-  font-size: 6px; color: rgba(255,152,0,.8); pointer-events: none;
+  font-size: 6px; color: rgba(201,150,10,.8); pointer-events: none;
 }
 body.edit-mode .brick.empty:not(.filler) {
   cursor: cell; opacity: 0.7;
-  box-shadow: 0 0 0 1px rgba(255,152,0,.3) inset;
+  box-shadow: 0 0 0 1px rgba(201,150,10,.3) inset;
 }
 body.edit-mode .brick.empty:not(.filler):hover {
   opacity: 1;
@@ -215,8 +215,8 @@ body.place-mode .brick.filler {
   box-shadow: 0 8px 28px rgba(0,0,0,.8); transform: scale(1.12) rotate(-2deg);
 }
 .brick.drop-target {
-  box-shadow: 0 0 0 3px var(--admin-accent), 0 0 18px rgba(255,152,0,.7) !important;
-  background: rgba(255,152,0,.3) !important; z-index: 25; transition: none !important;
+  box-shadow: 0 0 0 3px var(--admin-accent), 0 0 18px rgba(201,150,10,.7) !important;
+  background: rgba(201,150,10,.3) !important; z-index: 25; transition: none !important;
 }
 body.drag-active * { cursor: grabbing !important; user-select: none; }
 .pbtn-on { background: rgba(76,175,80,.2) !important; color: #4caf50 !important; border-color: #4caf50 !important; }
@@ -371,7 +371,7 @@ body.place-mode .brick.empty:not(.filler):hover {
     <input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)"> Edit bricks
   </label>
   <span class="admin-hint" style="font-size:11px;color:var(--muted)">Click any brick to edit its inscription</span>
-  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#ff9800;color:#ff9800">📥 Export Updated HTML</button>
+  <button class="cb" onclick="exportHTML()" style="margin-left:auto;border-color:#c9960a;color:#c9960a">📥 Export Updated HTML</button>
   <button class="cb" onclick="resetAllEdits()" style="color:#ff6060;border-color:#ff6060">🗑 Reset Edits</button>
   <button class="cb" onclick="logoutAdmin()">🔒 Logout</button>
 </div>
@@ -388,8 +388,8 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="tab" onclick="location.href='general.html'">General</div>
     <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
     <div class="tab on">McCombs Pergola Brick Garden</div>
-    <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
-    <div class="tab" onclick="location.href='section3.html'">Lois Perkins Peace Garden East</div>
+    <div class="tab" onclick="location.href='lois-perkins-west.html'">Lois Perkins Peace Garden West</div>
+    <div class="tab" onclick="location.href='lois-perkins-east.html'">Lois Perkins Peace Garden East</div>
   </div>
 </div>
 
@@ -910,7 +910,7 @@ function exportCSV() {
   const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'section1_bricks.csv';
+  a.download = 'mccombs-pergola-bricks.csv';
   a.click();
 }
 
@@ -1063,7 +1063,7 @@ function gasSet(section, key, lines, size) {
   const cb = '_gsCb' + Date.now();
   const s  = document.createElement('script');
   window[cb] = function() { delete window[cb]; s.parentNode && s.parentNode.removeChild(s); };
-  const params = { action: 'set', section, key, size: size || 2, callback: cb };
+  const params = { action: 'set', section, key, size: size || 2, token: ADMIN_PASS, callback: cb };
   for (let i = 0; i < 12; i++) params['l' + (i + 1)] = lines[i] || '';
   const p = new URLSearchParams(params);
   s.src = GAS_URL + '?' + p;
@@ -1291,11 +1291,11 @@ function exportHTML() {
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = 'section1_updated.html';
+  a.href = url; a.download = 'mccombs-pergola-bricks_updated.html';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  toast('section1_updated.html downloaded!');
+  toast('mccombs-pergola-bricks_updated.html downloaded!');
 }
 
 // ═══════════════════════════════════════════════════════════

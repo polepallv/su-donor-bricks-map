@@ -13,7 +13,7 @@
  *  5. Execute as: Me (your Google account)
  *  6. Who has access: Anyone
  *  7. Click Deploy and copy the URL (ends in /exec).
- *  8. Open section1.html, section2.html, and section3.html.
+ *  8. Open mccombs-pergola-bricks.html, lois-perkins-west.html, and lois-perkins-east.html.
  *     Find the line:  const GAS_URL = '...';
  *     Replace the existing value with your new URL (in single quotes):
  *       const GAS_URL = 'https://script.google.com/macros/s/ABC.../exec';
@@ -42,8 +42,8 @@
  *    the middle of the array — so a deliberately blank line stays put
  *    instead of later lines shifting up to fill the gap.
  *
- *  Save an edit:
- *    ?action=set&section=1&key=5,3&l1=NAME&l2=&l3=LINE3&…&l12=&size=1&callback=fn
+ *  Save an edit (requires the ADMIN_TOKEN below, or the write is rejected):
+ *    ?action=set&section=1&key=5,3&l1=NAME&l2=&l3=LINE3&…&l12=&size=1&token=…&callback=fn
  *    → Upserts a row in the BrickEdits sheet, returns fn({ok:true})
  *
  *  The Sheet ("BrickEdits") has columns:
@@ -52,6 +52,16 @@
 
 // ── Sheet name ──────────────────────────────────────────────
 const SHEET_NAME = 'BrickEdits';
+
+// ── Write-protection token ─────────────────────────────────
+// The site's admin login prompt and "Edit plaques" UI are purely
+// client-side — the GAS_URL is public (every visitor's browser needs
+// it to read the map), so without this check anyone who found the URL
+// could write directly to the Sheet, bypassing the site entirely. Every
+// save must include this exact token; reads (action=get) stay open, no
+// token needed, since the map itself is meant to be publicly viewable.
+// Keep this in sync with the ADMIN_PASS constant in every page's HTML.
+const ADMIN_TOKEN = 'SWU_Monument';
 
 // ── Column indices (0-based) ─────────────────────────────────
 const COL_SECTION = 0;
@@ -172,8 +182,13 @@ function handleGet(p) {
  * apostrophe (e.g. "CLASS OF '13") is untouched. A line that itself
  * starts with an apostrophe (e.g. "'88 REUNION") needs an extra leading
  * apostrophe on write so the one Sheets consumes isn't the real one.
+ *
+ * Rejects the write outright if the request doesn't carry the correct
+ * ADMIN_TOKEN — see the constant's comment above for why this exists.
  */
 function handleSet(p) {
+  if (String(p.token || '') !== ADMIN_TOKEN) throw new Error('Unauthorized');
+
   const section = String(p.section || '');
   const key     = String(p.key     || '');
   const lines   = [];
@@ -254,7 +269,7 @@ function testSetup() {
 
   // Insert a test edit, with a deliberately blank line 2 to check that
   // interior blanks round-trip correctly.
-  handleSet({ section: '1', key: '0,0', l1: 'TEST BRICK', l2: '', l3: 'SETUP WORKS', size: '1' });
+  handleSet({ section: '1', key: '0,0', l1: 'TEST BRICK', l2: '', l3: 'SETUP WORKS', size: '1', token: ADMIN_TOKEN });
   Logger.log('Test write OK');
 
   // Read it back
