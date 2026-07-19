@@ -388,8 +388,8 @@ body.place-mode .brick.empty:not(.filler):hover {
     <div class="tab" onclick="location.href='general.html'">General</div>
     <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
     <div class="tab on">McCombs Pergola Brick Garden</div>
-    <div class="tab" onclick="location.href='section2.html'">Lois Perkins Peace Garden West</div>
-    <div class="tab" onclick="location.href='section3.html'">Lois Perkins Peace Garden East</div>
+    <div class="tab" onclick="location.href='lois-perkins-west.html'">Lois Perkins Peace Garden West</div>
+    <div class="tab" onclick="location.href='lois-perkins-east.html'">Lois Perkins Peace Garden East</div>
   </div>
 </div>
 
@@ -910,7 +910,7 @@ function exportCSV() {
   const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'section1_bricks.csv';
+  a.download = 'mccombs-pergola-bricks.csv';
   a.click();
 }
 
@@ -1291,11 +1291,11 @@ function exportHTML() {
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = 'section1_updated.html';
+  a.href = url; a.download = 'mccombs-pergola-bricks_updated.html';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  toast('section1_updated.html downloaded!');
+  toast('mccombs-pergola-bricks_updated.html downloaded!');
 }
 
 // ═══════════════════════════════════════════════════════════
