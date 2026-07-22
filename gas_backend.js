@@ -1,6 +1,6 @@
 /**
  * ══════════════════════════════════════════════════════════════
- *  Donor Brick Monument — Google Apps Script Backend
+ *  Donor Brick Garden — Google Apps Script Backend
  *  Paste this code into a new Google Apps Script project,
  *  then deploy as a Web App (see setup steps below).
  * ══════════════════════════════════════════════════════════════

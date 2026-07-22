@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Southwestern University Donor Brick Monument – McCombs Pergola Benches</title>
+<title>Southwestern University Donor Brick Garden – McCombs Pergola Benches</title>
 <style>
 :root {
   --brick-bg:      #c8714a;
@@ -17,6 +17,10 @@
   --floor-color:   #8d8d88;
   --floor-border:  #6d6d68;
   --pergola-color: #0a0a0a;
+  --wood-color:    #8b5a2b;
+  --wood-border:   #5c3a1a;
+  --design-color:  #d8cbb0;
+  --design-border: #a8977a;
   --soil:          #1a0e06;
   --accent:        #f8c923;
   --bg:            #0a0b09;
@@ -63,7 +67,7 @@ header {
 
 .toolbar {
   background: var(--surface); border-bottom: 1px solid var(--surface2);
-  padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
+  padding: 10px 12px; display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
   overflow-x: auto;
 }
 .sw { position: relative; flex: 0 1 230px; min-width: 230px; }
@@ -83,7 +87,7 @@ header {
 }
 .cb:hover { background: #5a3a20; }
 .tabs { display: flex; margin-left: auto; flex-shrink: 0; }
-.tab { padding: 6px 8px; cursor: pointer; font-size: 12px; color: var(--muted);
+.tab { padding: 7px 6px; cursor: pointer; font-size: 13px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
@@ -114,8 +118,11 @@ header {
 .bench-body { position: absolute; background: var(--bench-body); border: 5px solid var(--bench-border); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .floor { position: absolute; background: var(--floor-color); border: 1px solid var(--floor-border); }
 .pergola { position: absolute; box-sizing: border-box; border: 7px solid var(--pergola-color); }
-.pergola-slat { position: absolute; background: var(--pergola-color); }
 .pergola-leg { position: absolute; width: 18px; height: 18px; background: var(--pergola-color); border-radius: 2px; }
+.pergola-table { position: absolute; background: var(--wood-color); border: 3px solid var(--wood-border); border-radius: 3px; }
+.pergola-bench { position: absolute; background: var(--wood-color); border: 2px solid var(--wood-border); border-radius: 2px; }
+.pergola-chair { position: absolute; background: var(--wood-color); border: 2px solid var(--wood-border); border-radius: 4px; }
+.pergola-design { position: absolute; background: var(--design-color); border: 2px solid var(--design-border); border-radius: 2px; }
 .ctx-building {
   position: absolute; background: var(--bench-border); border: 1px solid #8a8168; border-radius: 4px;
   display: flex; align-items: center; justify-content: center; text-align: center;
@@ -252,6 +259,7 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
     padding: 16px 40px 14px 16px;
   }
   .emodal { width: calc(100vw - 32px); min-width: 0; padding: 18px; }
+  .tab { padding: 9px 11px; font-size: 12px; white-space: nowrap; }
   .tabs { margin-left: 12px; }
 }
 </style>
@@ -261,7 +269,7 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
 <header>
   <div class="logo"><img src="assets/su_logo.png" alt="Southwestern University"></div>
   <div class="htext">
-    <h1>Donor Brick Monument — McCombs Pergola Benches</h1>
+    <h1>Donor Brick Garden — McCombs Pergola Benches</h1>
   </div>
   <div class="hstats" id="hstats" style="display:none">Loading…</div>
   <button class="hadmin-btn" onclick="openAdminLogin()" title="Admin login (Ctrl+Shift+A)">⚙ Admin</button>
@@ -379,7 +387,10 @@ const BENCHES = [
 // a little gap of floor showing behind (outside) it, and extends further
 // east than the benches (and the pergola inside it), into the open side.
 const FLOOR_BEHIND_GAP = 30;   // floor visible behind each bench's outer edge
-const FLOOR_EAST_EXTRA  = 400; // how far past the benches the floor reaches east
+// How far past the benches the floor reaches east. Big enough to also fit
+// the pergola furniture's east-side chair and commemorative floor design
+// (see PERGOLA_DESIGN below) with a small gap before the floor's own east edge.
+const FLOOR_EAST_EXTRA  = 470;
 const FLOOR = {
   x: (WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
   y: (NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
@@ -392,7 +403,7 @@ const FLOOR = {
 // and south benches. It's inset from the benches' inner edges (not the
 // floor's, which is sized around the benches) and stretched east to read
 // as a clearly elongated rectangle rather than a square.
-const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 290;
+const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 350;
 const PERGOLA = {
   x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
   y: (NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y,
@@ -403,6 +414,65 @@ const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y },
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y + PERGOLA.h },
 ]);
+
+// Pergola furniture: 4 wooden tables placed end-to-end, touching — no gap
+// between them, just each table's own thin border — spanning most of the
+// pergola's east-west length: 3 equal "big" tables plus a 4th (easternmost)
+// table half their length. The table block is inset from the pergola's west
+// and east walls so the tables sit comfortably inside the frame rather than
+// crowding it; the east inset is deliberately larger, leaving room for the
+// small table's east chair and the commemorative design beyond it (see
+// below). Each big table gets a bench along its north and south long side
+// (3 tables x 2 = 6 benches); the small table has no room for benches, so it
+// gets 3 chairs instead, beside its open north, east, and south sides.
+const PT_MARGIN_W    = 20;                        // west inset from the pergola wall
+const PT_MARGIN_E    = 150;                       // east inset — room for the chair + design below
+const PT_BIG_LEN      = (PERGOLA.w - PT_MARGIN_W - PT_MARGIN_E) / 3.5;  // big table length (east-west)
+const PT_SMALL_LEN    = PT_BIG_LEN / 2;                  // small (east) table length
+const PT_DEPTH        = 120;                      // table depth (north-south)
+const PT_BENCH_DEPTH  = 30;
+const PT_BENCH_GAP    = 10;                       // gap between a table's edge and its bench
+const PT_CHAIR_SIZE   = 34;
+const PT_CHAIR_GAP    = 12;                       // gap between the small table and each chair
+
+const PERGOLA_MID_Y = PERGOLA.y + PERGOLA.h / 2;
+
+const PERGOLA_TABLES = [0, 1, 2, 3].map(i => {
+  const isSmall = i === 3;
+  return {
+    x: PERGOLA.x + PT_MARGIN_W + i * PT_BIG_LEN,
+    len: isSmall ? PT_SMALL_LEN : PT_BIG_LEN,
+    y: PERGOLA_MID_Y - PT_DEPTH / 2,
+    isSmall,
+  };
+});
+const SMALL_TABLE = PERGOLA_TABLES[3];
+
+const PERGOLA_BENCHES = PERGOLA_TABLES.filter(t => !t.isSmall).flatMap(t => [
+  { x: t.x, w: t.len, y: t.y - PT_BENCH_GAP - PT_BENCH_DEPTH },  // north side
+  { x: t.x, w: t.len, y: t.y + PT_DEPTH + PT_BENCH_GAP },        // south side
+]);
+
+const PERGOLA_CHAIRS = [
+  { x: SMALL_TABLE.x + SMALL_TABLE.len / 2 - PT_CHAIR_SIZE / 2, y: SMALL_TABLE.y - PT_CHAIR_GAP - PT_CHAIR_SIZE },              // north
+  { x: SMALL_TABLE.x + SMALL_TABLE.len + PT_CHAIR_GAP,          y: PERGOLA_MID_Y - PT_CHAIR_SIZE / 2 },                          // east
+  { x: SMALL_TABLE.x + SMALL_TABLE.len / 2 - PT_CHAIR_SIZE / 2, y: SMALL_TABLE.y + PT_DEPTH + PT_CHAIR_GAP },                    // south
+];
+
+// A blank placeholder for a custom commemorative design (to be recreated
+// from an image provided separately) — 3/4 the size of a big table, with
+// its north/south edges (the width) 3x the length of its west/east edges
+// (the height). Centered on the pergola's east frame edge, so roughly half
+// of it sits under the pergola roof and half sits out in the open — with a
+// real gap still separating it from the small table's east chair.
+const PERGOLA_DESIGN_W   = PT_BIG_LEN * 0.75;
+const PERGOLA_DESIGN_H   = PERGOLA_DESIGN_W / 3;
+const PERGOLA_DESIGN = {
+  x: (PERGOLA.x + PERGOLA.w) - PERGOLA_DESIGN_W / 2,
+  y: PERGOLA_MID_Y - PERGOLA_DESIGN_H / 2,
+  w: PERGOLA_DESIGN_W,
+  h: PERGOLA_DESIGN_H,
+};
 
 // Surrounding context: McCombs Campus Center to the north — tall, stretching
 // further north (up) rather than encroaching toward the floor, and exactly
@@ -529,26 +599,46 @@ function renderMonument() {
   floor.style.cssText = `left:${FLOOR.x}px;top:${FLOOR.y}px;width:${FLOOR.w}px;height:${FLOOR.h}px;`;
   mon.appendChild(floor);
 
-  // ── black pergola frame + slatted roof (real elements, not a CSS
-  // gradient, so the slats stay crisp instead of shimmering while
-  // panning/zooming) + 6 legs ──
+  // ── black pergola perimeter frame + 6 legs (no roof crossbars — the
+  // wooden tables below are what visitors actually gather around) ──
   const pergola = document.createElement('div');
   pergola.className = 'pergola';
   pergola.style.cssText = `left:${PERGOLA.x}px;top:${PERGOLA.y}px;width:${PERGOLA.w}px;height:${PERGOLA.h}px;`;
   mon.appendChild(pergola);
-  const SLAT_THICK = 7, SLAT_PITCH = 30;
-  for (let y = 0; y <= PERGOLA.h - SLAT_THICK; y += SLAT_PITCH) {
-    const slat = document.createElement('div');
-    slat.className = 'pergola-slat';
-    slat.style.cssText = `left:${PERGOLA.x}px;top:${PERGOLA.y + y}px;width:${PERGOLA.w}px;height:${SLAT_THICK}px;`;
-    mon.appendChild(slat);
-  }
   PERGOLA_LEGS.forEach(leg => {
     const el = document.createElement('div');
     el.className = 'pergola-leg';
     el.style.cssText = `left:${leg.x - 9}px;top:${leg.y - 9}px;`;
     mon.appendChild(el);
   });
+
+  // ── wooden tables spanning the pergola's length, with benches flanking
+  // each big table and chairs beside the small east table ──
+  PERGOLA_TABLES.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'pergola-table';
+    el.style.cssText = `left:${t.x}px;top:${t.y}px;width:${t.len}px;height:${PT_DEPTH}px;`;
+    mon.appendChild(el);
+  });
+  PERGOLA_BENCHES.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'pergola-bench';
+    el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${PT_BENCH_DEPTH}px;`;
+    mon.appendChild(el);
+  });
+  PERGOLA_CHAIRS.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'pergola-chair';
+    el.style.cssText = `left:${c.x}px;top:${c.y}px;width:${PT_CHAIR_SIZE}px;height:${PT_CHAIR_SIZE}px;`;
+    mon.appendChild(el);
+  });
+
+  // ── commemorative floor design (blank placeholder — a custom graphic
+  // will be recreated here from an image provided separately) ──
+  const design = document.createElement('div');
+  design.className = 'pergola-design';
+  design.style.cssText = `left:${PERGOLA_DESIGN.x}px;top:${PERGOLA_DESIGN.y}px;width:${PERGOLA_DESIGN.w}px;height:${PERGOLA_DESIGN.h}px;`;
+  mon.appendChild(design);
 
   // ── benches: thick white-stone border, larger than the plaques on them ──
   BENCHES.forEach(bench => {

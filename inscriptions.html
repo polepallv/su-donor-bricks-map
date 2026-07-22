@@ -6,11 +6,12 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Donor Brick Monument – Inscriptions List</title>
+<title>Donor Brick Garden – Inscriptions List</title>
 <style>
 :root {
   --accent: #f8c923;
   --bg: #0a0b09;
+  --soil: #1a0e06;
   --surface: #1a1a16;
   --surface2: #332f27;
   --text: #f2efe6;
@@ -18,7 +19,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: Georgia, serif; background: var(--bg); color: var(--text);
+  font-family: Georgia, serif; background: var(--soil); color: var(--text);
   height: 100vh; display: flex; flex-direction: column; overflow: hidden;
 }
 
@@ -36,7 +37,7 @@ header {
 /* ─── TOOLBAR ─────────────────────── */
 .toolbar {
   background: var(--surface); border-bottom: 1px solid var(--surface2);
-  padding: 8px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
+  padding: 10px 12px; display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;
   overflow-x: auto;
 }
 .master-tab { padding: 7px 14px; cursor: pointer; font-size: 13px; color: var(--accent); border-bottom: 2px solid var(--accent); white-space: nowrap; }
@@ -51,7 +52,7 @@ header {
 .sw-collapsed-label { display: none; }
 #rinfo { font-size: 12px; color: var(--accent); }
 .tabs { display: flex; margin-left: auto; flex-shrink: 0; }
-.tab { padding: 7px 8px; cursor: pointer; font-size: 12px; color: var(--muted);
+.tab { padding: 7px 6px; cursor: pointer; font-size: 13px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
 
@@ -105,6 +106,7 @@ header {
   .list-header { display: none; }
   .row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; }
   .row-section, .row-pos { width: auto; text-align: left; }
+  .tab { padding: 9px 11px; font-size: 12px; white-space: nowrap; }
   .tabs { margin-left: 8px; }
 }
 </style>
