@@ -389,8 +389,8 @@ const BENCHES = [
 const FLOOR_BEHIND_GAP = 30;   // floor visible behind each bench's outer edge
 // How far past the benches the floor reaches east. Big enough to also fit
 // the pergola furniture's east-side chair and commemorative floor design
-// (see PERGOLA_DESIGN below) with a gap before the floor's own east edge.
-const FLOOR_EAST_EXTRA  = 600;
+// (see PERGOLA_DESIGN below) with a small gap before the floor's own east edge.
+const FLOOR_EAST_EXTRA  = 470;
 const FLOOR = {
   x: (WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
   y: (NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
@@ -403,7 +403,7 @@ const FLOOR = {
 // and south benches. It's inset from the benches' inner edges (not the
 // floor's, which is sized around the benches) and stretched east to read
 // as a clearly elongated rectangle rather than a square.
-const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 290;
+const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 350;
 const PERGOLA = {
   x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
   y: (NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y,
@@ -415,16 +415,19 @@ const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
   { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y + PERGOLA.h },
 ]);
 
-// Pergola furniture: 4 wooden tables placed end-to-end so together they
-// span the pergola's full east-west length — 3 equal "big" tables plus a
-// 4th (easternmost) table half their length. Each big table gets a bench
-// along its north and south long side (3 tables x 2 = 6 benches); the
-// small table has no room for benches, so it gets 3 chairs instead, beside
-// its open north, east, and south sides. A commemorative floor design (not
-// an inscription — a custom graphic to be added later) sits further east
-// of the small table, with a gap on both sides.
-const PT_GAP         = 15;                        // gap between adjacent tables
-const PT_BIG_LEN      = (PERGOLA.w - 3 * PT_GAP) / 3.5;  // big table length (east-west)
+// Pergola furniture: 4 wooden tables placed end-to-end, touching — no gap
+// between them, just each table's own thin border — spanning most of the
+// pergola's east-west length: 3 equal "big" tables plus a 4th (easternmost)
+// table half their length. The table block is inset from the pergola's west
+// and east walls so the tables sit comfortably inside the frame rather than
+// crowding it; the east inset is deliberately larger, leaving room for the
+// small table's east chair and the commemorative design beyond it (see
+// below). Each big table gets a bench along its north and south long side
+// (3 tables x 2 = 6 benches); the small table has no room for benches, so it
+// gets 3 chairs instead, beside its open north, east, and south sides.
+const PT_MARGIN_W    = 20;                        // west inset from the pergola wall
+const PT_MARGIN_E    = 150;                       // east inset — room for the chair + design below
+const PT_BIG_LEN      = (PERGOLA.w - PT_MARGIN_W - PT_MARGIN_E) / 3.5;  // big table length (east-west)
 const PT_SMALL_LEN    = PT_BIG_LEN / 2;                  // small (east) table length
 const PT_DEPTH        = 120;                      // table depth (north-south)
 const PT_BENCH_DEPTH  = 30;
@@ -437,7 +440,7 @@ const PERGOLA_MID_Y = PERGOLA.y + PERGOLA.h / 2;
 const PERGOLA_TABLES = [0, 1, 2, 3].map(i => {
   const isSmall = i === 3;
   return {
-    x: PERGOLA.x + i * (PT_BIG_LEN + PT_GAP),
+    x: PERGOLA.x + PT_MARGIN_W + i * PT_BIG_LEN,
     len: isSmall ? PT_SMALL_LEN : PT_BIG_LEN,
     y: PERGOLA_MID_Y - PT_DEPTH / 2,
     isSmall,
@@ -459,12 +462,13 @@ const PERGOLA_CHAIRS = [
 // A blank placeholder for a custom commemorative design (to be recreated
 // from an image provided separately) — 3/4 the size of a big table, with
 // its north/south edges (the width) 3x the length of its west/east edges
-// (the height), same elongated east-west shape as the tables themselves.
-const PERGOLA_DESIGN_GAP = 40;
+// (the height). Centered on the pergola's east frame edge, so roughly half
+// of it sits under the pergola roof and half sits out in the open — with a
+// real gap still separating it from the small table's east chair.
 const PERGOLA_DESIGN_W   = PT_BIG_LEN * 0.75;
 const PERGOLA_DESIGN_H   = PERGOLA_DESIGN_W / 3;
 const PERGOLA_DESIGN = {
-  x: SMALL_TABLE.x + SMALL_TABLE.len + PT_CHAIR_GAP + PT_CHAIR_SIZE + PERGOLA_DESIGN_GAP,
+  x: (PERGOLA.x + PERGOLA.w) - PERGOLA_DESIGN_W / 2,
   y: PERGOLA_MID_Y - PERGOLA_DESIGN_H / 2,
   w: PERGOLA_DESIGN_W,
   h: PERGOLA_DESIGN_H,
