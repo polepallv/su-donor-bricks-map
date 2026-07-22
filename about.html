@@ -119,10 +119,10 @@ header {
   font-family: Georgia, serif; font-size: 13px; padding: 3px 8px;
   border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.3);
 }
+/* No connecting arrow — the label's anchor corner sits directly on the
+   pin's tip, so there's no gap for a pointer to bridge. */
 .section-label::before {
-  border-top-color: var(--surface2);
-  border-left-color: var(--surface2);
-  border-right-color: var(--surface2);
+  display: none;
 }
 
 ::-webkit-scrollbar { width: 5px; }
@@ -312,9 +312,18 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
+// Leaflet's default icon nudges tooltips away from the marker (tooltipAnchor
+// [16,-28]) so they read as "pointing at" the pin from a distance. We want
+// the opposite — the label's anchor corner (bottom-left for 'right', bottom-
+// right for 'left') touching the pin's tip exactly — so that offset is
+// zeroed out here, and a matching [0, -12] tooltip offset (half of the
+// label's fixed 24px height) shifts the box up so its BOTTOM edge, not its
+// vertical center, lands on the tip.
+L.Icon.Default.prototype.options.tooltipAnchor = [0, 0];
+
 SECTIONS.forEach(s => {
   L.marker([s.lat, s.lng]).addTo(map)
-    .bindTooltip(s.name, { permanent: true, direction: s.dir, className: 'section-label', offset: s.dir === 'left' ? [-10, 0] : [10, 0] })
+    .bindTooltip(s.name, { permanent: true, direction: s.dir, className: 'section-label', offset: [0, -12] })
     .openTooltip();
 });
 </script>
