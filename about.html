@@ -291,17 +291,16 @@ document.getElementById('search').addEventListener('keydown', e => {
 });
 </script>
 <script>
-// Each pin's label direction is chosen to point away from whichever
-// other pin sits closest to it, since these four are clustered in two
-// close pairs (benches/brick garden, and west/east) and a shared
-// "always above" tooltip direction made every pair's labels overlap.
+// Each pin's label direction points to whichever side keeps it clear of
+// its neighbors.
 const SECTIONS = [
-  { name: 'McCombs Pergola Benches', lat: 30.63539595377628, lng: -97.66586453217728, dir: 'left' },
-  // Moved further southeast (was 30.63535095076775, -97.66581155855455) so
-  // this pin sits between the benches pin and the road rather than right
-  // on top of the benches pin.
-  { name: 'McCombs Pergola Brick Garden', lat: 30.63527595377628, lng: -97.66572453217728, dir: 'right' },
-  { name: 'Lois Perkins Peace Garden West', lat: 30.6355534, lng: -97.6655637, dir: 'left' },
+  { name: 'McCombs Pergola Benches', lat: 30.63539595377628, lng: -97.66586453217728, dir: 'right' },
+  // Brought back north (was 30.63527595377628, -97.66572453217728, after an
+  // earlier southeast move from 30.63535095076775, -97.66581155855455) to
+  // sit further up, between the benches pin and the road, per a marked-up
+  // screenshot — not visually verified since Leaflet can't render here.
+  { name: 'McCombs Pergola Brick Garden', lat: 30.63531795377628, lng: -97.66577353217728, dir: 'right' },
+  { name: 'Lois Perkins Peace Garden West', lat: 30.6355534, lng: -97.6655637, dir: 'right' },
   { name: 'Lois Perkins Peace Garden East', lat: 30.6356411, lng: -97.6654349, dir: 'right' },
 ];
 
