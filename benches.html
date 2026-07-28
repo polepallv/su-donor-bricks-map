@@ -158,10 +158,21 @@ header {
   50%      { box-shadow: 0 0 0 6px var(--act-border), 0 0 30px rgba(255,111,0,.9); }
 }
 .brick.act .bl { color: #1a0800 !important; }
+/* Filler plaques — same slot size, but blank and never editable */
+.brick.filler { background: var(--brick-bg); border-color: var(--brick-border); opacity: 0.88; cursor: default; pointer-events: none; }
+.brick.filler:hover { transform: none !important; box-shadow: none !important; }
+/* Wraps a plaque's text so it can be rotated to face the bench's own
+   orientation without affecting the plaque's own footprint/hit area —
+   sized as the pre-rotation (unrotated) box, then rotated + centered. */
+.bl-wrap {
+  position: absolute; top: 50%; left: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2px 3px;
+}
 
-body.edit-mode .brick:not(.empty) { cursor: pointer; box-shadow: 0 0 0 1px rgba(201,150,10,.4) inset; }
-body.edit-mode .brick:not(.empty):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); }
-body.edit-mode .brick:not(.empty)::after {
+body.edit-mode .brick:not(.empty):not(.filler) { cursor: pointer; box-shadow: 0 0 0 1px rgba(201,150,10,.4) inset; }
+body.edit-mode .brick:not(.empty):not(.filler):hover { box-shadow: 0 0 0 2px var(--admin-accent), 0 3px 14px rgba(0,0,0,.55); }
+body.edit-mode .brick:not(.empty):not(.filler)::after {
   content: '✏'; position: absolute; top: 1px; right: 2px;
   font-size: 6px; color: rgba(201,150,10,.8); pointer-events: none;
 }
@@ -383,6 +394,15 @@ const BENCHES = [
   { id: 'S', name: 'South Bench', orientation: 'h', x: SOUTH_X, y: SOUTH_Y },
 ];
 
+// West Bench Plaque 2 (idx 1) and Plaque 5 (idx 4) are blank filler slots —
+// same size as a normal plaque, just never editable/inscribed.
+const FILLER_PLAQUES = new Set(['W,1', 'W,4']);
+
+// Each bench's inscriptions are rotated to face its own orientation: the
+// west bench reads bottom-to-top (90° counterclockwise) and the south
+// bench reads upside-down relative to the north bench (180°).
+const BENCH_ROTATION = { N: 0, W: -90, S: 180 };
+
 // Grey concrete floor — big enough that each bench sits entirely on it with
 // a little gap of floor showing behind (outside) it, and extends further
 // east than the benches (and the pergola inside it), into the open side.
@@ -510,6 +530,7 @@ const bricks    = [];
 BENCHES.forEach(bench => {
   for (let i = 0; i < PLAQUE_COUNT; i++) {
     const key = bench.id + ',' + i;
+    if (FILLER_PLAQUES.has(key)) continue;   // filler plaques carry no data
     const id  = 'p_' + key;
     const obj = { id, bench: bench.id, benchName: bench.name, idx: i, lines: [], name: '' };
     bricks.push(obj);
@@ -652,25 +673,52 @@ function renderMonument() {
     mon.appendChild(el);
   });
 
-  bricks.forEach(b => {
-    const bench = BENCHES.find(x => x.id === b.bench);
-    const pos = plaquePos(bench, b.idx);
-    const el = document.createElement('div');
-    el.className = 'brick' + (b.lines.length ? '' : ' empty');
-    el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px';
-    el.style.width = pos.w + 'px'; el.style.height = pos.h + 'px';
-    el.id = b.id; el.dataset.id = b.id;
+  BENCHES.forEach(bench => {
+    const rot = BENCH_ROTATION[bench.id] || 0;
+    const swapped = Math.abs(rot) === 90;
+    for (let i = 0; i < PLAQUE_COUNT; i++) {
+      const key = bench.id + ',' + i;
+      const pos = plaquePos(bench, i);
+      const el = document.createElement('div');
+      el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px';
+      el.style.width = pos.w + 'px'; el.style.height = pos.h + 'px';
 
-    b.lines.forEach(ln => {
-      const s = document.createElement('span');
-      s.className = 'bl'; s.innerHTML = formatLine(ln) || '&nbsp;'; el.appendChild(s);
-    });
-    el.addEventListener('click', () => {
-      if (document.body.classList.contains('edit-mode')) openEditModal(b, el);
-      else if (b.lines.length) onBrickClick(b, el);
-    });
-    if (b.lines.length) fitBrick(el);
-    mon.appendChild(el);
+      if (FILLER_PLAQUES.has(key)) {
+        el.className = 'brick filler';
+        mon.appendChild(el);
+        continue;
+      }
+
+      const b = brickById[brickMap[key]];
+      el.className = 'brick' + (b.lines.length ? '' : ' empty');
+      el.id = b.id; el.dataset.id = b.id;
+
+      // Text sits in a wrapper sized as the pre-rotation box (swapped for
+      // the west bench's 90° turn) so it fits the plaque's actual footprint
+      // once rotated, rather than being measured against it pre-rotation.
+      const wrap = document.createElement('div');
+      wrap.className = 'bl-wrap';
+      wrap.style.width  = (swapped ? pos.h : pos.w) + 'px';
+      wrap.style.height = (swapped ? pos.w : pos.h) + 'px';
+      wrap.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
+      b.lines.forEach(ln => {
+        const s = document.createElement('span');
+        s.className = 'bl'; s.innerHTML = formatLine(ln) || '&nbsp;'; wrap.appendChild(s);
+      });
+      el.appendChild(wrap);
+
+      el.addEventListener('click', () => {
+        if (document.body.classList.contains('edit-mode')) openEditModal(b, el);
+        else if (b.lines.length) onBrickClick(b, el);
+      });
+      mon.appendChild(el);
+      // fitBrick measures actual rendered widths, so it must run after the
+      // element is in the document -- a detached node always reports 0 for
+      // clientWidth/scrollWidth, which previously collapsed every
+      // inscription to the smallest allowed font size regardless of how
+      // much room it had.
+      if (b.lines.length) fitBrick(wrap);
+    }
   });
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
