@@ -311,18 +311,19 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-// Leaflet's default icon nudges tooltips away from the marker (tooltipAnchor
-// [16,-28]) so they read as "pointing at" the pin from a distance. We want
-// the opposite — the label's anchor corner (bottom-left for 'right', bottom-
-// right for 'left') touching the pin's tip exactly — so that offset is
-// zeroed out here, and a matching [0, -12] tooltip offset (half of the
-// label's fixed 24px height) shifts the box up so its BOTTOM edge, not its
-// vertical center, lands on the tip.
-L.Icon.Default.prototype.options.tooltipAnchor = [0, 0];
+// Anchor each label to the pin's middle edge rather than its lower stem —
+// the default icon is 25x41 with its geographic point at the bottom tip
+// (iconAnchor [12,41]), so nudging the tooltip's reference point up by half
+// the icon's height (~20px) and out to its side (~13px, the icon's half-
+// width) puts it at the pin's vertical middle instead of its tip. Leaflet's
+// direction:'right'/'left' positioning already centers the tooltip
+// vertically on this reference point, so no extra offset is needed — the
+// label's near edge lands right on the pin's middle edge.
+L.Icon.Default.prototype.options.tooltipAnchor = [13, -20];
 
 SECTIONS.forEach(s => {
   L.marker([s.lat, s.lng]).addTo(map)
-    .bindTooltip(s.name, { permanent: true, direction: s.dir, className: 'section-label', offset: [0, -12] })
+    .bindTooltip(s.name, { permanent: true, direction: s.dir, className: 'section-label' })
     .openTooltip();
 });
 </script>
