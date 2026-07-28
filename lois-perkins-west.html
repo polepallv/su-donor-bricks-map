@@ -482,10 +482,13 @@ function bH(rs) { return rs * UNIT - GAP; }   // brick height from rowspan
 
 // ═══════════════════════════════════════════════════════════
 // LAYOUT — from Google Sheets Lois Perkins Peace Garden West
-// Each entry: [row_off, col_off, rowspan, colspan]
+// Each entry: [row_off, col_off, rowspan, colspan, tag?]
 //   rowspan=2, colspan=1  → filler brick (narrow, no text, not editable)
 //   rowspan=2, colspan=2  → large text brick  (84×84 px)
 //   rowspan=1, colspan=2  → standard text brick (84×40 px)
+//   tag === 'filler'      → forces filler styling/behavior at any colspan,
+//                           without shrinking the brick's footprint — used
+//                           for standard-size slots that were never claimed
 // ═══════════════════════════════════════════════════════════
 const LAYOUT = [
   // Row group 0
@@ -496,7 +499,7 @@ const LAYOUT = [
   [ 2, 8,2,1],[ 2, 9,2,2],[ 2,11,2,1],[ 2,12,2,2],[ 2,14,2,2],
   // Row group 2
   [ 4, 0,2,1],[ 4, 1,2,2],[ 4, 3,2,1],[ 4, 4,2,2],[ 4, 6,2,1],
-  [ 4, 7,2,2],[ 4, 9,2,1],[ 4,10,2,2],[ 4,12,2,1],[ 4,13,2,2],[ 4,15,2,1],
+  [ 4, 7,2,2],[ 4, 9,2,1],[ 4,10,2,2,'filler'],[ 4,12,2,1],[ 4,13,2,2],[ 4,15,2,1],
   // Row group 3
   [ 6, 0,2,2],[ 6, 2,2,2],[ 6, 4,2,1],[ 6, 5,2,2],[ 6, 7,2,1],
   [ 6, 8,2,2],[ 6,10,2,1],[ 6,11,2,2],[ 6,13,2,1],[ 6,14,2,2],
@@ -539,8 +542,8 @@ const brickMap  = {};   // "r,c" → brick_id   (text slot anchors only)
 const brickById = {};   // brick_id → brick object
 const bricks    = [];   // all text brick objects
 
-LAYOUT.forEach(([r, c, rs, cs], i) => {
-  if (cs >= 2) {
+LAYOUT.forEach(([r, c, rs, cs, tag], i) => {
+  if (cs >= 2 && tag !== 'filler') {
     const id  = 'b' + i;
     const obj = { id, row: r, col: c, rowspan: rs, colspan: cs, lines: [], name: '' };
     bricks.push(obj);
@@ -633,8 +636,8 @@ function renderMonument() {
   mon.appendChild(right);
 
   // Render each brick slot from LAYOUT
-  LAYOUT.forEach(([r, c, rs, cs]) => {
-    const isFiller = cs === 1;
+  LAYOUT.forEach(([r, c, rs, cs, tag]) => {
+    const isFiller = cs === 1 || tag === 'filler';
     const b = isFiller ? null : brickById[brickMap[r + ',' + c]];
 
     const el = document.createElement('div');
