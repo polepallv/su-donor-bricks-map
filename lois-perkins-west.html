@@ -677,15 +677,11 @@ function renderMonument() {
           onBrickClick(b, el);
         }
       });
+      if (b.lines.length) fitBrick(el);
     }
     // Filler bricks: pointer-events:none via CSS, no JS handlers
 
     mon.appendChild(el);
-    // fitBrick measures actual rendered widths, so it must run after the
-    // element is in the document -- a detached node always reports 0 for
-    // clientWidth/scrollWidth, which previously collapsed every inscription
-    // to the smallest allowed font size regardless of how much room it had.
-    if (!isFiller && b && b.lines.length) fitBrick(el);
   });
 
   const recorded = bricks.filter(b => b.lines.length > 0).length;
