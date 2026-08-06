@@ -490,14 +490,14 @@ const PERGOLA_CHAIRS = [
 
 // The "Celebrate 175 Years" commemorative floor design — 1.5x the length of a
 // big table, with its north/south edges (the width) 3x the length of its
-// west/east edges (the height). Sits east of the small table's east chair,
-// with a small gap separating them.
-const PERGOLA_DESIGN_GAP = 30;    // gap between the small table's east chair and the design
+// west/east edges (the height). Centered horizontally halfway between the
+// small table's east chair and the grey platform's east edge.
 const PERGOLA_DESIGN_W   = PT_BIG_LEN * 1.5;
 const PERGOLA_DESIGN_H   = PERGOLA_DESIGN_W / 3;
 const PERGOLA_CHAIR_EAST_EDGE = SMALL_TABLE.x + SMALL_TABLE.len + PT_CHAIR_GAP + PT_CHAIR_SIZE;
+const PERGOLA_DESIGN_CENTER_X = (PERGOLA_CHAIR_EAST_EDGE + (FLOOR.x + FLOOR.w)) / 2;
 const PERGOLA_DESIGN = {
-  x: PERGOLA_CHAIR_EAST_EDGE + PERGOLA_DESIGN_GAP,
+  x: PERGOLA_DESIGN_CENTER_X - PERGOLA_DESIGN_W / 2,
   y: PERGOLA_MID_Y - PERGOLA_DESIGN_H / 2,
   w: PERGOLA_DESIGN_W,
   h: PERGOLA_DESIGN_H,
