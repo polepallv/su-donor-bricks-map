@@ -16,7 +16,6 @@
   --bench-border:  #b8ae94;
   --floor-color:   #8d8d88;
   --floor-border:  #6d6d68;
-  --pergola-color: #0a0a0a;
   --wood-color:    #8b5a2b;
   --wood-border:   #5c3a1a;
   --design-color:  #d8cbb0;
@@ -117,8 +116,6 @@ header {
 .mon { position: relative; }
 .bench-body { position: absolute; background: var(--bench-body); border: 5px solid var(--bench-border); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .floor { position: absolute; background: var(--floor-color); border: 1px solid var(--floor-border); }
-.pergola { position: absolute; box-sizing: border-box; border: 7px solid var(--pergola-color); }
-.pergola-leg { position: absolute; width: 18px; height: 18px; background: var(--pergola-color); border-radius: 2px; }
 .pergola-table { position: absolute; background: var(--wood-color); border: 3px solid var(--wood-border); border-radius: 3px; }
 .pergola-bench { position: absolute; background: var(--wood-color); border: 2px solid var(--wood-border); border-radius: 2px; }
 .pergola-chair { position: absolute; background: var(--wood-color); border: 2px solid var(--wood-border); border-radius: 4px; }
@@ -369,11 +366,15 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
 // carries 5 plaques, evenly spaced, facing into the shared center.
 // ═══════════════════════════════════════════════════════════
 const GAP           = 4;     // visual seam between adjacent plaques
-const PLAQUE_PITCH   = 100;   // center-to-center spacing along a bench
+// Benches and plaques sized 50% bigger than the original design (pitch,
+// thickness, and bench-body margin all scaled by 1.5x); CORNER_GAP and
+// FLOOR_BEHIND_GAP (below) stay the same absolute distance so the gap at
+// each corner and the floor's margin around the benches don't change.
+const PLAQUE_PITCH   = 150;   // center-to-center spacing along a bench
 const PLAQUE_COUNT   = 5;
-const BENCH_THICK    = 60;    // bench depth (and plaque's short dimension)
-const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 500
-const BENCH_MARGIN   = 18;    // white-stone bench body is larger than the plaques it carries
+const BENCH_THICK    = 90;    // bench depth (and plaque's short dimension)
+const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 750
+const BENCH_MARGIN   = 27;    // white-stone bench body is larger than the plaques it carries
 const CORNER_GAP     = 130;   // open space between adjacent bench ends at each corner
 
 const OFFSET_X = 90, OFFSET_Y = 170; // room for the (taller) surrounding context band
@@ -398,10 +399,10 @@ const BENCHES = [
 // same size as a normal plaque, just never editable/inscribed.
 const FILLER_PLAQUES = new Set(['W,1', 'W,4']);
 
-// Each bench's inscriptions are rotated to face its own orientation: the
-// west bench reads bottom-to-top (90° counterclockwise) and the south
-// bench reads upside-down relative to the north bench (180°).
-const BENCH_ROTATION = { N: 0, W: -90, S: 180 };
+// The west bench's inscriptions are rotated to read bottom-to-top (90°
+// counterclockwise), facing along the bench's own length; north and south
+// read normally.
+const BENCH_ROTATION = { N: 0, W: -90, S: 0 };
 
 // Grey concrete floor — big enough that each bench sits entirely on it with
 // a little gap of floor showing behind (outside) it, and extends further
@@ -418,11 +419,12 @@ const FLOOR = {
   h: ((SOUTH_Y + BENCH_THICK + BENCH_MARGIN) + FLOOR_BEHIND_GAP) - ((NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP),
 };
 
-// Black rectangular pergola frame in the center — 6 legs, 3 along each of
-// its longer (north/south-facing) sides, which run parallel to the north
-// and south benches. It's inset from the benches' inner edges (not the
-// floor's, which is sized around the benches) and stretched east to read
-// as a clearly elongated rectangle rather than a square.
+// Geometric footprint for the pergola furniture area in the center (no
+// visible frame — the black perimeter frame + legs have been removed, this
+// rect now only positions the wooden tables/benches/chairs/design below).
+// It's inset from the benches' inner edges (not the floor's, which is sized
+// around the benches) and stretched east to read as a clearly elongated
+// rectangle rather than a square.
 const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 350;
 const PERGOLA = {
   x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
@@ -430,10 +432,6 @@ const PERGOLA = {
   w: (NORTH_X + BENCH_LEN + PERGOLA_EAST_EXTRA) - ((WEST_X + BENCH_THICK) + PERGOLA_INSET_X),
   h: (SOUTH_Y - PERGOLA_INSET_Y) - ((NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y),
 };
-const PERGOLA_LEGS = [0, 0.5, 1].flatMap(f => [
-  { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y },
-  { x: PERGOLA.x + PERGOLA.w * f, y: PERGOLA.y + PERGOLA.h },
-]);
 
 // Pergola furniture: 4 wooden tables placed end-to-end, touching — no gap
 // between them, just each table's own thin border — spanning most of the
@@ -620,20 +618,9 @@ function renderMonument() {
   floor.style.cssText = `left:${FLOOR.x}px;top:${FLOOR.y}px;width:${FLOOR.w}px;height:${FLOOR.h}px;`;
   mon.appendChild(floor);
 
-  // ── black pergola perimeter frame + 6 legs (no roof crossbars — the
-  // wooden tables below are what visitors actually gather around) ──
-  const pergola = document.createElement('div');
-  pergola.className = 'pergola';
-  pergola.style.cssText = `left:${PERGOLA.x}px;top:${PERGOLA.y}px;width:${PERGOLA.w}px;height:${PERGOLA.h}px;`;
-  mon.appendChild(pergola);
-  PERGOLA_LEGS.forEach(leg => {
-    const el = document.createElement('div');
-    el.className = 'pergola-leg';
-    el.style.cssText = `left:${leg.x - 9}px;top:${leg.y - 9}px;`;
-    mon.appendChild(el);
-  });
-
-  // ── wooden tables spanning the pergola's length, with benches flanking
+  // ── wooden tables spanning the pergola area's length, with benches
+  // flanking each big table and chairs beside the small east table (the
+  // black frame + legs that used to outline this area have been removed) ──
   // each big table and chairs beside the small east table ──
   PERGOLA_TABLES.forEach(t => {
     const el = document.createElement('div');
@@ -711,8 +698,12 @@ function renderMonument() {
         if (document.body.classList.contains('edit-mode')) openEditModal(b, el);
         else if (b.lines.length) onBrickClick(b, el);
       });
-      if (b.lines.length) fitBrick(wrap);
       mon.appendChild(el);
+      // fitBrick measures actual rendered widths, so it must run after the
+      // element is in the document -- a detached node always reports 0 for
+      // clientWidth/scrollWidth, which would otherwise cut text off instead
+      // of shrinking it to fit.
+      if (b.lines.length) fitBrick(wrap);
     }
   });
 
