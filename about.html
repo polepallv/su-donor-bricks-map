@@ -58,10 +58,13 @@ header {
   max-width: 880px; margin: 0 auto; padding: 40px 24px 80px;
 }
 .hero {
-  width: 100%; border-radius: 10px; overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0,0,0,.5); margin-bottom: 32px;
+  width: 50%; margin: 0 auto 32px; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
 }
 .hero img { width: 100%; height: auto; display: block; }
+@media (max-width: 640px) {
+  .hero { width: 75%; }
+}
 
 .content h2 {
   font-size: 22px; font-weight: normal; color: var(--accent);
@@ -184,7 +187,7 @@ header {
 
 <div class="content">
   <div class="hero">
-    <img src="assets/general_hero.jpg" alt="Donor brick walkway at Southwestern University">
+    <img src="assets/celebrate_175_years.jpg" alt="Celebrate 175 Years — Southwestern University commemorative artwork">
   </div>
 
   <section>
