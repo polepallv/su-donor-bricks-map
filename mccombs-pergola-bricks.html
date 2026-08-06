@@ -82,7 +82,7 @@ header {
   transition: background .15s; white-space: nowrap;
 }
 .cb:hover { background: #5a3a20; }
-.tabs { display: flex; margin-left: auto; flex-shrink: 0; }
+.tab-bar { display: flex; gap: 0; flex-shrink: 0; margin-left: auto; }
 .tab { padding: 7px 6px; cursor: pointer; font-size: 13px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
@@ -329,7 +329,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   .admin-hint { display: none; }
   .cb { padding: 5px 8px; font-size: 11px; }
 
-  .toolbar { padding: 6px 10px; }
+  .toolbar { padding: 8px 10px; }
   .sw { flex: 0 0 auto; width: 84px; min-width: 84px; overflow: hidden; transition: width .25s ease; cursor: pointer; }
   .sw.expanded { flex: 1 0 100%; width: 100%; min-width: 0; cursor: text; }
   .sw input { opacity: 0; pointer-events: none; }
@@ -345,7 +345,7 @@ body.place-mode .brick.empty:not(.filler):hover {
 
   .emodal { width: calc(100vw - 32px); min-width: 0; padding: 18px; }
   .tab { padding: 9px 11px; font-size: 12px; white-space: nowrap; }
-  .tabs { margin-left: 12px; }
+  .tab-bar { margin-left: 8px; }
 }
 </style>
 </head>
@@ -381,7 +381,7 @@ body.place-mode .brick.empty:not(.filler):hover {
   </div>
   <span id="rinfo"></span>
     <div class="tab" onclick="location.href='about.html'">About</div>
-  <div class="tabs">
+  <div class="tab-bar">
     <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
     <div class="tab on">McCombs Pergola Brick Garden</div>
     <div class="tab" onclick="location.href='lois-perkins-west.html'">Lois Perkins Peace Garden West</div>

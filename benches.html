@@ -85,7 +85,7 @@ header {
   transition: background .15s; white-space: nowrap;
 }
 .cb:hover { background: #5a3a20; }
-.tabs { display: flex; margin-left: auto; flex-shrink: 0; }
+.tab-bar { display: flex; gap: 0; flex-shrink: 0; margin-left: auto; }
 .tab { padding: 7px 6px; cursor: pointer; font-size: 13px; color: var(--muted);
        border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .tab:hover { color: var(--text); }
@@ -264,7 +264,7 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
   .admin-hint { display: none; }
   .cb { padding: 5px 8px; font-size: 11px; }
 
-  .toolbar { padding: 6px 10px; }
+  .toolbar { padding: 8px 10px; }
   .sw { flex: 0 0 auto; width: 84px; min-width: 84px; overflow: hidden; transition: width .25s ease; cursor: pointer; }
   .sw.expanded { flex: 1 0 100%; width: 100%; min-width: 0; cursor: text; }
   .sw input { opacity: 0; pointer-events: none; }
@@ -278,7 +278,7 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
   }
   .emodal { width: calc(100vw - 32px); min-width: 0; padding: 18px; }
   .tab { padding: 9px 11px; font-size: 12px; white-space: nowrap; }
-  .tabs { margin-left: 12px; }
+  .tab-bar { margin-left: 8px; }
 }
 </style>
 </head>
@@ -311,7 +311,7 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
   </div>
   <span id="rinfo"></span>
     <div class="tab" onclick="location.href='about.html'">About</div>
-  <div class="tabs">
+  <div class="tab-bar">
     <div class="tab on">McCombs Pergola Benches</div>
     <div class="tab" onclick="location.href='mccombs-pergola-bricks.html'">McCombs Pergola Brick Garden</div>
     <div class="tab" onclick="location.href='lois-perkins-west.html'">Lois Perkins Peace Garden West</div>
@@ -456,7 +456,11 @@ const PERGOLA = {
 // has no room for benches, so it gets 3 chairs instead, beside its open
 // north, east, and south sides.
 const PT_MARGIN_W    = 60;                        // west inset from the pergola wall
-const PT_BIG_LEN      = 275;                      // big table length (east-west) -- fixed, not scaled with the pergola area
+// Kept even (rather than the closer-to-derived 275) so PT_SMALL_LEN and every
+// downstream pergola/design coordinate lands on a whole pixel -- fractional
+// (.5px) edges are what caused the hairline seam artifacting between the
+// touching tables when the canvas is panned/zoomed at a non-integer scale.
+const PT_BIG_LEN      = 276;                      // big table length (east-west) -- fixed, not scaled with the pergola area
 const PT_SMALL_LEN    = PT_BIG_LEN / 2;                  // small (east) table length
 const PT_DEPTH        = 120;                      // table depth (north-south)
 const PT_BENCH_DEPTH  = 30;
@@ -633,10 +637,16 @@ function renderMonument() {
   // flanking each big table and chairs beside the small east table (the
   // black frame + legs that used to outline this area have been removed) ──
   // each big table and chairs beside the small east table ──
-  PERGOLA_TABLES.forEach(t => {
+  // Tables are meant to touch with zero visible gap, so each non-last table
+  // is drawn 1px wider than its logical length to overlap the start of the
+  // next one -- without this, a sub-pixel rounding difference between the
+  // two abutting elements' edges can flash a hairline seam of floor color
+  // while the canvas is being panned/zoomed at a non-integer scale.
+  PERGOLA_TABLES.forEach((t, i) => {
     const el = document.createElement('div');
     el.className = 'pergola-table';
-    el.style.cssText = `left:${t.x}px;top:${t.y}px;width:${t.len}px;height:${PT_DEPTH}px;`;
+    const renderLen = i < PERGOLA_TABLES.length - 1 ? t.len + 1 : t.len;
+    el.style.cssText = `left:${t.x}px;top:${t.y}px;width:${renderLen}px;height:${PT_DEPTH}px;`;
     mon.appendChild(el);
   });
   PERGOLA_BENCHES.forEach(b => {
@@ -713,12 +723,8 @@ function renderMonument() {
         if (document.body.classList.contains('edit-mode')) openEditModal(b, el);
         else if (b.lines.length) onBrickClick(b, el);
       });
-      mon.appendChild(el);
-      // fitBrick measures actual rendered widths, so it must run after the
-      // element is in the document -- a detached node always reports 0 for
-      // clientWidth/scrollWidth, which would otherwise cut text off instead
-      // of shrinking it to fit.
       if (b.lines.length) fitBrick(wrap);
+      mon.appendChild(el);
     }
   });
 
