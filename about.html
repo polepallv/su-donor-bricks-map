@@ -39,6 +39,7 @@ header {
   flex-wrap: nowrap; overflow-x: auto;
 }
 .sw { position: relative; flex: 0 1 230px; min-width: 230px; }
+#rinfo { font-size: 12px; color: var(--accent); }
 .sw input {
   width: 100%; padding: 7px 12px 7px 34px;
   background: var(--bg); border: 1px solid var(--surface2); border-radius: 18px;
@@ -57,10 +58,13 @@ header {
   max-width: 880px; margin: 0 auto; padding: 40px 24px 80px;
 }
 .hero {
-  width: 100%; border-radius: 10px; overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0,0,0,.5); margin-bottom: 32px;
+  width: 50%; margin: 0 auto 32px; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
 }
 .hero img { width: 100%; height: auto; display: block; }
+@media (max-width: 640px) {
+  .hero { width: 75%; }
+}
 
 .content h2 {
   font-size: 22px; font-weight: normal; color: var(--accent);
@@ -171,6 +175,7 @@ header {
     <span class="sw-collapsed-label">Search</span>
     <input id="search" type="text" placeholder="Search name, class year, etc…" autocomplete="off">
   </div>
+  <span id="rinfo"></span>
   <div class="tab active">About</div>
   <div class="tab-bar">
     <div class="tab" onclick="location.href='benches.html'">McCombs Pergola Benches</div>
@@ -182,7 +187,7 @@ header {
 
 <div class="content">
   <div class="hero">
-    <img src="assets/general_hero.jpg" alt="Donor brick walkway at Southwestern University">
+    <img src="assets/celebrate_175_years.jpg" alt="Celebrate 175 Years — Southwestern University commemorative artwork">
   </div>
 
   <section>
