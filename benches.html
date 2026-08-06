@@ -421,7 +421,7 @@ const FLOOR_BEHIND_GAP = 30;   // floor visible behind each bench's outer edge
 // How far past the benches the floor reaches east. Big enough to also fit
 // the pergola furniture's east-side chair and commemorative floor design
 // (see PERGOLA_DESIGN below) with a small gap before the floor's own east edge.
-const FLOOR_EAST_EXTRA  = 470;
+const FLOOR_EAST_EXTRA  = 720;
 const FLOOR = {
   x: (WEST_X - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
   y: (NORTH_Y - BENCH_MARGIN) - FLOOR_BEHIND_GAP,
@@ -435,7 +435,7 @@ const FLOOR = {
 // It's inset from the benches' inner edges (not the floor's, which is sized
 // around the benches) and stretched east to read as a clearly elongated
 // rectangle rather than a square.
-const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 350;
+const PERGOLA_INSET_X = 100, PERGOLA_INSET_Y = 130, PERGOLA_EAST_EXTRA = 600;
 const PERGOLA = {
   x: (WEST_X + BENCH_THICK) + PERGOLA_INSET_X,
   y: (NORTH_Y + BENCH_THICK) + PERGOLA_INSET_Y,
@@ -455,7 +455,7 @@ const PERGOLA = {
 // north and south long side (3 tables x 2 = 6 benches); the small table
 // has no room for benches, so it gets 3 chairs instead, beside its open
 // north, east, and south sides.
-const PT_MARGIN_W    = 20;                        // west inset from the pergola wall
+const PT_MARGIN_W    = 60;                        // west inset from the pergola wall
 const PT_BIG_LEN      = 275;                      // big table length (east-west) -- fixed, not scaled with the pergola area
 const PT_SMALL_LEN    = PT_BIG_LEN / 2;                  // small (east) table length
 const PT_DEPTH        = 120;                      // table depth (north-south)
@@ -488,12 +488,12 @@ const PERGOLA_CHAIRS = [
   { x: SMALL_TABLE.x + SMALL_TABLE.len / 2 - PT_CHAIR_SIZE / 2, y: SMALL_TABLE.y + PT_DEPTH + PT_CHAIR_GAP },                    // south
 ];
 
-// The "Celebrate 175 Years" commemorative floor design — 3/4 the size of a
+// The "Celebrate 175 Years" commemorative floor design — 1.5x the length of a
 // big table, with its north/south edges (the width) 3x the length of its
 // west/east edges (the height). Sits east of the small table's east chair,
 // with a small gap separating them.
 const PERGOLA_DESIGN_GAP = 30;    // gap between the small table's east chair and the design
-const PERGOLA_DESIGN_W   = PT_BIG_LEN * 0.75;
+const PERGOLA_DESIGN_W   = PT_BIG_LEN * 1.5;
 const PERGOLA_DESIGN_H   = PERGOLA_DESIGN_W / 3;
 const PERGOLA_CHAIR_EAST_EDGE = SMALL_TABLE.x + SMALL_TABLE.len + PT_CHAIR_GAP + PT_CHAIR_SIZE;
 const PERGOLA_DESIGN = {
