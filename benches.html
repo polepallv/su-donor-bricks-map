@@ -121,8 +121,14 @@ header {
 .pergola-chair { position: absolute; background: var(--wood-color); border: 2px solid var(--wood-border); border-radius: 4px; }
 .pergola-design {
   position: absolute; background-color: var(--design-color); border: 2px solid var(--design-border); border-radius: 2px;
-  background-image: url('assets/celebrate_175_years.jpg'); background-size: contain;
-  background-repeat: no-repeat; background-position: center;
+  overflow: hidden;
+}
+/* Sized as the pre-rotation (swapped) box and rotated 90° so the artwork
+   fills the design's full elongated rectangle edge-to-edge instead of
+   being letterboxed. */
+.pergola-design-img {
+  position: absolute; top: 50%; left: 50%;
+  background-image: url('assets/celebrate_175_years.jpg'); background-size: cover; background-position: center;
 }
 .ctx-building {
   position: absolute; background: var(--bench-border); border: 1px solid #8a8168; border-radius: 4px;
@@ -370,15 +376,15 @@ body.edit-mode .brick.empty:hover { opacity: 1; box-shadow: 0 0 0 2px var(--admi
 // carries 5 plaques, evenly spaced, facing into the shared center.
 // ═══════════════════════════════════════════════════════════
 const GAP           = 4;     // visual seam between adjacent plaques
-// Benches and plaques sized 50% bigger than the original design (pitch,
-// thickness, and bench-body margin all scaled by 1.5x); CORNER_GAP and
+// Benches and plaques sized 100% bigger than the original design (pitch,
+// thickness, and bench-body margin all scaled by 2x); CORNER_GAP and
 // FLOOR_BEHIND_GAP (below) stay the same absolute distance so the gap at
 // each corner and the floor's margin around the benches don't change.
-const PLAQUE_PITCH   = 150;   // center-to-center spacing along a bench
+const PLAQUE_PITCH   = 200;   // center-to-center spacing along a bench
 const PLAQUE_COUNT   = 5;
-const BENCH_THICK    = 90;    // bench depth (and plaque's short dimension)
-const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 750
-const BENCH_MARGIN   = 27;    // white-stone bench body is larger than the plaques it carries
+const BENCH_THICK    = 120;   // bench depth (and plaque's short dimension)
+const BENCH_LEN      = PLAQUE_COUNT * PLAQUE_PITCH; // 1000
+const BENCH_MARGIN   = 36;    // white-stone bench body is larger than the plaques it carries
 const CORNER_GAP     = 130;   // open space between adjacent bench ends at each corner
 
 const OFFSET_X = 90, OFFSET_Y = 170; // room for the (taller) surrounding context band
@@ -438,18 +444,19 @@ const PERGOLA = {
 };
 
 // Pergola furniture: 4 wooden tables placed end-to-end, touching — no gap
-// between them, just each table's own thin border — spanning most of the
-// pergola's east-west length: 3 equal "big" tables plus a 4th (easternmost)
-// table half their length. The table block is inset from the pergola's west
-// and east walls so the tables sit comfortably inside the frame rather than
-// crowding it; the east inset is deliberately larger, leaving room for the
-// small table's east chair and the commemorative design beyond it (see
-// below). Each big table gets a bench along its north and south long side
-// (3 tables x 2 = 6 benches); the small table has no room for benches, so it
-// gets 3 chairs instead, beside its open north, east, and south sides.
+// between them, just each table's own thin border — 3 equal "big" tables
+// plus a 4th (easternmost) table half their length. Table size is fixed
+// (not derived from the pergola area's width) so that as the surrounding
+// benches grow, the furniture doesn't automatically balloon along with
+// them — it stays a reasonable, human-scale size, just with more open
+// floor around it. The block is inset from the pergola's west wall; the
+// small table's east chair and the commemorative design (see below) sit
+// further east with their own gaps. Each big table gets a bench along its
+// north and south long side (3 tables x 2 = 6 benches); the small table
+// has no room for benches, so it gets 3 chairs instead, beside its open
+// north, east, and south sides.
 const PT_MARGIN_W    = 20;                        // west inset from the pergola wall
-const PT_MARGIN_E    = 150;                       // east inset — room for the chair + design below
-const PT_BIG_LEN      = (PERGOLA.w - PT_MARGIN_W - PT_MARGIN_E) / 3.5;  // big table length (east-west)
+const PT_BIG_LEN      = 275;                      // big table length (east-west) -- fixed, not scaled with the pergola area
 const PT_SMALL_LEN    = PT_BIG_LEN / 2;                  // small (east) table length
 const PT_DEPTH        = 120;                      // table depth (north-south)
 const PT_BENCH_DEPTH  = 30;
@@ -481,16 +488,16 @@ const PERGOLA_CHAIRS = [
   { x: SMALL_TABLE.x + SMALL_TABLE.len / 2 - PT_CHAIR_SIZE / 2, y: SMALL_TABLE.y + PT_DEPTH + PT_CHAIR_GAP },                    // south
 ];
 
-// A blank placeholder for a custom commemorative design (to be recreated
-// from an image provided separately) — 3/4 the size of a big table, with
-// its north/south edges (the width) 3x the length of its west/east edges
-// (the height). Centered on the pergola's east frame edge, so roughly half
-// of it sits under the pergola roof and half sits out in the open — with a
-// real gap still separating it from the small table's east chair.
+// The "Celebrate 175 Years" commemorative floor design — 3/4 the size of a
+// big table, with its north/south edges (the width) 3x the length of its
+// west/east edges (the height). Sits east of the small table's east chair,
+// with a small gap separating them.
+const PERGOLA_DESIGN_GAP = 30;    // gap between the small table's east chair and the design
 const PERGOLA_DESIGN_W   = PT_BIG_LEN * 0.75;
 const PERGOLA_DESIGN_H   = PERGOLA_DESIGN_W / 3;
+const PERGOLA_CHAIR_EAST_EDGE = SMALL_TABLE.x + SMALL_TABLE.len + PT_CHAIR_GAP + PT_CHAIR_SIZE;
 const PERGOLA_DESIGN = {
-  x: (PERGOLA.x + PERGOLA.w) - PERGOLA_DESIGN_W / 2,
+  x: PERGOLA_CHAIR_EAST_EDGE + PERGOLA_DESIGN_GAP,
   y: PERGOLA_MID_Y - PERGOLA_DESIGN_H / 2,
   w: PERGOLA_DESIGN_W,
   h: PERGOLA_DESIGN_H,
@@ -646,10 +653,14 @@ function renderMonument() {
   });
 
   // ── commemorative floor design — the "Celebrate 175 Years" artwork,
-  // cropped to cover this elongated slot ──
+  // rotated 90° and covering the full elongated slot ──
   const design = document.createElement('div');
   design.className = 'pergola-design';
   design.style.cssText = `left:${PERGOLA_DESIGN.x}px;top:${PERGOLA_DESIGN.y}px;width:${PERGOLA_DESIGN.w}px;height:${PERGOLA_DESIGN.h}px;`;
+  const designImg = document.createElement('div');
+  designImg.className = 'pergola-design-img';
+  designImg.style.cssText = `width:${PERGOLA_DESIGN.h}px;height:${PERGOLA_DESIGN.w}px;transform:translate(-50%, -50%) rotate(-90deg);`;
+  design.appendChild(designImg);
   mon.appendChild(design);
 
   // ── benches: thick white-stone border, larger than the plaques on them ──
