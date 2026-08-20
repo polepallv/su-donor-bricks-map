@@ -919,11 +919,11 @@ function exportCSV() {
 // TOAST
 // ═══════════════════════════════════════════════════════════
 let toastTimer;
-function toast(msg) {
+function toast(msg, ms) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  toastTimer = setTimeout(() => el.classList.remove('show'), ms || 2400);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1021,7 +1021,9 @@ function saveBrickEdit() {
   allEdits[key]   = { lines };
   saveLocalEdits();
 
-  if (GAS_URL) gasSet(SECTION_ID, key, lines, b.colspan);
+  if (GAS_URL) gasSet(SECTION_ID, key, lines, b.colspan, (ok, err) => {
+    if (!ok) toast('⚠ Saved on this device only — sync to shared sheet failed (' + (err || 'network error') + ')', 6000);
+  });
 
   document.getElementById('mon').innerHTML = '';
   renderMonument();
@@ -1059,11 +1061,19 @@ document.getElementById('editOverlay').addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════
 // GAS HELPERS
 // ═══════════════════════════════════════════════════════════
-function gasSet(section, key, lines, size) {
-  if (!GAS_URL) return;
-  const cb = '_gsCb' + Date.now();
+function gasSet(section, key, lines, size, onResult) {
+  if (!GAS_URL) { onResult && onResult(false, 'GAS_URL not configured'); return; }
+  const cb = '_gsCb' + Date.now() + Math.random().toString(36).slice(2);
   const s  = document.createElement('script');
-  window[cb] = function() { delete window[cb]; s.parentNode && s.parentNode.removeChild(s); };
+  let done = false;
+  const finish = (ok, err) => {
+    if (done) return; done = true;
+    clearTimeout(timer); delete window[cb]; s.parentNode && s.parentNode.removeChild(s);
+    onResult && onResult(ok, err);
+  };
+  window[cb] = resp => finish(!resp || !resp.error, resp && resp.error);
+  s.onerror = () => finish(false, 'network error');
+  const timer = setTimeout(() => finish(false, 'timed out'), 8000);
   const params = { action: 'set', section, key, size: size || 2, token: ADMIN_PASS, callback: cb };
   for (let i = 0; i < 12; i++) params['l' + (i + 1)] = lines[i] || '';
   const p = new URLSearchParams(params);
@@ -1179,8 +1189,11 @@ function finalizeBrickMove(toRow, toCol) {
   saveLocalEdits();
 
   if (GAS_URL) {
-    gasSet(SECTION_ID, fromKey, fromB.lines, fromB.colspan);
-    gasSet(SECTION_ID, toKey, toB.lines, toB.colspan);
+    const onSwapResult = (ok, err) => {
+      if (!ok) toast('⚠ Moved on this device only — sync to shared sheet failed (' + (err || 'network error') + ')', 6000);
+    };
+    gasSet(SECTION_ID, fromKey, fromB.lines, fromB.colspan, onSwapResult);
+    gasSet(SECTION_ID, toKey, toB.lines, toB.colspan, onSwapResult);
   }
 
   document.getElementById('mon').innerHTML = '';
