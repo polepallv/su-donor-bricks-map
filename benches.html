@@ -1049,7 +1049,14 @@ function initWithGAS() {
 // EXPORT UPDATED HTML
 // ═══════════════════════════════════════════════════════════
 function exportHTML() {
-  const merged = Object.assign({}, INITIAL_EDITS, localEdits);
+  // Export exactly what's currently rendered on screen (the same merge of
+  // baked-in, synced-from-Sheet, and this-browser's-local edits that
+  // initWithGAS() computes into allEdits) -- not just INITIAL_EDITS +
+  // localEdits, which silently dropped every edit that only exists in the
+  // shared Google Sheet (remoteEdits) and was never also saved to this
+  // specific browser's localStorage, truncating most multi-line bricks
+  // down to whatever partial text happened to be cached locally.
+  const merged = allEdits;
   let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
   html = html.replace('const INITIAL_EDITS = {};', 'const INITIAL_EDITS = ' + JSON.stringify(merged, null, 2) + ';');
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
